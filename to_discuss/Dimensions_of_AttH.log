@@ -1,0 +1,68 @@
+2024-03-25 19:31:33 INFO     ### Saving logs in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results ###
+2024-03-25 19:31:33 INFO     Sampling 1 subgraphs with a relative size (0.6, 0.7) from WN18RR with Entity sampling
+2024-03-25 19:31:34 INFO     -/	Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\sub_000 from WN18RR with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-03-25 19:31:34 INFO     Enforcing 40559 entities to be present in the subgraph.
+2024-03-25 19:31:39 INFO     Current subgraph size 0.7004203374215466 reached or exceeded target size 0.7.
+2024-03-25 19:31:39 INFO     Created subgraph 0 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7004203374215466.
+2024-03-25 19:31:40 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\subgraph_config.csv for subgraph 000	/-
+
+2024-03-25 19:31:40 INFO     ### Successfully created 1 subgraphs of the relative size (0.6, 0.7) from the original KG "WN18RR" in a total of 6.62 seconds (avg: 6.62 sec) ###
+2024-03-25 19:31:40 INFO     ### Saving .json config files of models in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\model_setup_configs ###
+2024-03-25 19:31:40 INFO     ### Saving .pt files of stored models in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\model_files ###
+2024-03-25 19:31:40 INFO     -/	Setting up embedding models	\-
+2024-03-25 19:31:40 INFO     All subgraphs will be embedded by TransE
+2024-03-25 19:31:40 INFO     Setting AttH as embedding method for subgraph sub_000
+2024-03-25 19:31:40 INFO     Mapping from embedding methods to subgraphs: {'AttH': [0]}
+2024-03-25 19:31:40 INFO     No already trained models found.
+2024-03-25 19:31:40 INFO     -/	Creating new model from embedding method AttH for subgraph sub_000	\-
+2024-03-25 19:31:40 INFO     Loading data fom subgraph sub_000.
+2024-03-25 19:31:41 INFO     -\	Total number of parameters: 2706484	/-
+2024-03-25 19:31:41 INFO     -\	Successfully created all models in 0.672 seconds / 0.011 minutes	/-
+2024-03-25 19:31:41 INFO     -/	Starting training	\-
+2024-03-25 19:31:41 INFO     -/	Start training sub_000 with AttH	\-
+2024-03-25 19:32:02 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 0.1402
+2024-03-25 19:32:02 INFO     Subgraph sub_000 Validation Epoch 0 | average train loss: 0.0992
+2024-03-25 19:32:19 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 0.0739
+2024-03-25 19:32:19 INFO     Subgraph sub_000 Validation Epoch 1 | average train loss: 0.0947
+2024-03-25 19:32:35 INFO     Subgraph sub_000 Training Epoch 2 | average train loss: 0.0550
+2024-03-25 19:32:35 INFO     Subgraph sub_000 Validation Epoch 2 | average train loss: 0.0936
+2024-03-25 19:32:35 INFO     Saving model at epoch 2 in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results
+2024-03-25 19:32:51 INFO     Subgraph sub_000 Training Epoch 3 | average train loss: 0.0448
+2024-03-25 19:32:52 INFO     Subgraph sub_000 Validation Epoch 3 | average train loss: 0.0940
+2024-03-25 19:33:08 INFO     Subgraph sub_000 Training Epoch 4 | average train loss: 0.0386
+2024-03-25 19:33:08 INFO     Subgraph sub_000 Validation Epoch 4 | average train loss: 0.0949
+2024-03-25 19:33:24 INFO     Subgraph sub_000 Training Epoch 5 | average train loss: 0.0347
+2024-03-25 19:33:24 INFO     Subgraph sub_000 Validation Epoch 5 | average train loss: 0.0959
+2024-03-25 19:33:24 INFO     Saving model at epoch 5 in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results
+2024-03-25 19:33:40 INFO     Subgraph sub_000 Training Epoch 6 | average train loss: 0.0319
+2024-03-25 19:33:40 INFO     Subgraph sub_000 Validation Epoch 6 | average train loss: 0.0968
+2024-03-25 19:33:57 INFO     Subgraph sub_000 Training Epoch 7 | average train loss: 0.0299
+2024-03-25 19:33:57 INFO     Subgraph sub_000 Validation Epoch 7 | average train loss: 0.0979
+2024-03-25 19:34:13 INFO     Subgraph sub_000 Training Epoch 8 | average train loss: 0.0284
+2024-03-25 19:34:13 INFO     Subgraph sub_000 Validation Epoch 8 | average train loss: 0.0989
+2024-03-25 19:34:13 INFO     Saving model at epoch 8 in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results
+2024-03-25 19:34:29 INFO     Subgraph sub_000 Training Epoch 9 | average train loss: 0.0273
+2024-03-25 19:34:29 INFO     Subgraph sub_000 Validation Epoch 9 | average train loss: 0.0998
+2024-03-25 19:34:46 INFO     Subgraph sub_000 Training Epoch 10 | average train loss: 0.0263
+2024-03-25 19:34:46 INFO     Subgraph sub_000 Validation Epoch 10 | average train loss: 0.1006
+2024-03-25 19:35:02 INFO     Subgraph sub_000 Training Epoch 11 | average train loss: 0.0255
+2024-03-25 19:35:02 INFO     Subgraph sub_000 Validation Epoch 11 | average train loss: 0.1015
+2024-03-25 19:35:02 INFO     Saving model at epoch 11 in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results
+2024-03-25 19:35:02 INFO     Saving new model saved at epoch None
+D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\model_files\model_sub_000_AttH.pt
+2024-03-25 19:35:02 INFO     -\	Training and optimization of model AttH for subgraph sub_000 finished in 201.302 seconds / 3.355 minutes	/-
+2024-03-25 19:35:02 INFO     -\	Successfully finished training and optimizing all subgraphs in 201.328 seconds / 3.355 minutes	/-
+2024-03-25 19:35:02 INFO     Updated mapping from subgraphs to embedding methods in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\subgraph_embedding_mapping.json.
+2024-03-25 19:35:02 INFO     Updated mapping from embedding methods to subgraphs in D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N1_min0.6\results\embedding_subgraph_mapping.json.
+2024-03-25 19:35:02 INFO     Calculating self-attention for sub_000 (AttH)
+2024-03-25 19:35:02 ERROR    Traceback (most recent call last):
+  File "D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\run_ensemble_embedding.py", line 110, in <module>
+    KGEmb.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+  File "D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\run.py", line 495, in own_train
+    Attention_mechanism.calculate_self_attention(embedding_model)
+  File "D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\Attention_mechanism.py", line 23, in calculate_self_attention
+    embedding_model["att_weights_rel"] = torch.sum(contex_vec_rel * embedding_rel * scale, dim=-1, keepdim=True)
+                                                   ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+RuntimeError: The size of tensor a (32) must match the size of tensor b (64) at non-singleton dimension 1
+
