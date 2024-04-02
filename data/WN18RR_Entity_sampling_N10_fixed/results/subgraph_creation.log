@@ -1,0 +1,65 @@
+2024-03-11 12:46:44 INFO     
+### Saving logs in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results ###
+2024-03-11 12:46:44 INFO     Sampling 10 subgraphs with a relative size (0.2, 0.7) from WN18RR with Entity sampling
+2024-03-11 12:46:45 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_000 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:47:45 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:47:45 INFO     -\ Created subgraph 0 with 2807 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:47:45 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 000
+2024-03-11 12:47:46 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_001 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:48:35 INFO     Current subgraph size 0.7000172741406115 reached or exceeded target size 0.7.
+2024-03-11 12:48:35 INFO     -\ Created subgraph 1 with 408 entities and 0 relation names left unused and a relative subgraph size 0.7000172741406115. --
+
+2024-03-11 12:48:36 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 001
+2024-03-11 12:48:36 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_002 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:49:27 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:49:27 INFO     -\ Created subgraph 2 with 74 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:49:28 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 002
+2024-03-11 12:49:28 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_003 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:50:21 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:50:21 INFO     -\ Created subgraph 3 with 18 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:50:22 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 003
+2024-03-11 12:50:22 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_004 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:51:15 INFO     Current subgraph size 0.7000172741406115 reached or exceeded target size 0.7.
+2024-03-11 12:51:15 INFO     -\ Created subgraph 4 with 2 entities and 0 relation names left unused and a relative subgraph size 0.7000172741406115. --
+
+2024-03-11 12:51:16 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 004
+2024-03-11 12:51:16 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_005 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:52:10 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:52:10 INFO     -\ Created subgraph 5 with 1 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:52:11 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 005
+2024-03-11 12:52:11 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_006 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:53:06 INFO     Current subgraph size 0.7000172741406115 reached or exceeded target size 0.7.
+2024-03-11 12:53:06 INFO     -\ Created subgraph 6 with 1 entities and 0 relation names left unused and a relative subgraph size 0.7000172741406115. --
+
+2024-03-11 12:53:07 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 006
+2024-03-11 12:53:07 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_007 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:53:07 INFO     Enforcing 1 entities to be present in the subgraph.
+2024-03-11 12:54:03 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:54:03 INFO     -\ Created subgraph 7 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:54:04 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 007
+2024-03-11 12:54:04 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_008 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:54:59 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:54:59 INFO     -\ Created subgraph 8 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:54:59 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 008
+2024-03-11 12:55:00 INFO     -/ Sampling subgraph KGEmb\data\WN18RR_Entity_sampling_N10\sub_009 from WN18RR with params:
+		Entity sampling and (0.2, 0.7) relative subgraph size. --
+2024-03-11 12:55:55 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-03-11 12:55:55 INFO     -\ Created subgraph 9 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705. --
+
+2024-03-11 12:55:56 INFO     Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding\KGEmb\data\WN18RR_Entity_sampling_N10\results\Entity_sampling_config.csv for subgraph 009
+2024-03-11 12:55:56 INFO     ### Successfully created 10 subgraphs of the relative size (0.2, 0.7) from the original KG "WN18RR" in a total of 551.437 seconds (avg: 55.144 sec) ###

@@ -1,0 +1,4 @@
+2024-04-02 22:06:25 INFO     ### Saving logs in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\YAGO3-10_Entity_sampling_N10_min0.6\results ###
+2024-04-02 22:06:25 INFO     Sampling 10 subgraphs with a relative size (0.6, 0.7) from YAGO3-10 with Entity sampling
+2024-04-02 22:06:32 INFO     -/	Sampling subgraph data\YAGO3-10_Entity_sampling_N10_min0.6\sub_000 from YAGO3-10 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-

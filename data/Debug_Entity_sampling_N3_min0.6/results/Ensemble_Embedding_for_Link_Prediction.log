@@ -1,0 +1,25 @@
+2024-04-02 18:55:44 INFO     ### Saving logs in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\Debug_Entity_sampling_N3_min0.6\results ###
+2024-04-02 18:55:44 INFO     Sampling 3 subgraphs with a relative size (0.6, 0.7) from Debug with Entity sampling
+2024-04-02 18:55:44 INFO     -/	Sampling subgraph data\Debug_Entity_sampling_N3_min0.6\sub_000 from Debug with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-02 18:55:44 INFO     Enforcing 50 entities to be present in the subgraph.
+2024-04-02 18:55:44 INFO     Current subgraph size 0.7005 reached or exceeded target size 0.7.
+2024-04-02 18:55:44 INFO     Created subgraph 0 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7005.
+2024-04-02 18:55:44 CRITICAL Length of delta: 1401	Duplicates removed from delta: 0
+2024-04-02 18:55:44 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\Debug_Entity_sampling_N3_min0.6\results\subgraph_config.csv for subgraph 000	/-
+
+2024-04-02 18:55:44 INFO     -/	Sampling subgraph data\Debug_Entity_sampling_N3_min0.6\sub_001 from Debug with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-02 18:55:45 INFO     Current subgraph size 0.7005 reached or exceeded target size 0.7.
+2024-04-02 18:55:45 INFO     Created subgraph 1 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7005.
+2024-04-02 18:55:45 CRITICAL Length of delta: 1401	Duplicates removed from delta: 0
+2024-04-02 18:55:45 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\Debug_Entity_sampling_N3_min0.6\results\subgraph_config.csv for subgraph 001	/-
+
+2024-04-02 18:55:45 INFO     -/	Sampling subgraph data\Debug_Entity_sampling_N3_min0.6\sub_002 from Debug with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-02 18:55:45 INFO     Current subgraph size 0.7005 reached or exceeded target size 0.7.
+2024-04-02 18:55:45 INFO     Created subgraph 2 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7005.
+2024-04-02 18:55:45 CRITICAL Length of delta: 1401	Duplicates removed from delta: 0
+2024-04-02 18:55:45 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\Debug_Entity_sampling_N3_min0.6\results\subgraph_config.csv for subgraph 002	/-
+
+2024-04-02 18:55:45 INFO     ### Successfully created 3 subgraphs of the relative size (0.6, 0.7) from the original KG "Debug" in a total of 0.56 seconds (avg: 0.187 sec) ###

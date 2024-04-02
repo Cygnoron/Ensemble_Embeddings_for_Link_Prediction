@@ -1,0 +1,2 @@
+original_kg;sampling_method;relation_names_rho;directory;sampling_time;subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;subgraph_entities_amount;subgraph_relation_names_amount;subgraph_relation_names
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.6\sub_000;44.221;(0.6, 0.7);0.7;0;60785;39609;11;[1, 4, 3, 5, 6, 2, 10, 8, 0, 7, 9]

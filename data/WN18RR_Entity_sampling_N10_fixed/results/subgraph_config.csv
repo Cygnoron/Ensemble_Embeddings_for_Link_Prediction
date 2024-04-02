@@ -1,0 +1,11 @@
+original_kg;sampling_method;relation_names_rho;directory;sampling_time;subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;subgraph_entities_amount;subgraph_relation_names_amount;subgraph_relation_names;embedded_by
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_000;60.592;(0.2, 0.7);0.7;0;60785;37752;11;[5, 3, 0, 1, 4, 6, 2, 8, 10, 7, 9];[TransE, RotatE]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_001;50.248;(0.2, 0.7);0.7;1;60786;37796;11;[4, 10, 9, 1, 6, 3, 7, 2, 5, 8, 0];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_002;51.891;(0.2, 0.7);0.7;2;60785;37762;11;[1, 4, 10, 6, 5, 3, 7, 0, 2, 8, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_003;53.683;(0.2, 0.7);0.7;3;60785;37853;11;[4, 6, 3, 5, 10, 1, 7, 0, 2, 8, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_004;53.551;(0.2, 0.7);0.7;4;60786;37804;11;[4, 1, 6, 7, 3, 10, 5, 8, 0, 2, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_005;55.109;(0.2, 0.7);0.7;5;60785;37842;11;[4, 1, 3, 10, 6, 5, 2, 0, 7, 8, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_006;55.965;(0.2, 0.7);0.7;6;60786;37816;11;[4, 6, 7, 1, 5, 3, 10, 0, 2, 8, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_007;56.419;(0.2, 0.7);0.7;7;60785;37919;11;[7, 4, 3, 1, 6, 0, 5, 8, 2, 10, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_008;55.539;(0.2, 0.7);0.7;8;60785;37839;11;[7, 4, 6, 1, 3, 10, 5, 0, 2, 8, 9];[]
+WN18RR;Entity sampling;11;KGEmb\data\WN18RR_Entity_sampling_N10\sub_009;56.286;(0.2, 0.7);0.7;9;60785;37810;11;[1, 6, 4, 10, 5, 3, 7, 2, 0, 9, 8];[]
