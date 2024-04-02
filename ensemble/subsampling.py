@@ -14,8 +14,9 @@ from tqdm import tqdm
 from ensemble import Constants, util, util_files
 from ensemble.util import get_unique_triple_ids
 
-
 # from util import get_unique_triple_ids
+
+removed_ids_counter = 0
 
 
 def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sampling_method, subgraph_amount=10,
@@ -34,6 +35,8 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     :param relation_name_amount: how many entities should be selected compared to relation names, only applied in FEATURE_SAMPLING
     :param max_indices_per_step: The max amount of indices that may be sampled per step. (int or "max")
     """
+
+    global removed_ids_counter
 
     util_files.delete_paths(f"{info_directory}", "Ensemble_Embedding_for_Link_Prediction.log")
     dataset_in_train = f"data\\{dataset_in}\\train"
@@ -109,7 +112,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 # Initialize a mask with False values
                 mask = np.zeros(len(data), dtype=bool)
                 # Set mask to True for all indices in delta_triples
-                mask[delta_triples] = True
+                mask[list(delta_triples)] = True
                 # Use the mask to select only the wanted triples
                 sampled_data = [data[i] for i in range(len(data)) if mask[i]]
 
@@ -145,7 +148,11 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                                       f"{round(len(delta_triples) / len(data), 3)};{subgraph_num};"
                                       f"{len(delta_triples)};{len(used_entity_set)};{len(used_relation_name_set)};"
                                       f"{subgraph_relation_names}")
-                    logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}\t/-\n")
+                    logging.critical(f"Length of delta: {len(delta_triples)}\t"
+                                     f"Unnecessary sampling steps: {removed_ids_counter}")
+                    logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}, "
+                                 f"sampling took {round(time_stop_sub - time_start_sub, 3)} sec\t/-\n")
+                    removed_ids_counter = 0
 
     except FileNotFoundError:
         if not init_successful:
@@ -185,7 +192,8 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
     """
 
     # initialize general variables
-    delta = np.shape(1)
+    # delta = []
+    delta = set()
     samples = []
     enforce_relation_names = False
     enforce_entities = False
@@ -358,6 +366,10 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
     :return: The updated samples, delta, entity_ids_unused, and relation_name_ids_unused.
     """
 
+    global removed_ids_counter
+    unique_before = 0
+    unique_after = 0
+
     try:
         # -- enforce relation names in case of Entity sampling --
         if (enforce_relation_names and sampling_method == Constants.ENTITY_SAMPLING and
@@ -369,7 +381,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
                 # sample = random.choice(list(relation_name_set[enforced_relation_name_id]))
                 sample = relation_name_set[enforced_relation_name_id].pop()
                 # add sampled triple index to delta
-                delta = np.append(delta, sample).flatten().astype(int)
+                delta.add(sample)
 
                 # get head entity, relation name and tail entity of sampled triple
                 head_entity, relation_name, tail_entity = dataset[sample]
@@ -399,7 +411,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
                     sample = entity_set[enforced_entity_id].pop()
 
                     # add sampled triple index to delta
-                    delta = np.append(delta, sample).flatten().astype(int)
+                    delta.add(sample)
 
                     # get head entity, relation name and tail entity of sampled triple
                     head_entity, relation_name, tail_entity = dataset[sample]
@@ -443,13 +455,22 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         if len(sampling_set[sample]) == 0 or sampling_set[sample] == set():
             del sampling_set[sample]
         # add all indices of the sample to delta
-        delta = np.append(delta, list(sample_triple_indices)).flatten().astype(int)
+        unique_before = len(delta)
+        delta.update(sample_triple_indices)
+        unique_after = len(delta)
+
         # remove sample from entity_ids_unused and relation_name_ids_unused
         for index, triple in enumerate(dataset[list(sample_triple_indices)]):
             # get head entity, relation name and tail entity of sampled triple
             head_entity, relation_name, tail_entity = triple
 
-            relation_name_set[relation_name].discard(sample)
+            # remove remaining triple indices from entity and relation name sets
+            if head_entity in entity_set:
+                entity_set[head_entity].discard(sample)
+            if relation_name in relation_name_set:
+                relation_name_set[relation_name].discard(sample)
+            if tail_entity in entity_set:
+                entity_set[tail_entity].discard(sample)
 
             # remove head entity from list of unused entities
             if head_entity in entity_ids_unused:
@@ -467,14 +488,19 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         else:
             relation_name_set = sampling_set
 
-    except IndexError or KeyError:
-        logging.error("Received KeyError or IndexError")
+    except IndexError:
+        logging.error("Received IndexError")
+    # except KeyError as key:
+    #     logging.error(f"Received KeyError with key {key}")
 
     except Exception as error:
-        logging.error(f"{error}")
+        logging.error(f"{error}\t{traceback.format_exc()}")
 
     # ensure delta only has unique triple indices
-    # delta = np.unique(delta)
+
+    if unique_before == unique_after:
+        removed_ids_counter += 1
+        # logging.critical(f"No indices were added to delta")
 
     # update progress bar
     progress_bar.n = len(delta)
