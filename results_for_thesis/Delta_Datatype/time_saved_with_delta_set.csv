@@ -1,0 +1,18 @@
+﻿;Numpy Array;set
+Time per subgraph in seconds;643.529;158.346
+;693.980;162.817
+;763.536;191.002
+;627.618;190.600
+;634.902;190.708
+;666.152;193.591
+;728.203;192.979
+;716.387;197.678
+;691.769;193.399
+;723.257;196.273
+;;
+Average;688.933;186.739
+;;
+Improvement over Numpy Array;368.928%;
+Total time saved in seconds;5021.940;
+Total time saved in minutes;83.699;
+Total time saved in hours;1.395;
