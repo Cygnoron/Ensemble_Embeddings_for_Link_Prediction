@@ -30,8 +30,11 @@ def avg_both(mrs, mrrs, hits, amris, mr_deviations):
     mr = (mrs['lhs'] + mrs['rhs']) / 2.
     mrr = (mrrs['lhs'] + mrrs['rhs']) / 2.
     h = (hits['lhs'] + hits['rhs']) / 2.
+
+    # added AMRI and MR_deviation
     amri = (amris['lhs'] + amris['rhs']) / 2.
     mr_deviation = (mr_deviations['lhs'] + mr_deviations['rhs']) / 2.
+
     return {'MR': mr, 'MRR': mrr, 'hits@[1,3,10]': h, 'AMRI': amri, 'MR_deviation': mr_deviation}
 
 
@@ -42,6 +45,10 @@ def format_metrics(metrics, split):
     result += "H@1: {:.3f} | ".format(metrics['hits@[1,3,10]'][0])
     result += "H@3: {:.3f} | ".format(metrics['hits@[1,3,10]'][1])
     result += "H@10: {:.3f}".format(metrics['hits@[1,3,10]'][2])
+
+    # added AMRI and MR_deviation
+    result += "AMRI: {:.3f} | ".format(metrics['AMRI'])
+    result += "MR_deviation: {:.3f} | ".format(metrics['MR_deviation'])
     return result
 
 
@@ -52,6 +59,10 @@ def write_metrics(writer, step, metrics, split):
     writer.add_scalar('{}_H1'.format(split), metrics['hits@[1,3,10]'][0], global_step=step)
     writer.add_scalar('{}_H3'.format(split), metrics['hits@[1,3,10]'][1], global_step=step)
     writer.add_scalar('{}_H10'.format(split), metrics['hits@[1,3,10]'][2], global_step=step)
+
+    # added AMRI and MR_deviation
+    writer.add_scalar('{}_AMRI'.format(split), metrics['AMRI'], global_step=step)
+    writer.add_scalar('{}_MR_deviation'.format(split), metrics['MR_deviation'], global_step=step)
 
 
 def count_params(model):
