@@ -2,11 +2,9 @@ import logging
 import os
 import traceback
 
+import ensemble.run
 import run
 from ensemble import Constants, util_files, subsampling
-
-
-# TODO fix project setup -> save environment on OneDrive
 
 if __name__ == "__main__":
     # dataset_in = "Debug"
@@ -92,21 +90,21 @@ if __name__ == "__main__":
         #                       Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
 
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
-        # Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
-        #
-        # allowed_kge_models = [{Constants.TRANS_E: ["all"], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
-        #                        Constants.COMPL_EX: [], Constants.ATT_E: []}]
-        # # for i in range(1):
-        # #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        # #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
-        # #                     rank=32, debug=False)
-        #
-        # # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
-        # #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
-        #
-        # for models in allowed_kge_models:
-        #     try:
-        #         run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        #                       kge_models=models, max_epochs=6, batch_size=800, rank=32)
-        #     except RuntimeError:
-        #         logging.error(traceback.format_exc())
+        #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
+
+        allowed_kge_models = [{Constants.TRANS_E: ["all"], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
+                               Constants.COMPL_EX: [], Constants.ATT_E: []}]
+        # for i in range(1):
+        #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+        #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
+        #                     rank=32, debug=False)
+
+        # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
+        #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
+
+        for models in allowed_kge_models:
+            try:
+                ensemble.run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+                                   kge_models=models, max_epochs=6, batch_size=800, rank=32)
+            except RuntimeError:
+                logging.error(traceback.format_exc())
