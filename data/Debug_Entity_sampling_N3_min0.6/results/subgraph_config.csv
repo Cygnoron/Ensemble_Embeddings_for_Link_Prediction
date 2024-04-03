@@ -1,4 +1,0 @@
-original_kg;sampling_method;relation_names_rho;directory;sampling_time;subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;subgraph_entities_amount;subgraph_relation_names_amount;subgraph_relation_names
-Debug;Entity sampling;11;data\Debug_Entity_sampling_N3_min0.6\sub_000;0.177;(0.6, 0.7);0.701;0;1401;50;11;[0, 3, 2, 1, 4, 5, 8, 7, 9, 6, 10]
-Debug;Entity sampling;11;data\Debug_Entity_sampling_N3_min0.6\sub_001;0.187;(0.6, 0.7);0.701;1;1401;50;11;[0, 1, 2, 3, 5, 4, 8, 7, 9, 6, 10]
-Debug;Entity sampling;11;data\Debug_Entity_sampling_N3_min0.6\sub_002;0.179;(0.6, 0.7);0.701;2;1401;50;11;[0, 5, 1, 2, 3, 4, 8, 9, 7, 6, 10]
