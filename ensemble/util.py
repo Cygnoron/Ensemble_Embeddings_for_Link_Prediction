@@ -4,6 +4,8 @@ import pickle
 import random
 from collections import defaultdict
 
+import models
+from datasets.kg_dataset import KGDataset
 from ensemble import Constants
 
 
@@ -13,20 +15,25 @@ def create_entity_and_relation_name_set_file(dataset):
 
     :param dataset: Name of the input dataset
     """
+    logging.debug(f"Creating csv files containing the entity and relation name sets for dataset {dataset}")
 
     with (open(os.path.abspath(f"data\\{dataset}\\train.pickle"), 'rb') as pickle_file,
           open(f"data\\{dataset}\\entity_set.csv", 'w') as entity_set_file,
           open(f"data\\{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
 
+        logging.debug("Loading data from .pickle file")
         # load data from train.pickle file
         data = pickle.load(pickle_file)
         total_triples = len(data)
+
+        logging.debug("Creating entity and relation name sets")
         # calculate entity and relation name sets
         entity_set, relation_name_set = get_unique_triple_ids(data, h=True, r=True, t=True)
 
         # sort entities by total amount of triples
         sorted_entities = sorted(entity_set.items(), key=lambda x: len(x[1]), reverse=True)
 
+        logging.debug("Writing entity set to csv file")
         # write header for entity set file
         entity_set_file.write(f"entity_id;total_amount_of_triples;relative_amount_of_triples\n")
         # write entity id and amount of triples for each entity
@@ -37,6 +44,7 @@ def create_entity_and_relation_name_set_file(dataset):
         # sort relation names by total amount of triples
         sorted_relation_names = sorted(relation_name_set.items(), key=lambda x: len(x[1]), reverse=True)
 
+        logging.debug("Writing relation name set to csv file")
         # write header for relation name file
         relation_name_set_file.write(f"relation_name_id;total_amount_of_triples;relative_amount_of_triples\n")
         # write relation name id and amount of triples for each relation name
@@ -51,12 +59,14 @@ def get_unique_triple_ids(dataset, h=False, r=False, t=False):
     The get_unique_triple_ids function takes in a dataset and returns a dictionary of unique entities or relations
         with their corresponding indices in the dataset.
 
-    :param dataset: Get the unique entities and relations in the dataset
+    :param dataset: The dataset, which was loaded from a .pickle file
     :param h: Indicate whether to check for head entities
     :param r: Indicate whether to check for relation names
     :param t: Indicate whether to check for tail entities
     :return: Depending on h, r, t return the respective dictionaries
     """
+
+    logging.debug(f"Calculating sets of unique ids for entities and relation names")
     entity_ids = {}
     relation_name_ids = {}
     for index, triple in enumerate(dataset):
@@ -76,10 +86,14 @@ def get_unique_triple_ids(dataset, h=False, r=False, t=False):
             entity_ids[tail].add(index)
 
     if (h or t) and r:
+        # logging.debug(f"Entity ids:\n{entity_ids}")
+        # logging.debug(f"Relation name ids:\n{relation_name_ids}")
         return entity_ids, relation_name_ids
     elif (h or t) and not r:
+        # logging.debug(f"Entity ids:\n{entity_ids}")
         return entity_ids
     elif r and not (h or t):
+        # logging.debug(f"Relation name ids:\n{relation_name_ids}")
         return relation_name_ids
 
 
@@ -159,9 +173,11 @@ def assign_model_to_subgraph(kge_models, args):
     subgraph_embedding_mapping = {}
     kge_models_adjusted = list(kge_models.keys()).copy()
 
+    logging.debug("Checking if 'all' or 'rest' was specified")
     for embedding_model in list(kge_models.keys()):
         # Handle case "all" if specified in kge_models
         if kge_models[embedding_model] == ["all"]:
+            logging.debug(f"'all' was found for embedding model {embedding_model}")
             logging.info(f"All subgraphs will be embedded by {kge_models_adjusted[0]}")
             # Clear mapping, if some subgraphs were already mapped (-> "all" overrides all other specifications)
             subgraph_embedding_mapping.clear()
@@ -177,13 +193,15 @@ def assign_model_to_subgraph(kge_models, args):
                 args.model = embedding_model
                 args.subgraph = subgraph
 
-                logging.info(f"Setting {args.model} as embedding method for subgraph {args.subgraph}")
+                logging.info(f"Setting {args.model} as embedding method for subgraph {args.subgraph}.")
 
             logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
             return subgraph_embedding_mapping
 
         # Handle case "rest" if specified in kge_models
         elif "rest" in kge_models[embedding_model]:
+            logging.debug(f"'rest' was found for embedding model {embedding_model}")
+
             if len(kge_models_adjusted) == len(list(kge_models.keys())):
                 # Clear embedding methods to choose from
                 kge_models_adjusted.clear()
@@ -191,6 +209,7 @@ def assign_model_to_subgraph(kge_models, args):
             kge_models_adjusted.append(embedding_model)
 
     # Iterate through kge_models to get specific mappings
+    logging.debug("Checking for direct mappings")
     for embedding_model in kge_models:
         for subgraph in kge_models[embedding_model]:
             if subgraph == "rest":
@@ -225,3 +244,100 @@ def assign_model_to_subgraph(kge_models, args):
 
     logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
     return subgraph_embedding_mapping
+
+
+def setup_logging(info_directory: str, log_file_name: str, logging_level="info"):
+    """
+    Set up logging configuration.
+
+    Args:
+        info_directory (str): Directory where log files will be saved.
+        log_file_name (str): Name of the log file.
+        logging_level (str): Logging level for the logger, will be converted to logging class if available.
+    """
+    # logging levels:
+    #  CRITICAL - 50
+    #  ERROR - 40
+    #  WARNING - 30
+    #  INFO - 20
+    #  DEBUG - 10
+    #  DATA - 5
+    logging.addLevelName(Constants.DATA_LEVEL, "DATA")
+    logging_level = logging_level.lower()
+    if logging_level == "critical":
+        logging_level = logging.CRITICAL
+    elif logging_level == "error":
+        logging_level = logging.ERROR
+    elif logging_level == "warning":
+        logging_level = logging.WARNING
+    elif logging_level == "info":
+        logging_level = logging.INFO
+    elif logging_level == "debug":
+        logging_level = logging.DEBUG
+    elif logging_level == "data":
+        logging_level = Constants.DATA_LEVEL
+    else:
+        raise ValueError("Invalid logging level")
+
+
+    # file logger
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        level=logging_level,
+        datefmt="%Y-%m-%d %H:%M:%S",
+        filename=os.path.join(info_directory, log_file_name),
+        filemode="w"
+    )
+
+    # setup log for subgraph sampling
+    console = logging.StreamHandler()
+    console.setLevel(logging_level)
+    formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
+    console.setFormatter(formatter)
+    logging.getLogger("").addHandler(console)
+    logging.log(Constants.DATA_LEVEL, "### Logging data ###")
+    logging.debug(f"### Debug messages are enabled ###")
+    logging.info(f"### Saving logs in: {info_directory} ###")
+
+
+def get_dataset_name(dataset: str):
+    """
+        Extract the original dataset name from a possibly sampled dataset name.
+
+        Args:
+            dataset (str): The dataset name, which may have been sampled.
+
+        Returns:
+            str: The original name of the dataset.
+        """
+    if Constants.ENTITY_SAMPLING[2] in dataset:
+        dataset_name = dataset.split(f"_{Constants.ENTITY_SAMPLING[2]}")[0]
+        logging.debug(f"Given dataset was sampled by {Constants.ENTITY_SAMPLING[1]}, "
+                      f"returning original name {dataset_name}")
+        return dataset_name
+    elif Constants.FEATURE_SAMPLING[2] in dataset:
+        dataset_name = dataset.split(f"_{Constants.FEATURE_SAMPLING[2]}")[0]
+        logging.debug(f"Given dataset was sampled by {Constants.FEATURE_SAMPLING[1]}, "
+                      f"returning original name {dataset_name}")
+        return dataset_name
+    else:
+        logging.debug(f"Given dataset has not been sampled. Returning dataset name {dataset}")
+        return dataset
+
+
+def generate_general_embeddings(general_dataset: str, args):
+    logging.debug("Creating dataset and model for later unified embeddings.")
+    # load data
+    dataset = KGDataset(os.path.abspath(f"data\\{general_dataset}"), args.debug)
+    args.sizes = dataset.get_shape()
+    model_to_use = Constants.ATT_E
+    logging.debug(f"Using {model_to_use} for general embedding")
+    args.model = model_to_use
+
+    # create model
+    logging.debug(f"Dataset: {dataset}")
+    model = getattr(models, args.model)(args)
+    device = "cuda"
+    model.to(device)
+
+    return model
