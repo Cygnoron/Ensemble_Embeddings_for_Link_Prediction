@@ -1,9 +1,12 @@
 import csv
+import logging
 import os
 import pickle
 import shutil
 
 import numpy as np
+
+from ensemble import Constants
 
 
 def check_directory(directory):
@@ -70,6 +73,7 @@ def check_file(file_path, argument='r', clear_file=False):
         return file  # Return the file path if successfully opened
     except NotADirectoryError:
         # Create directory and try again
+        logging.debug(f"File {file} was not found, creating folders")
         check_directory(file)  # Create directory if it does not exist
         return check_file(file, argument=argument, clear_file=clear_file)  # Recursively check file
     except FileNotFoundError:
@@ -93,6 +97,7 @@ def delete_paths(paths, to_skip=None):
     Returns:
         None
     """
+    logging.debug("Deleting unwanted files and directories")
     if isinstance(paths, str):  # Convert single path to list
         paths = [paths]
 
@@ -117,8 +122,9 @@ def pickle_to_csv(input_pickle_path, output_csv_path, delim=';'):
     :param output_csv_path: Directory to the output csv file.
     :param delim: Delimiter for the csv file. Defaults to ';'.
     """
+    logging.debug(f"Converting pickle file {input_pickle_path} to csv file {output_csv_path}")
     with (open(input_pickle_path, 'rb') as pickle_file, open(output_csv_path, 'w', newline='') as csv_file):
-        # load pickle file
+        # load pickle fil
         data = pickle.load(pickle_file)
 
         # initialize csv writer
@@ -130,25 +136,58 @@ def pickle_to_csv(input_pickle_path, output_csv_path, delim=';'):
             csv_writer.writerow([head, relation_name, tail])
 
 
-def csv_to_file(input_csv_path, output_path, delim=';'):
+def csv_to_file(input_csv_path, output_pickle_path, delim=';', only_unique=False):
     """
-    Converts a csv file to a pickle file.
+    Converts a CSV file containing triples (head, relation, tail) into a pickle file.
 
-    :param input_csv_path: Directory to the csv file.
-    :param output_path: Directory to the output pickle file.
-    :param delim: Delimiter for the csv file. Defaults to ';'.
+    Args:
+        input_csv_path (str): Path to the input CSV file.
+        output_pickle_path (str): Path to the output pickle file.
+        delim (str, optional): Delimiter used in the CSV file. Defaults to ';'.
+        only_unique (bool, optional): If True, only unique triples will be included in the output. Defaults to False.
     """
-    with (open(input_csv_path, 'r') as csv_file, open(output_path, 'w') as output_file):
+
+    # Log the start of the conversion process
+    logging.debug(f"Converting CSV file {input_csv_path} to pickle file {output_pickle_path}")
+
+    # Open input and output files
+    with open(input_csv_path, 'r') as csv_file, open(output_pickle_path, 'w') as output_file:
         data = csv.reader(csv_file, delimiter=delim)
-        for index, triple in enumerate(data):
-            output_file.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
 
+        # Process data based on whether only unique triples are required
+        if only_unique:
+            unique_triples = []
+            last_row = 0
+            for index, triple in enumerate(data):
+                if triple not in unique_triples:
+                    unique_triples.append(triple)
+                # Log the processed triple and its index
+                logging.log(Constants.DATA_LEVEL, f"Triple: {triple}\tIndex: {index}")
+                last_row = index + 1
+
+            # Log information about excluded duplicates
+            if last_row - len(unique_triples) > 0:
+                logging.debug(f"Excluded {last_row - len(unique_triples)} duplicates.")
+            else:
+                logging.log(Constants.DATA_LEVEL, "No duplicate triples found")
+
+            # Write unique triples to output file
+            for triple in unique_triples:
+                output_file.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
+        else:
+            # Write all triples to output file
+            for index, triple in enumerate(data):
+                output_file.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
+
+    # Process the created plain text file and create a pickle file
     examples = []
-    with (open(output_path, "r") as plain_text_file, open(f"{output_path}.pickle", 'wb') as output_pickle_file):
+    with open(output_pickle_path, "r") as plain_text_file, \
+            open(f"{output_pickle_path}.pickle", 'wb') as output_pickle_file:
         for line in plain_text_file:
             head, rel, tail = line.strip().split("\t")
             try:
                 examples.append([head, rel, tail])
             except ValueError:
                 continue
+        # Dump examples to pickle file after converting to numpy array of int64
         pickle.dump(np.array(examples).astype("int64"), output_pickle_file)
