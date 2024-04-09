@@ -4,6 +4,8 @@ import pickle
 import random
 from collections import defaultdict
 
+import torch
+
 import models
 from datasets.kg_dataset import KGDataset
 from ensemble import Constants
@@ -253,7 +255,8 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
     Args:
         info_directory (str): Directory where log files will be saved.
         log_file_name (str): Name of the log file.
-        logging_level (str): Logging level for the logger, will be converted to logging class if available.
+        logging_level (str): Logging level for the logger, will be converted to logging class (e.g. logging.INFO) if
+         available.
     """
     # logging levels:
     #  CRITICAL - 50
@@ -278,7 +281,6 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
         logging_level = Constants.DATA_LEVEL
     else:
         raise ValueError("Invalid logging level")
-
 
     # file logger
     logging.basicConfig(
@@ -340,4 +342,65 @@ def generate_general_embeddings(general_dataset: str, args):
     device = "cuda"
     model.to(device)
 
+    # TODO be able to change the values of the embeddings
+    model.entity.weight.data.zero_()
+    model.rel.weight.data.zero_()
+
     return model
+
+
+def filter_dataset(dataset, filters):
+    """
+    Filter the dataset based on specified entity and relation name filters.
+
+    Args:
+        dataset (list): The dataset to be filtered, represented as a list of triples, where each triple consists of
+            (head, relation, tail).
+        filters (dict): A dictionary containing filters for entities and relation names. It has the following structure:
+            {
+                "entity": list or None,  # A list of entity names to filter on, or None if no entity filtering is required.
+                "relation name": list or None,  # A list of relation names to filter on, or None if no relation name filtering is required.
+            }
+
+    Returns:
+        list: The filtered dataset containing only the triples that match the specified filters.
+
+    Example:
+        >>> dataset = [
+        ...     ("John", "works_at", "CompanyA"),
+        ...     ("Alice", "works_at", "CompanyB"),
+        ...     ("John", "lives_in", "CityX"),
+        ...     ("Alice", "lives_in", "CityY"),
+        ... ]
+        >>> filters = {"entity": ["John"], "relation name": ["works_at"]}
+        >>> filtered_dataset = filter_dataset(dataset, filters)
+        >>> print(filtered_dataset)
+        [('Alice', 'lives_in', 'CityY')]
+    """
+    entity_filters = []
+    relation_name_filters = []
+    filtered_indices = []
+
+    logging.debug(f"Filters:\t{filters}")
+
+    if filters.get("entity") is not None:
+        entity_filters = filters["entity"]
+        logging.debug(f"Entity filters:\t{entity_filters}")
+    if filters.get("relation name") is not None:
+        relation_name_filters = filters["relation name"]
+        logging.debug(f"Relation name filters:\t{relation_name_filters}")
+
+    for index, triple in enumerate(dataset):
+        head, relation, tail = triple
+
+        if ((int(head) not in entity_filters) and (int(relation) not in relation_name_filters) and
+                (int(tail) not in entity_filters)):
+            # If none of the components are in the filters, add to filtered_indices
+            filtered_indices.append(index)
+        if index < 5:
+            logging.log(Constants.DATA_LEVEL, f"{head}\t{relation}\t{tail}")
+
+    # Use filtered_indices to select only the wanted triples
+    filtered_dataset = [dataset[i] for i in filtered_indices]
+    logging.log(Constants.DATA_LEVEL, f"{filtered_dataset[:5]}")
+    return filtered_dataset
