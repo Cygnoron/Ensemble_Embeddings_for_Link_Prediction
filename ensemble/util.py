@@ -295,9 +295,9 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
     formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
-    logging.log(Constants.DATA_LEVEL, "### Logging data ###")
-    logging.debug(f"### Debug messages are enabled ###")
     logging.info(f"### Saving logs in: {info_directory} ###")
+    logging.debug(f"### Debug messages are enabled ###")
+    logging.log(Constants.DATA_LEVEL, "### Logging data ###")
 
 
 def get_dataset_name(dataset: str):
