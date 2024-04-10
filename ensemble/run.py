@@ -14,16 +14,13 @@ from ensemble import Constants, util_files, util
 from optimizers import regularizers as regularizers, KGOptimizer
 from utils.train import count_params
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-os.environ['TORCH_USE_CUDA_DSA'] = '1'
-
 try:
     # path on pc
     DATA_PATH = "data"
     os.listdir(DATA_PATH)
 except:
     # path on laptop
-    DATA_PATH = "C:\\Users\\timbr\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data"
+    DATA_PATH = "C:\\Users\\timbr\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data"
 
 
 def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kge_models=None,
@@ -37,6 +34,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     takes all the arguments that are passed into the general train, but also takes an additional argument: multi_c.
 
 
+    :param info_directory: Directory for all
     :param dataset: default="WN18RR", choices=["FB15K", "WN", "WN18RR", "WN18RR_sampled", "FB237", "YAGO3-10"], help="Knowledge Graph dataset"
     :param dataset_directory: The directory, where the dataset is located, default="data\\WN18RR"
     :param kge_models: default="RotE", all allowed KGE models
@@ -68,6 +66,12 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                               batch_size=batch_size, neg_sample_size=neg_sample_size, dropout=dropout,
                               init_size=init_size, learning_rate=learning_rate, gamma=gamma, bias=bias, dtype=dtype,
                               double_neg=double_neg, debug=debug, multi_c=multi_c)
+
+    # TODO get embedding from dummy model, to initialize embedding models
+    # get original dataset name
+    general_dataset = util.get_dataset_name(dataset)
+    # create model using original dataset and sizes, use returned embeddings in new models as initialization
+    embedding_initial_entity, embedding_initial_relation_name = util.generate_general_embeddings(general_dataset, args)
 
     # set directories and ensure that they exist
     model_setup_config_dir = util_files.check_directory(f"{info_directory}\\model_setup_configs")
@@ -125,6 +129,17 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         logging.info(f"-\\\tTotal number of parameters: {total}\t/-")
         device = "cuda"
         model.to(device)
+
+        logging.debug(f"Entity embedding before general: Size {model.entity.weight.data.size()}")
+        logging.debug(f"Relation name embedding before general: Size - {model.rel.weight.data.size()}")
+
+        model.entity = embedding_initial_entity
+        model.rel = embedding_initial_relation_name
+
+        logging.debug(f"Entity embedding: Size - {model.entity.weight.data.size()}")
+        # logging.log(Constants.DATA_LEVEL, model.entity.weight.data)
+        logging.debug(f"Relation name embedding: Size - {model.rel.weight.data.size()}")
+        # logging.log(Constants.DATA_LEVEL, model.rel.weight.data)
 
         # Skip already trained embedding models
         if s_e_mapping:
@@ -188,6 +203,11 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         counter = 0
         best_mrr = None
         best_epoch = None
+
+        logging.debug(f"Saving embeddings before training steps")
+        embedding_before_training_ent = model.entity.weight.data.clone()
+        embedding_before_training_rel = model.rel.weight.data.clone()
+
         for step in range(embedding_model['args'].max_epochs):
 
             # Train step
@@ -198,10 +218,10 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
 
             # TODO fully implement validation
             # Valid step
-            embedding_model['model'].eval()
-            valid_loss = optimizer.calculate_valid_loss(valid_examples)
-            logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {step} | "
-                         f"average train loss: {valid_loss:.4f}")
+            # embedding_model['model'].eval()
+            # valid_loss = optimizer.calculate_valid_loss(valid_examples)
+            # logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {step} | "
+            #              f"average train loss: {valid_loss:.4f}")
 
             if (step + 1) % embedding_model['args'].valid == 0:
                 # TODO fully implement validation
@@ -214,8 +234,8 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                 #     counter = 0
                 #     best_epoch = step
                 logging.info(f"Saving model at epoch {step} in {info_directory}")
-                torch.save(model.cpu().state_dict(),
-                           f"{model_file_dir}\\model_{embedding_model['args'].subgraph}_{embedding_model['args'].model_name}.pt")
+                torch.save(model.cpu().state_dict(), f"{model_file_dir}\\model_{embedding_model['args'].subgraph}_"
+                                                     f"{embedding_model['args'].model_name}.pt")
                 model.cuda()
 
                 # TODO fully implement validation
@@ -226,8 +246,17 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                     break
                 elif counter == args.patience // 2:
                     pass
-            logging.info("\t Reducing learning rate")
+            logging.info(f"\t Reducing learning rate")
             optimizer.reduce_lr()
+
+        logging.debug(f"Saving embeddings after training")
+        embedding_after_training_ent = model.entity.weight.data
+        embedding_after_training_rel = model.rel.weight.data
+
+        output_path = os.path.join(info_directory, "differences_between_embeddings")
+        util_files.check_directory(output_path)
+        util.difference_embeddings(embedding_before_training_ent, embedding_after_training_ent, output_path, ent=True)
+        util.difference_embeddings(embedding_before_training_rel, embedding_after_training_rel, output_path, rel=True)
 
         time_stop_training_sub = time.time()
 
@@ -298,9 +327,6 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         json.dump(e_s_mapping, e_s_mapping_file)
         logging.info(f"Updated mapping from embedding methods to subgraphs in {e_s_mapping_file.name}.")
 
-    # TODO why do models load with None fields?
-    #  how to initialize context_vec, so it's saved in model.pt?
-
     if len(models_to_load) > 0:
         logging.info(f"-/\tLoading {len(models_to_load)} models from storage.\t\\-")
 
@@ -343,7 +369,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         # Validation metrics
         # valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
         # logging.info(format_metrics(valid_metrics, split="valid"))
-        #
-        # # Test metrics
+
+        # Test metrics
         # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
         # logging.info(format_metrics(test_metrics, split="test"))

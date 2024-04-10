@@ -4,9 +4,8 @@ import pickle
 import random
 from collections import defaultdict
 
-import torch
+from torch import nn
 
-import models
 from datasets.kg_dataset import KGDataset
 from ensemble import Constants
 
@@ -331,25 +330,17 @@ def generate_general_embeddings(general_dataset: str, args):
     logging.debug("Creating dataset and model for later unified embeddings.")
     # load data
     dataset = KGDataset(os.path.abspath(f"data\\{general_dataset}"), args.debug)
-    args.sizes = dataset.get_shape()
-    model_to_use = Constants.ATT_E
-    logging.debug(f"Using {model_to_use} for general embedding")
-    args.model = model_to_use
+    sizes_entity, sizes_rel, _ = dataset.get_shape()
 
-    # create model
-    logging.debug(f"Dataset: {dataset}")
-    model = getattr(models, args.model)(args)
-    device = "cuda"
-    model.to(device)
+    embedding_general_entity = nn.Embedding(sizes_entity, args.rank)
+    embedding_general_rel = nn.Embedding(sizes_rel, args.rank)
+    embedding_general_entity.to("cuda")
+    embedding_general_rel.to("cuda")
 
-    # TODO be able to change the values of the embeddings
-    model.entity.weight.data.zero_()
-    model.rel.weight.data.zero_()
-
-    return model
+    return embedding_general_entity, embedding_general_rel
 
 
-def filter_dataset(dataset, filters):
+def filter_dataset(dataset, filters, invert_filter=False):
     """
     Filter the dataset based on specified entity and relation name filters.
 
@@ -361,25 +352,15 @@ def filter_dataset(dataset, filters):
                 "entity": list or None,  # A list of entity names to filter on, or None if no entity filtering is required.
                 "relation name": list or None,  # A list of relation names to filter on, or None if no relation name filtering is required.
             }
+        invert_filter (boolean): If true, invert filtering and only keep a triple if one of its contens is in a filter
 
     Returns:
         list: The filtered dataset containing only the triples that match the specified filters.
-
-    Example:
-        >>> dataset = [
-        ...     ("John", "works_at", "CompanyA"),
-        ...     ("Alice", "works_at", "CompanyB"),
-        ...     ("John", "lives_in", "CityX"),
-        ...     ("Alice", "lives_in", "CityY"),
-        ... ]
-        >>> filters = {"entity": ["John"], "relation name": ["works_at"]}
-        >>> filtered_dataset = filter_dataset(dataset, filters)
-        >>> print(filtered_dataset)
-        [('Alice', 'lives_in', 'CityY')]
     """
     entity_filters = []
     relation_name_filters = []
     filtered_indices = []
+    length_dataset = len(dataset)
 
     logging.debug(f"Filters:\t{filters}")
 
@@ -393,14 +374,96 @@ def filter_dataset(dataset, filters):
     for index, triple in enumerate(dataset):
         head, relation, tail = triple
 
-        if ((int(head) not in entity_filters) and (int(relation) not in relation_name_filters) and
-                (int(tail) not in entity_filters)):
+        if invert_filter:
+            # If one of the components is in the filters, add to filtered_indices
+            if ((int(head) in entity_filters) or (int(relation) in relation_name_filters) or
+                    (int(tail) in entity_filters)):
+                filtered_indices.append(index)
+        else:
             # If none of the components are in the filters, add to filtered_indices
-            filtered_indices.append(index)
+            if ((int(head) not in entity_filters) and (int(relation) not in relation_name_filters) and
+                    (int(tail) not in entity_filters)):
+                filtered_indices.append(index)
+
         if index < 5:
             logging.log(Constants.DATA_LEVEL, f"{head}\t{relation}\t{tail}")
 
     # Use filtered_indices to select only the wanted triples
     filtered_dataset = [dataset[i] for i in filtered_indices]
-    logging.log(Constants.DATA_LEVEL, f"{filtered_dataset[:5]}")
+    logging.log(Constants.DATA_LEVEL, f"Filtered Dataset: {filtered_dataset[:5]}")
+    logging.debug(f"There were {length_dataset-len(filtered_dataset)} triples removed due to filtering.")
     return filtered_dataset
+
+
+def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False):
+    """
+    Compute the difference between two embeddings and write the results to a CSV file.
+
+    Args:
+        embedding_before (torch.tensor): The embedding before some transformation.
+        embedding_after (torch.tensor): The embedding after the same transformation.
+        output_path (str): The path to save the output CSV file.
+        ent (bool): Set True if embedding is from entities, affects output file name
+        rel (bool): Set True if embedding is from relation names, affects output file name
+
+    Returns:
+        None
+    """
+    output_path = os.path.abspath(output_path)
+    if ent:
+        output_file_name = "difference_embeddings_ent.csv"
+    elif rel:
+        output_file_name = "difference_embeddings_rel.csv"
+    else:
+        output_file_name = "difference_embeddings.csv"
+    logging.debug(f"Calculating difference between embeddings an saving it to {output_path}.")
+
+    embedding_difference = embedding_before - embedding_after
+
+    with open(os.path.join(output_path, output_file_name), "w") as output_file:
+        logging.debug("Write embeddings before some transformation")
+        # iterate through all embeddings
+        for embedding_before_id in embedding_before:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_before_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")
+        output_file.write("\n")
+
+        logging.debug("Write embeddings after some transformation")
+        # iterate through all embeddings
+        for embedding_after_id in embedding_after:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_after_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")
+        output_file.write("\n")
+
+        logging.debug("Write difference between embeddings after some transformation")
+        # iterate through all embeddings
+        for embedding_difference_id in embedding_difference:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_difference_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")

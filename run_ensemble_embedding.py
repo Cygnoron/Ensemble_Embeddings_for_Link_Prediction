@@ -1,18 +1,20 @@
 import logging
 import os
+import pickle
 import traceback
 
-import ensemble.run
-import run
-from ensemble import Constants, util_files, subsampling
+from ensemble import Constants, util_files, util, subsampling, run
+
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+os.environ['TORCH_USE_CUDA_DSA'] = '1'
 
 if __name__ == "__main__":
-    # dataset_in = "Debug"
+    dataset_in = "Debug"
     # dataset_in = "WN18RR"
-    dataset_in = "YAGO3-10"
+    # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 10
-    subgraph_size_range = (0.6, 0.7)
+    subgraph_amount = 1
+    subgraph_size_range = (0.4, 0.7)
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
@@ -37,33 +39,18 @@ if __name__ == "__main__":
         info_directory = os.path.abspath(f"{dataset_out_dir}\\results")
         util_files.check_directory(info_directory)
 
-        # file logger
-        logging.basicConfig(
-            format="%(asctime)s %(levelname)-8s %(message)s",
-            level=logging.INFO,
-            datefmt="%Y-%m-%d %H:%M:%S",
-            filename=os.path.join(info_directory, "Ensemble_Embedding_for_Link_Prediction.log"),
-            filemode="w"
-        )
-        # setup log for subgraph sampling
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
-        console.setFormatter(formatter)
-        logging.getLogger("").addHandler(console)
-        logging.info(f"### Saving logs in: {info_directory} ###")
-
-        # util_files.csv_to_file(
-        #     "D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\Random_Triples.csv",
-        #     f"D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data\\"
-        #     f"Debug\\train")
-
-        # util_files.pickle_to_csv(
-        #     f"D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data\\"
-        #     f"{dataset_in}\\train.pickle",
-        #     f"D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data\\"
-        #     f"{dataset_in}\\train_readable.csv", ';')
-
+        util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log", logging_level="data")
+        #
+        # util_files.csv_to_file("D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+        #                        "ensemble\\Random_Triples.csv",
+        #                        "D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+        #                        "data\\Debug\\train", only_unique=True)
+        #
+        # util_files.pickle_to_csv(f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+        #                          f"data\\{dataset_in}\\train.pickle",
+        #                          f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+        #                          f"data\\{dataset_in}\\train_readable.csv", ';')
+        #
         # util.create_entity_and_relation_name_set_file(dataset_in)
 
         # for dataset in os.scandir("data"):
@@ -74,10 +61,24 @@ if __name__ == "__main__":
                                  subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
                                  relation_name_amount=relation_name_amount,
                                  max_indices_per_step=max_indices_per_step)
+        entity_filter_ids = []
+        for i in range(10):
+            entity_filter_ids += [i]
 
-        # temporary for specific subgraph
-        # dataset_out = f"{dataset_out}_fixed"
-        # dataset_out_dir = f"{dataset_out_dir}_fixed"
+        # filter dataset for debugging regarding embeddings
+        for subgraph_dir in os.listdir(dataset_out_dir):
+            if "sub_" not in subgraph_dir:
+                continue
+
+            subgraph_num = int(subgraph_dir.split("_")[1])
+            filters = {
+                "entity": entity_filter_ids,
+                "relation name": []
+            }
+
+            with open(os.path.join(dataset_out_dir, subgraph_dir, "train.pickle"), 'rb+') as dataset_file_pickle:
+                dataset = util.filter_dataset(pickle.load(dataset_file_pickle), filters, invert_filter=False)
+                pickle.dump(dataset, dataset_file_pickle)
 
         # create .graphml files for visualizing the subgraphs
         # plotting.create_graphml(info_directory, os.path.abspath(dataset_out_dir))
@@ -94,17 +95,19 @@ if __name__ == "__main__":
 
         allowed_kge_models = [{Constants.TRANS_E: ["all"], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
                                Constants.COMPL_EX: [], Constants.ATT_E: []}]
-        # for i in range(1):
-        #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
-        #                     rank=32, debug=False)
-
+        # # for i in range(1):
+        # #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+        # #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
+        # #                     rank=32, debug=False)
+        #
         # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
-        #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
-
+        #                       # {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
+        #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}]
+        #
         for models in allowed_kge_models:
             try:
-                ensemble.run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-                                   kge_models=models, max_epochs=6, batch_size=800, rank=32)
+                run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+                          learning_rate=0.01, kge_models=models, max_epochs=3, batch_size=400,
+                          rank=32, debug=False)
             except RuntimeError:
                 logging.error(traceback.format_exc())

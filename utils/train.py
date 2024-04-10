@@ -9,9 +9,7 @@ def get_savedir(model, dataset):
     """Get unique saving directory name."""
     dt = datetime.datetime.now()
     date = dt.strftime("%m_%d")
-    save_dir = os.path.join(LOGS_PATH, date, dataset,
-                            model + dt.strftime('_%H_%M_%S')
-                            )
+    save_dir = os.path.join(LOGS_PATH, date, dataset, model + dt.strftime('_%H_%M_%S'))
     os.makedirs(save_dir)
     return save_dir
 
@@ -23,7 +21,8 @@ def avg_both(mrs, mrrs, hits, amris, mr_deviations):
         mrs: Dict[str, float]
         mrrs: Dict[str, float]
         hits: Dict[str, torch.FloatTensor]
-
+        amris: Dict[str, float]
+        mr_deviations: Dict[str, float]
     Returns:
         Dict[str, torch.FloatTensor] mapping metric name to averaged score
     """
@@ -44,11 +43,11 @@ def format_metrics(metrics, split):
     result += "MRR: {:.3f} | ".format(metrics['MRR'])
     result += "H@1: {:.3f} | ".format(metrics['hits@[1,3,10]'][0])
     result += "H@3: {:.3f} | ".format(metrics['hits@[1,3,10]'][1])
-    result += "H@10: {:.3f}".format(metrics['hits@[1,3,10]'][2])
+    result += "H@10: {:.3f} | ".format(metrics['hits@[1,3,10]'][2])
 
     # added AMRI and MR_deviation
     result += "AMRI: {:.3f} | ".format(metrics['AMRI'])
-    result += "MR_deviation: {:.3f} | ".format(metrics['MR_deviation'])
+    result += "MR_deviation: {:.3f}".format(metrics['MR_deviation'])
     return result
 
 
