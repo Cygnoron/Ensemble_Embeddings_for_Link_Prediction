@@ -67,12 +67,6 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                               init_size=init_size, learning_rate=learning_rate, gamma=gamma, bias=bias, dtype=dtype,
                               double_neg=double_neg, debug=debug, multi_c=multi_c)
 
-    # TODO get embedding from dummy model, to initialize embedding models
-    # get original dataset name
-    general_dataset = util.get_dataset_name(dataset)
-    # create model using original dataset and sizes, use returned embeddings in new models as initialization
-    embedding_initial_entity, embedding_initial_relation_name = util.generate_general_embeddings(general_dataset, args)
-
     # set directories and ensure that they exist
     model_setup_config_dir = util_files.check_directory(f"{info_directory}\\model_setup_configs")
     model_file_dir = util_files.check_directory(f"{info_directory}\\model_files")
@@ -83,7 +77,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
     logging.info(f"### Saving .pt files of stored models in: {model_file_dir} ###")
 
-    # create dataset object
+    # set up dataset directory
     dataset_path = os.path.join(DATA_PATH, args.dataset)
 
     # --- setting up embedding models ---
@@ -130,17 +124,6 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         device = "cuda"
         model.to(device)
 
-        logging.debug(f"Entity embedding before general: Size {model.entity.weight.data.size()}")
-        logging.debug(f"Relation name embedding before general: Size - {model.rel.weight.data.size()}")
-
-        model.entity = embedding_initial_entity
-        model.rel = embedding_initial_relation_name
-
-        logging.debug(f"Entity embedding: Size - {model.entity.weight.data.size()}")
-        # logging.log(Constants.DATA_LEVEL, model.entity.weight.data)
-        logging.debug(f"Relation name embedding: Size - {model.rel.weight.data.size()}")
-        # logging.log(Constants.DATA_LEVEL, model.rel.weight.data)
-
         # Skip already trained embedding models
         if s_e_mapping:
             if subgraph_embedding_mapping[subgraph_num] in s_e_mapping[str(subgraph_num)]:
@@ -174,57 +157,63 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     time_start_training_total = time.time()
 
     for embedding_model in embedding_models:
-        # skip training for already trained models
+        # Skip training setup for already trained models
         if embedding_model['load_from_file']:
             continue
 
         # --- Setting up training ---
         logging.info(f"-/\tStart training {embedding_model['subgraph']} with {embedding_model['args'].model_name}\t\\-")
-        subgraph = embedding_model['subgraph']
-
-        time_start_training_sub = time.time()
 
         model = embedding_model['model']
-        valid_examples = embedding_model['dataset'].get_examples("valid")
-        test_examples = embedding_model['dataset'].get_examples("test")
-        filters = embedding_model['dataset'].get_filters()
+        embedding_model['valid_examples'] = embedding_model['dataset'].get_examples("valid")
+        embedding_model['test_examples'] = embedding_model['dataset'].get_examples("test")
+        embedding_model['filters'] = embedding_model['dataset'].get_filters()
 
-        # unpack dictionary from json file and write into args
-        with (open(f"{model_setup_config_dir}\\config_{subgraph}_{embedding_model['args'].model_name}.json", "r")
-              as json_file):
-            args = argparse.Namespace(**json.loads(json_file.read()))
+        # Get optimizer
+        embedding_model['regularizer'] = (getattr(regularizers, embedding_model['args'].regularizer)
+                                          (embedding_model['args'].reg))
+        embedding_model['optim_method'] = (getattr(torch.optim, embedding_model['args'].optimizer)
+                                           (model.parameters(), lr=embedding_model['args'].learning_rate))
+        embedding_model['optimizer'] = KGOptimizer(model, embedding_model['regularizer'],
+                                                   embedding_model['optim_method'],
+                                                   embedding_model['args'].batch_size,
+                                                   embedding_model['args'].neg_sample_size,
+                                                   bool(embedding_model['args'].double_neg))
 
-        # get optimizer
-        regularizer = getattr(regularizers, embedding_model['args'].regularizer)(embedding_model['args'].reg)
-        optim_method = (getattr(torch.optim, embedding_model['args'].optimizer)
-                        (model.parameters(), lr=embedding_model['args'].learning_rate))
-        optimizer = KGOptimizer(model, regularizer, optim_method, embedding_model['args'].batch_size,
-                                embedding_model['args'].neg_sample_size, bool(embedding_model['args'].double_neg))
-        counter = 0
-        best_mrr = None
-        best_epoch = None
+        embedding_model['args'].counter = 0
+        embedding_model['args'].best_mrr = None
+        embedding_model['args'].best_epoch = None
 
-        logging.debug(f"Saving embeddings before training steps")
-        embedding_before_training_ent = model.entity.weight.data.clone()
-        embedding_before_training_rel = model.rel.weight.data.clone()
+    # Iterate over epochs
+    for epoch in range(max_epochs):
+        time_start_training_sub = time.time()
 
-        for step in range(embedding_model['args'].max_epochs):
+        # Iterate over models
+        for embedding_model in embedding_models:
+            # TODO check feasibility
+            #  Skip training for already trained models
+            if embedding_model['load_from_file']:
+                continue
+
+            args = embedding_model['args']
+            logging.info(f"Training subgraph {embedding_model['subgraph']} in epoch {epoch} with model "
+                         f"{args.model_name}")
 
             # Train step
             embedding_model['model'].train()
-            train_loss = optimizer.epoch(embedding_model['train_examples'])
-            logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {step} | "
+            train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
+            logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
 
-            # TODO fully implement validation
+            # TODO fully implement validation -> correct datasets and maybe adapting process
             # Valid step
             # embedding_model['model'].eval()
             # valid_loss = optimizer.calculate_valid_loss(valid_examples)
-            # logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {step} | "
+            # logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {epoch} | "
             #              f"average train loss: {valid_loss:.4f}")
 
-            if (step + 1) % embedding_model['args'].valid == 0:
-                # TODO fully implement validation
+            if (epoch + 1) % args.valid == 0:
+                # TODO fully implement validation -> correct datasets and maybe adapting process
                 # valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
                 # logging.info(format_metrics(valid_metrics, split="valid"))
                 #
@@ -232,50 +221,41 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                 # if not best_mrr or valid_mrr > best_mrr:
                 #     best_mrr = valid_mrr
                 #     counter = 0
-                #     best_epoch = step
-                logging.info(f"Saving model at epoch {step} in {info_directory}")
-                torch.save(model.cpu().state_dict(), f"{model_file_dir}\\model_{embedding_model['args'].subgraph}_"
-                                                     f"{embedding_model['args'].model_name}.pt")
-                model.cuda()
+                #     best_epoch = epoch
+                logging.info(f"Saving model at epoch {epoch} in {info_directory}")
+                torch.save(embedding_model['model'].cpu().state_dict(),
+                           f"{model_file_dir}\\model_{args.subgraph}_"f"{args.model_name}.pt")
+                embedding_model['model'].cuda()
 
-                # TODO fully implement validation
+                # TODO fully implement validation -> correct datasets and maybe adapting process
             else:
-                counter += 1
-                if counter == args.patience:
+                args.counter += 1
+                if args.counter == args.patience:
                     logging.info("\t Early stopping")
                     break
-                elif counter == args.patience // 2:
+                elif args.counter == args.patience // 2:
                     pass
             logging.info(f"\t Reducing learning rate")
-            optimizer.reduce_lr()
+            embedding_model['optimizer'].reduce_lr()
 
-        logging.debug(f"Saving embeddings after training")
-        embedding_after_training_ent = model.entity.weight.data
-        embedding_after_training_rel = model.rel.weight.data
+            if not args.best_mrr:
+                logging.info(f"Saving new model saved at epoch {args.best_epoch}\n{model_file_dir}\\model_"
+                             f"{args.subgraph}_{args.model_name}.pt")
+                torch.save(embedding_model['model'].cpu().state_dict(),
+                           f"{model_file_dir}\\model_{args.subgraph}_"
+                           f"{args.model_name}.pt")
+            else:
+                logging.info(f"Loading best model saved at epoch {args.best_epoch}")
+                embedding_model['model'].load_state_dict(torch.load(f"{model_file_dir}\\model_{args.subgraph}_"
+                                                                    f"{args.model_name}.pt"))
 
-        output_path = os.path.join(info_directory, "differences_between_embeddings")
-        util_files.check_directory(output_path)
-        util.difference_embeddings(embedding_before_training_ent, embedding_after_training_ent, output_path, ent=True)
-        util.difference_embeddings(embedding_before_training_rel, embedding_after_training_rel, output_path, rel=True)
+            embedding_model['model'].cuda()
+            embedding_model['model'].eval()
 
         time_stop_training_sub = time.time()
-
-        if not best_mrr:
-            logging.info(f"Saving new model saved at epoch {best_epoch}\n{model_file_dir}\\"
-                         f"model_{embedding_model['args'].subgraph}_{embedding_model['args'].model_name}.pt")
-            torch.save(model.cpu().state_dict(), f"{model_file_dir}\\model_{embedding_model['args'].subgraph}_"
-                                                 f"{embedding_model['args'].model_name}.pt")
-        else:
-            logging.info(f"Loading best model saved at epoch {best_epoch}")
-            model.load_state_dict(torch.load(f"{model_file_dir}\\model_{embedding_model['args'].subgraph}_"
-                                             f"{embedding_model['args'].model_name}.pt"))
-
-        logging.info(f"-\\\tTraining and optimization of model {embedding_model['args'].model_name} for subgraph "
-                     f"{embedding_model['args'].subgraph} finished in "
+        logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{round(time_stop_training_sub - time_start_training_sub, 3)} seconds / "
                      f"{round((time_stop_training_sub - time_start_training_sub) / 60, 3)} minutes\t/-")
-        model.cuda()
-        model.eval()
 
     time_stop_training_total = time.time()
 
@@ -283,6 +263,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                  f"{round(time_stop_training_total - time_start_training_total, 3)} seconds / "
                  f"{round((time_stop_training_total - time_start_training_total) / 60, 3)} minutes\t/-")
 
+    # TODO adapt to new training process
     # Update mappings for already trained embeddings, in order to skip already trained subgraphs
     with (open(s_e_mapping_dir, 'r+') as s_e_mapping_file,
           open(e_s_mapping_dir, 'r+') as e_s_mapping_file):
@@ -359,7 +340,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
 
     # --- Testing with aggregated scores ---
 
-    # TODO fully implement validation and testing metrics
+    # TODO fully implement validation and testing metrics -> correct datasets and maybe adapting process
     for embedding_model in embedding_models:
         model = embedding_model["model"]
         valid_examples = embedding_model["valid_examples"]
