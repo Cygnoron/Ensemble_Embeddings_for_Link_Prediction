@@ -339,6 +339,11 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                      f"{len(delta) / len(dataset)}.")
         return delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names
 
+    elif sampling_method[0] == Constants.DEBUG_SAMPLING[0]:
+        # TODO Debug sampling, for only letting through specific entity or relation name ids
+        logging.critical(f"{Constants.DEBUG_SAMPLING[1]} wasn't implemented yet!")
+        return delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names
+
     # If no legal sampling method was given, return -1
     logging.error("Given argument for sampling method is not supported")
     return -1

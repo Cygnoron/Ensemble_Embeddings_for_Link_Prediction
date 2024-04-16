@@ -7,12 +7,13 @@ import time
 
 import numpy as np
 import torch
+from torch import nn
 
 import models as models
 from datasets.kg_dataset import KGDataset
-from ensemble import Constants, util_files, util
+from ensemble import Constants, util_files, util, Attention_mechanism
 from optimizers import regularizers as regularizers, KGOptimizer
-from utils.train import count_params
+from utils.train import count_params, format_metrics, avg_both
 
 try:
     # path on pc
@@ -80,6 +81,12 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     # set up dataset directory
     dataset_path = os.path.join(DATA_PATH, args.dataset)
 
+    # get original dataset name
+    dataset_general = util.get_dataset_name(dataset)
+    # create model using original dataset and sizes, use returned embeddings in new models as initialization
+    buffer_var = util.generate_general_embeddings(dataset_general, args)
+    embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel = buffer_var
+
     # --- setting up embedding models ---
     logging.info("-/\tSetting up embedding models\t\\-")
     time_start_model_creation = time.time()
@@ -120,6 +127,19 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         # create model
         model = getattr(models, args_subgraph.model)(args_subgraph)
         total = count_params(model)
+
+        # set embeddings
+        model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim)
+        model.entity.weight.data = embedding_general_ent.weight.data.clone()
+        model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
+        model.rel.weight.data = embedding_general_rel.weight.data.clone()
+
+        # set context vectors
+        model.theta_ent = nn.Embedding(theta_general_ent.num_embeddings, theta_general_ent.embedding_dim)
+        model.theta_ent.weight.data = theta_general_ent.weight.data.clone()
+        model.theta_rel = nn.Embedding(theta_general_rel.num_embeddings, theta_general_rel.embedding_dim)
+        model.theta_rel.weight.data = theta_general_rel.weight.data.clone()
+
         logging.info(f"-\\\tTotal number of parameters: {total}\t/-")
         device = "cuda"
         model.to(device)
@@ -162,27 +182,20 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
             continue
 
         # --- Setting up training ---
-        logging.info(f"-/\tStart training {embedding_model['subgraph']} with {embedding_model['args'].model_name}\t\\-")
+        args = embedding_model['args']
+        logging.info(f"-/\tStart training {embedding_model['subgraph']} with {args.model_name}\t\\-")
 
         model = embedding_model['model']
-        embedding_model['valid_examples'] = embedding_model['dataset'].get_examples("valid")
-        embedding_model['test_examples'] = embedding_model['dataset'].get_examples("test")
-        embedding_model['filters'] = embedding_model['dataset'].get_filters()
 
         # Get optimizer
-        embedding_model['regularizer'] = (getattr(regularizers, embedding_model['args'].regularizer)
-                                          (embedding_model['args'].reg))
-        embedding_model['optim_method'] = (getattr(torch.optim, embedding_model['args'].optimizer)
-                                           (model.parameters(), lr=embedding_model['args'].learning_rate))
-        embedding_model['optimizer'] = KGOptimizer(model, embedding_model['regularizer'],
-                                                   embedding_model['optim_method'],
-                                                   embedding_model['args'].batch_size,
-                                                   embedding_model['args'].neg_sample_size,
-                                                   bool(embedding_model['args'].double_neg))
+        regularizer = (getattr(regularizers, args.regularizer)(args.reg))
+        optim_method = (getattr(torch.optim, args.optimizer)(model.parameters(), lr=args.learning_rate))
+        embedding_model['optimizer'] = KGOptimizer(model, regularizer, optim_method, args.batch_size,
+                                                   args.neg_sample_size, bool(args.double_neg))
 
-        embedding_model['args'].counter = 0
-        embedding_model['args'].best_mrr = None
-        embedding_model['args'].best_epoch = None
+        args.counter = 0
+        args.best_mrr = None
+        args.best_epoch = None
 
     # Iterate over epochs
     for epoch in range(max_epochs):
@@ -196,32 +209,34 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                 continue
 
             args = embedding_model['args']
+            model = embedding_model['model']
             logging.info(f"Training subgraph {embedding_model['subgraph']} in epoch {epoch} with model "
                          f"{args.model_name}")
 
             # Train step
-            embedding_model['model'].train()
+            model.train()
             train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
             logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
 
             # TODO fully implement validation -> correct datasets and maybe adapting process
             # Valid step
-            # embedding_model['model'].eval()
-            # valid_loss = optimizer.calculate_valid_loss(valid_examples)
-            # logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {epoch} | "
-            #              f"average train loss: {valid_loss:.4f}")
+            model.eval()
+            valid_loss = embedding_model['optimizer'].calculate_valid_loss(embedding_model["valid_examples"])
+            logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {epoch} | "
+                         f"average train loss: {valid_loss:.4f}")
 
             if (epoch + 1) % args.valid == 0:
                 # TODO fully implement validation -> correct datasets and maybe adapting process
-                # valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
-                # logging.info(format_metrics(valid_metrics, split="valid"))
-                #
-                # valid_mrr = valid_metrics["MRR"]
-                # if not best_mrr or valid_mrr > best_mrr:
-                #     best_mrr = valid_mrr
-                #     counter = 0
-                #     best_epoch = epoch
+                valid_metrics = avg_both(*model.compute_metrics(embedding_model["valid_examples"],
+                                                                embedding_model['filters']))
+                logging.info(format_metrics(valid_metrics, split="valid"))
+
+                valid_mrr = valid_metrics["MRR"]
+                if not args.best_mrr or valid_mrr > args.best_mrr:
+                    args.best_mrr = valid_mrr
+                    args.counter = 0
+                    args.best_epoch = epoch
                 logging.info(f"Saving model at epoch {epoch} in {info_directory}")
                 torch.save(embedding_model['model'].cpu().state_dict(),
                            f"{model_file_dir}\\model_{args.subgraph}_"f"{args.model_name}.pt")
@@ -256,6 +271,20 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{round(time_stop_training_sub - time_start_training_sub, 3)} seconds / "
                      f"{round((time_stop_training_sub - time_start_training_sub) / 60, 3)} minutes\t/-")
+
+        Attention_mechanism.calculate_self_attention(embedding_models)
+
+        Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
+                                                                  embedding_general_rel,
+                                                                  embedding_models)
+
+    # for embedding_model in embedding_models:
+    #     util.difference_embeddings(embedding_general_ent.weight.data,
+    #                                embedding_model['model'].entity.weight.data,
+    #                                info_directory, ent=True, file_identifier=embedding_model['args'].subgraph)
+    #     util.difference_embeddings(embedding_general_rel.weight.data,
+    #                                embedding_model['model'].rel.weight.data,
+    #                                info_directory, rel=True, file_identifier=embedding_model['args'].subgraph)
 
     time_stop_training_total = time.time()
 
@@ -320,23 +349,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
 
         logging.info(f"-\\\tSuccessfully loaded {len(models_to_load)} models from storage.\t/-")
 
-    # --- Create unified embedding ---
-
-    # Calculate attention values
-    # for embedding_model in embedding_models:
-    #     Attention_mechanism.calculate_self_attention(embedding_model)
-    #
-    # # Combine embeddings using the previously calculated attention values
-    #
-    # unified_embedding_ent, unified_embedding_rel = Attention_mechanism.calculate_unified_embedding(embedding_models)
-
     # TODO fix dimension error with AttH
-
-    # logging.info("Loading unified embeddings into all models")
-    # for embedding_model in embedding_models:
-    #     model = embedding_model["model"]
-    #     model.entity.weight.data = unified_embedding_ent
-    #     model.rel.weight.data = unified_embedding_rel
 
     # --- Testing with aggregated scores ---
 
@@ -348,9 +361,9 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         filters = embedding_model["filters"]
 
         # Validation metrics
-        # valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
-        # logging.info(format_metrics(valid_metrics, split="valid"))
+        valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+        logging.info(format_metrics(valid_metrics, split="valid"))
 
         # Test metrics
-        # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
-        # logging.info(format_metrics(test_metrics, split="test"))
+        test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+        logging.info(format_metrics(test_metrics, split="test"))

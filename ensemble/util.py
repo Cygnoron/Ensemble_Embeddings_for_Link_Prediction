@@ -4,6 +4,7 @@ import pickle
 import random
 from collections import defaultdict
 
+import torch
 from torch import nn
 
 from datasets.kg_dataset import KGDataset
@@ -18,9 +19,9 @@ def create_entity_and_relation_name_set_file(dataset):
     """
     logging.debug(f"Creating csv files containing the entity and relation name sets for dataset {dataset}")
 
-    with (open(os.path.abspath(f"data\\{dataset}\\train.pickle"), 'rb') as pickle_file,
-          open(f"data\\{dataset}\\entity_set.csv", 'w') as entity_set_file,
-          open(f"data\\{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
+    with (open(os.path.abspath(f"{dataset}\\train.pickle"), 'rb') as pickle_file,
+          open(f"{dataset}\\entity_set.csv", 'w') as entity_set_file,
+          open(f"{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
 
         logging.debug("Loading data from .pickle file")
         # load data from train.pickle file
@@ -177,7 +178,7 @@ def assign_model_to_subgraph(kge_models, args):
     logging.debug("Checking if 'all' or 'rest' was specified")
     for embedding_model in list(kge_models.keys()):
         # Handle case "all" if specified in kge_models
-        if kge_models[embedding_model] == ["all"]:
+        if "all" in kge_models[embedding_model]:
             logging.debug(f"'all' was found for embedding model {embedding_model}")
             logging.info(f"All subgraphs will be embedded by {kge_models_adjusted[0]}")
             # Clear mapping, if some subgraphs were already mapped (-> "all" overrides all other specifications)
@@ -327,75 +328,30 @@ def get_dataset_name(dataset: str):
 
 
 def generate_general_embeddings(general_dataset: str, args):
-    logging.debug("Creating dataset and model for later unified embeddings.")
+    logging.debug("Creating general embeddings and context vectors.")
+
     # load data
     dataset = KGDataset(os.path.abspath(f"data\\{general_dataset}"), args.debug)
     sizes_entity, sizes_rel, _ = dataset.get_shape()
 
-    embedding_general_entity = nn.Embedding(sizes_entity, args.rank)
-    embedding_general_rel = nn.Embedding(sizes_rel, args.rank)
-    embedding_general_entity.to("cuda")
+    # embeddings
+    embedding_general_ent = nn.Embedding(sizes_entity, args.rank, dtype=torch.double)
+    embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=torch.double)
+
+    # context vectors
+    theta_ent = nn.Embedding(sizes_entity, args.rank, dtype=torch.double)
+    theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=torch.double)
+
+    # set device as "cuda"
+    embedding_general_ent.to("cuda")
     embedding_general_rel.to("cuda")
+    theta_ent.to("cuda")
+    theta_rel.to("cuda")
 
-    return embedding_general_entity, embedding_general_rel
-
-
-def filter_dataset(dataset, filters, invert_filter=False):
-    """
-    Filter the dataset based on specified entity and relation name filters.
-
-    Args:
-        dataset (list): The dataset to be filtered, represented as a list of triples, where each triple consists of
-            (head, relation, tail).
-        filters (dict): A dictionary containing filters for entities and relation names. It has the following structure:
-            {
-                "entity": list or None,  # A list of entity names to filter on, or None if no entity filtering is required.
-                "relation name": list or None,  # A list of relation names to filter on, or None if no relation name filtering is required.
-            }
-        invert_filter (boolean): If true, invert filtering and only keep a triple if one of its contens is in a filter
-
-    Returns:
-        list: The filtered dataset containing only the triples that match the specified filters.
-    """
-    entity_filters = []
-    relation_name_filters = []
-    filtered_indices = []
-    length_dataset = len(dataset)
-
-    logging.debug(f"Filters:\t{filters}")
-
-    if filters.get("entity") is not None:
-        entity_filters = filters["entity"]
-        logging.debug(f"Entity filters:\t{entity_filters}")
-    if filters.get("relation name") is not None:
-        relation_name_filters = filters["relation name"]
-        logging.debug(f"Relation name filters:\t{relation_name_filters}")
-
-    for index, triple in enumerate(dataset):
-        head, relation, tail = triple
-
-        if invert_filter:
-            # If one of the components is in the filters, add to filtered_indices
-            if ((int(head) in entity_filters) or (int(relation) in relation_name_filters) or
-                    (int(tail) in entity_filters)):
-                filtered_indices.append(index)
-        else:
-            # If none of the components are in the filters, add to filtered_indices
-            if ((int(head) not in entity_filters) and (int(relation) not in relation_name_filters) and
-                    (int(tail) not in entity_filters)):
-                filtered_indices.append(index)
-
-        if index < 5:
-            logging.log(Constants.DATA_LEVEL, f"{head}\t{relation}\t{tail}")
-
-    # Use filtered_indices to select only the wanted triples
-    filtered_dataset = [dataset[i] for i in filtered_indices]
-    logging.log(Constants.DATA_LEVEL, f"Filtered Dataset: {filtered_dataset[:5]}")
-    logging.debug(f"There were {length_dataset-len(filtered_dataset)} triples removed due to filtering.")
-    return filtered_dataset
+    return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel
 
 
-def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False):
+def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False, file_identifier=""):
     """
     Compute the difference between two embeddings and write the results to a CSV file.
 
@@ -403,24 +359,30 @@ def difference_embeddings(embedding_before, embedding_after, output_path, ent=Fa
         embedding_before (torch.tensor): The embedding before some transformation.
         embedding_after (torch.tensor): The embedding after the same transformation.
         output_path (str): The path to save the output CSV file.
-        ent (bool): Set True if embedding is from entities, affects output file name
-        rel (bool): Set True if embedding is from relation names, affects output file name
+        ent (bool): Set True if embedding is from entities, affects output filename
+        rel (bool): Set True if embedding is from relation names, affects output filename
+        file_identifier (str): Additional string, that is attached to the output filename
 
     Returns:
         None
+
     """
     output_path = os.path.abspath(output_path)
     if ent:
-        output_file_name = "difference_embeddings_ent.csv"
+        output_file_name = "difference_embeddings_ent"
     elif rel:
-        output_file_name = "difference_embeddings_rel.csv"
+        output_file_name = "difference_embeddings_rel"
     else:
-        output_file_name = "difference_embeddings.csv"
+        output_file_name = "difference_embeddings"
+
+    if file_identifier != "":
+        file_identifier = f"_{file_identifier}"
+
     logging.debug(f"Calculating difference between embeddings an saving it to {output_path}.")
 
     embedding_difference = embedding_before - embedding_after
 
-    with open(os.path.join(output_path, output_file_name), "w") as output_file:
+    with open(os.path.join(output_path, f"{output_file_name}{file_identifier}.csv"), "w") as output_file:
         logging.debug("Write embeddings before some transformation")
         # iterate through all embeddings
         for embedding_before_id in embedding_before:

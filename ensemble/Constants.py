@@ -1,4 +1,5 @@
 # sampling methods
+DEBUG_SAMPLING = [0, "Debug sampling", "Debug_sampling"]
 ENTITY_SAMPLING = [1, "Entity sampling", "Entity_sampling"]
 FEATURE_SAMPLING = [2, "Feature sampling", "Feature_sampling"]
 
