@@ -2,11 +2,12 @@
 import datetime
 import os
 
-LOGS_PATH = "/\\logs"
+LOGS_PATH = "\\logs"
 
 
 def get_savedir(model, dataset):
     """Get unique saving directory name."""
+    print(LOGS_PATH)
     dt = datetime.datetime.now()
     date = dt.strftime("%m_%d")
     save_dir = os.path.join(LOGS_PATH, date, dataset, model + dt.strftime('_%H_%M_%S'))

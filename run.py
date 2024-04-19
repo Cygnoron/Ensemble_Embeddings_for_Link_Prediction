@@ -148,11 +148,9 @@ def train(args):
     logging.info("\t Start training")
     for step in range(args.max_epochs):
 
-        # TODO Training
         # Train step
         model.train()
 
-        # TODO Training loss metrics
         train_loss = optimizer.epoch(train_examples)
         logging.info("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
 
@@ -161,7 +159,6 @@ def train(args):
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
         logging.info("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
 
-        # TODO Combine
         if (step + 1) % args.valid == 0:
             valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
             logging.info(format_metrics(valid_metrics, split="valid"))
