@@ -18,43 +18,20 @@ def calculate_self_attention(embedding_models):
         scale = model.scale
 
         embedding_ent = model.entity.weight.data
-        contex_vec_ent = model.theta_ent.weight.data
-
         embedding_rel = model.rel.weight.data
+
+        contex_vec_ent = model.theta_ent.weight.data
         contex_vec_rel = model.theta_rel.weight.data
 
         embedding_model["att_weights_ent"] = torch.sum(contex_vec_ent * embedding_ent * scale, dim=-1, keepdim=True)
         embedding_model["att_weights_rel"] = torch.sum(contex_vec_rel * embedding_rel * scale, dim=-1, keepdim=True)
 
-        logging.debug(f"Sum entity before: {torch.sum(embedding_model['att_weights_ent'])}")
-        logging.log(Constants.DATA_LEVEL, f"att_weights_ent before softmax:\n{embedding_model['att_weights_ent']}")
-
         embedding_model["att_weights_ent"] = activation(embedding_model["att_weights_ent"])
-
-        logging.debug(f"Sum entity after: {torch.sum(embedding_model['att_weights_ent'])}")
-        logging.log(Constants.DATA_LEVEL, f"att_weights_ent after softmax:\n{embedding_model['att_weights_ent']}")
-
-        logging.debug(f"Sum rel before: {torch.sum(embedding_model['att_weights_rel'])}")
-        logging.log(Constants.DATA_LEVEL, f"att_weights_rel before softmax:\n{embedding_model['att_weights_rel']}")
-
         embedding_model["att_weights_rel"] = activation(embedding_model["att_weights_rel"])
 
-        logging.debug(f"Sum rel after: {torch.sum(embedding_model['att_weights_rel'])}")
-        logging.log(Constants.DATA_LEVEL, f"att_weights_rel after softmax:\n{embedding_model['att_weights_rel']}")
-
-    # collected_attention_ent = embedding_models[0]['att_weights_ent']
-    # collected_attention_rel = embedding_models[0]['att_weights_rel']
-    #
-    # for index, embedding_model in enumerate(embedding_models):
-    #     if index == 0:
-    #         continue
-    #     torch.cat((collected_attention_ent, embedding_model['att_weights_ent']),
-    #               dim=0, out=collected_attention_ent)
-    #     torch.cat((collected_attention_rel, embedding_model['att_weights_rel']),
-    #               dim=0, out=collected_attention_rel)
-    #
-    #     collected_attention_ent = activation(collected_attention_ent)
-    #     collected_attention_rel = activation(collected_attention_rel)
+        logging.log(Constants.DATA_LEVEL, f"Attention weights entity embeddings:\n{embedding_model['att_weights_ent']}")
+        logging.log(Constants.DATA_LEVEL, f"Attention weights relation name embeddings:\n"
+                                          f"{embedding_model['att_weights_rel']}")
 
     return
 
@@ -72,6 +49,7 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
     general_embedding_rel.weight.data = (embedding_models[0]["att_weights_rel"] *
                                          embedding_models[0]["model"].rel.weight.data)
 
+    # each model has same influence, only embeddings inside each model are scaled via attention
     for index, embedding_model in enumerate(embedding_models):
         if index == 0:
             continue
@@ -79,6 +57,8 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
                   other=embedding_model["att_weights_ent"] * embedding_model["model"].entity.weight.data)
         torch.add(input=general_embedding_rel.weight.data, out=general_embedding_rel.weight.data,
                   other=embedding_model["att_weights_rel"] * embedding_model["model"].rel.weight.data)
+
+    general_embedding_rel.weight.data /= len(embedding_models)
 
     logging.debug(f"Size of general entity embedding, after applying attention:\t"
                   f"{general_embedding_ent.weight.data.size()}")

@@ -47,7 +47,7 @@ def format_metrics(metrics, split):
     result += "H@10: {:.3f} | ".format(metrics['hits@[1,3,10]'][2])
 
     # added AMRI and MR_deviation
-    result += "AMRI: {:.3f} | ".format(metrics['AMRI'])
+    result += "AMRI: {:.6f} | ".format(metrics['AMRI'])
     result += "MR_deviation: {:.3f}".format(metrics['MR_deviation'])
     return result
 

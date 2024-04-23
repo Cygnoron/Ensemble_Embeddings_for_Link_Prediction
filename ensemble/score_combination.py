@@ -68,7 +68,7 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE):
             stacked_scores = torch.stack(model_scores, dim=1)
             logging.log(Constants.DATA_LEVEL, f"Stacked scores:\n{stacked_scores}")
 
-            aggregated_scores[mode] = torch.max(stacked_scores, dim=1)
+            aggregated_scores[mode], _ = torch.max(stacked_scores, dim=1)
             logging.log(Constants.DATA_LEVEL, f"Size:\t{aggregated_scores[mode].size()}\t\t"
                                               f"Aggregated scores:\n{aggregated_scores[mode]}")
 
@@ -92,7 +92,7 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE):
 
 def compute_ranks(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500):
     queries = examples.clone()
-    ranks = torch.ones(len(queries))
+    ranks = {'rhs': torch.ones(len(queries)), 'lhs': torch.ones(len(queries))}
 
     for mode in ["rhs", "lhs"]:
         with torch.no_grad():
@@ -110,10 +110,12 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
 
                     # set filtered and true scores to -1e6 to be ignored
                     for i, query in enumerate(these_queries):
-                        filter_out = filters[(query[0].item(), query[1].item())]
+                        # TODO fix filter for true score
+                        # filter_out = filters[(query[0].item(), query[1].item())]
+                        filter_out = []
                         filter_out += [queries[b_begin + i, 2].item()]
                         aggregated_scores[mode][i, torch.LongTensor(filter_out)] = -1e6
-                    ranks[b_begin:b_begin + batch_size] += torch.sum(
+                    ranks[mode][b_begin:b_begin + batch_size] += torch.sum(
                         (aggregated_scores[mode] >= targets[mode]).float(),
                         dim=1).cpu()
                 except KeyError:
@@ -121,7 +123,7 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
 
                 b_begin += batch_size
 
-        # logging.debug(f"Mode:\t{mode}\t\tSize:\t{ranks.size()}\t\tRanks:\n{ranks}")
+        logging.log(Constants.DATA_LEVEL, f"Mode:\t{mode}\t\tSize:\t{ranks[mode].size()}\t\tRanks:\n{ranks[mode]}")
     return ranks
 
 

@@ -204,6 +204,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
 
     # -- delta creation for Entity Sampling --
     if sampling_method[0] == Constants.ENTITY_SAMPLING[0]:
+        # TODO revise sampling to better reflect formula E_sampled x R x E_sampled
         # select entities with respect to subgraph size:
         # select e_1 -> check size of effected triples in dataset
         # size > subgraph_size?: (yes)->select e_2, repeat; (no)->end selection process

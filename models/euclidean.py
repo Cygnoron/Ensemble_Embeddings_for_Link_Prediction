@@ -1,4 +1,5 @@
 """Euclidean Knowledge Graph embedding models where embeddings are in real space."""
+import logging
 
 import numpy as np
 import torch

@@ -377,8 +377,8 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     # logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
-    logging.info(format_metrics(test_metrics, split="test"))
+    # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    # logging.info(format_metrics(test_metrics, split="test"))
 
     # --- Testing with aggregated scores ---
 
@@ -397,7 +397,6 @@ def test_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode
     else:
         logging.error(f"The given mode \"{mode}\" does not exist!")
         return
-    filters = embedding_models[0]["filters"]
 
     # calculate scores for all models
     embedding_models = score_combination.calculate_scores(embedding_models, examples, batch_size=batch_size)
@@ -409,11 +408,12 @@ def test_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode
     aggregated_scores = score_combination.combine_scores(embedding_models, aggregation_method)
 
     # compute the ranks for all queries
+    filters = embedding_models[0]["filters"]
     ranks = score_combination.compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
                                             batch_size=batch_size)
 
     # calculate metrics from the ranks
-    # test_metrics = avg_both(*compute_metrics_from_ranks(ranks))
-    # logging.info(format_metrics(test_metrics, split="test"))
+    metrics = avg_both(*score_combination.compute_metrics_from_ranks(ranks))
+    logging.info(format_metrics(metrics, split=mode))
 
     return
