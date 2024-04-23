@@ -65,12 +65,17 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE):
             model_scores = []
             for embedding_model in embedding_models:
                 model_scores += [embedding_model['scores'][mode]]
-            stacked_scores = torch.stack(model_scores, dim=1)
-            logging.log(Constants.DATA_LEVEL, f"Stacked scores:\n{stacked_scores}")
+            try:
+                stacked_scores = torch.stack(model_scores, dim=1)
+                logging.log(Constants.DATA_LEVEL, f"Stacked scores:\n{stacked_scores}")
 
-            aggregated_scores[mode], _ = torch.max(stacked_scores, dim=1)
-            logging.log(Constants.DATA_LEVEL, f"Size:\t{aggregated_scores[mode].size()}\t\t"
-                                              f"Aggregated scores:\n{aggregated_scores[mode]}")
+                aggregated_scores[mode], _ = torch.max(stacked_scores, dim=1)
+                logging.log(Constants.DATA_LEVEL, f"Size:\t{aggregated_scores[mode].size()}\t\t"
+                                                  f"Aggregated scores:\n{aggregated_scores[mode]}")
+            except Exception:
+                for index,  score in enumerate(model_scores):
+                    logging.error(f"Mode: {mode}\tSize of score set {index}: {score.size()}")
+
 
         elif aggregation_method[0] == Constants.AVERAGE_SCORE[0]:
             logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")

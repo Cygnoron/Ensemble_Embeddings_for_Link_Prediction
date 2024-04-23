@@ -1,0 +1,201 @@
+2024-04-23 15:38:11 INFO     ### Saving logs in: D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results ###
+2024-04-23 15:38:11 DEBUG    ### Debug messages are enabled ###
+2024-04-23 15:38:11 INFO     ### Saving .json config files of models in: D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_setup_configs ###
+2024-04-23 15:38:11 INFO     ### Saving .pt files of stored models in: D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files ###
+2024-04-23 15:38:11 DEBUG    Given dataset was sampled by Entity sampling, returning original name WN18RR
+2024-04-23 15:38:11 DEBUG    Creating general embeddings and context vectors.
+2024-04-23 15:38:11 INFO     -/	Setting up embedding models	\-
+2024-04-23 15:38:11 DEBUG    Checking if 'all' or 'rest' was specified
+2024-04-23 15:38:11 DEBUG    Checking for direct mappings
+2024-04-23 15:38:11 INFO     Subgraphs with fixed embedding: {0: 'TransE', 1: 'DistMult', 2: 'RotatE', 3: 'ComplEx', 4: 'AttE'}
+		Remaining subgraphs will be embedded by random embedding methods ['TransE', 'DistMult', 'RotatE', 'ComplEx', 'AttE']
+2024-04-23 15:38:11 INFO     Found mapping, using embedding method TransE for subgraph sub_000
+2024-04-23 15:38:11 INFO     Found mapping, using embedding method DistMult for subgraph sub_001
+2024-04-23 15:38:11 INFO     Found mapping, using embedding method RotatE for subgraph sub_002
+2024-04-23 15:38:11 INFO     Found mapping, using embedding method ComplEx for subgraph sub_003
+2024-04-23 15:38:11 INFO     Found mapping, using embedding method AttE for subgraph sub_004
+2024-04-23 15:38:11 INFO     Randomly selected embedding method RotatE for subgraph sub_005
+2024-04-23 15:38:11 INFO     Randomly selected embedding method AttE for subgraph sub_006
+2024-04-23 15:38:11 INFO     Randomly selected embedding method ComplEx for subgraph sub_007
+2024-04-23 15:38:11 INFO     Randomly selected embedding method ComplEx for subgraph sub_008
+2024-04-23 15:38:11 INFO     Randomly selected embedding method RotatE for subgraph sub_009
+2024-04-23 15:38:11 INFO     Mapping from embedding methods to subgraphs: {'TransE': [0], 'DistMult': [1], 'RotatE': [2, 5, 9], 'ComplEx': [3, 7, 8], 'AttE': [4, 6]}
+2024-04-23 15:38:11 INFO     No already trained models found.
+2024-04-23 15:38:11 INFO     -/	Creating new model from embedding method TransE for subgraph sub_000	\-
+2024-04-23 15:38:11 INFO     Loading data fom subgraph sub_000.
+2024-04-23 15:38:12 INFO     -\	Total number of parameters: 2703646	/-
+2024-04-23 15:38:12 INFO     -/	Creating new model from embedding method DistMult for subgraph sub_001	\-
+2024-04-23 15:38:12 INFO     Loading data fom subgraph sub_001.
+2024-04-23 15:38:12 INFO     -\	Total number of parameters: 2703646	/-
+2024-04-23 15:38:12 INFO     -/	Creating new model from embedding method RotatE for subgraph sub_002	\-
+2024-04-23 15:38:12 INFO     Loading data fom subgraph sub_002.
+2024-04-23 15:38:13 INFO     -\	Total number of parameters: 4014428	/-
+2024-04-23 15:38:13 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_003	\-
+2024-04-23 15:38:13 INFO     Loading data fom subgraph sub_003.
+2024-04-23 15:38:13 INFO     -\	Total number of parameters: 4014526	/-
+2024-04-23 15:38:13 INFO     -/	Creating new model from embedding method AttE for subgraph sub_004	\-
+2024-04-23 15:38:13 INFO     Loading data fom subgraph sub_004.
+2024-04-23 15:38:14 INFO     -\	Total number of parameters: 2705692	/-
+2024-04-23 15:38:14 INFO     -/	Creating new model from embedding method RotatE for subgraph sub_005	\-
+2024-04-23 15:38:14 INFO     Loading data fom subgraph sub_005.
+2024-04-23 15:38:14 INFO     -\	Total number of parameters: 4014526	/-
+2024-04-23 15:38:14 INFO     -/	Creating new model from embedding method AttE for subgraph sub_006	\-
+2024-04-23 15:38:14 INFO     Loading data fom subgraph sub_006.
+2024-04-23 15:38:15 INFO     -\	Total number of parameters: 2705758	/-
+2024-04-23 15:38:15 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_007	\-
+2024-04-23 15:38:15 INFO     Loading data fom subgraph sub_007.
+2024-04-23 15:38:15 INFO     -\	Total number of parameters: 4014526	/-
+2024-04-23 15:38:15 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_008	\-
+2024-04-23 15:38:15 INFO     Loading data fom subgraph sub_008.
+2024-04-23 15:38:16 INFO     -\	Total number of parameters: 4014526	/-
+2024-04-23 15:38:16 INFO     -/	Creating new model from embedding method RotatE for subgraph sub_009	\-
+2024-04-23 15:38:16 INFO     Loading data fom subgraph sub_009.
+2024-04-23 15:38:16 INFO     -\	Total number of parameters: 4014526	/-
+2024-04-23 15:38:16 INFO     -\	Successfully created all models in 4.527 seconds / 0.075 minutes	/-
+2024-04-23 15:38:16 INFO     -/	Starting training	\-
+2024-04-23 15:38:16 INFO     -/	Start training sub_000 with TransE	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_001 with DistMult	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_002 with RotatE	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_003 with ComplEx	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_004 with AttE	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_005 with RotatE	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_006 with AttE	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_007 with ComplEx	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_008 with ComplEx	\-
+2024-04-23 15:38:17 INFO     -/	Start training sub_009 with RotatE	\-
+2024-04-23 15:38:17 INFO     Training subgraph sub_000 in epoch 0 with model TransE
+2024-04-23 15:38:21 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 1.6968
+2024-04-23 15:38:21 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_000_TransE.pt
+2024-04-23 15:38:21 INFO     Training subgraph sub_001 in epoch 0 with model DistMult
+2024-04-23 15:38:24 INFO     Subgraph sub_001 Training Epoch 0 | average train loss: 1.0791
+2024-04-23 15:38:24 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_001_DistMult.pt
+2024-04-23 15:38:24 INFO     Training subgraph sub_002 in epoch 0 with model RotatE
+2024-04-23 15:38:30 INFO     Subgraph sub_002 Training Epoch 0 | average train loss: 0.6477
+2024-04-23 15:38:30 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_002_RotatE.pt
+2024-04-23 15:38:30 INFO     Training subgraph sub_003 in epoch 0 with model ComplEx
+2024-04-23 15:38:36 INFO     Subgraph sub_003 Training Epoch 0 | average train loss: 0.6597
+2024-04-23 15:38:36 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_003_ComplEx.pt
+2024-04-23 15:38:36 INFO     Training subgraph sub_004 in epoch 0 with model AttE
+2024-04-23 15:38:46 INFO     Subgraph sub_004 Training Epoch 0 | average train loss: 1.4651
+2024-04-23 15:38:46 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_004_AttE.pt
+2024-04-23 15:38:46 INFO     Training subgraph sub_005 in epoch 0 with model RotatE
+2024-04-23 15:38:52 INFO     Subgraph sub_005 Training Epoch 0 | average train loss: 0.6423
+2024-04-23 15:38:52 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_005_RotatE.pt
+2024-04-23 15:38:52 INFO     Training subgraph sub_006 in epoch 0 with model AttE
+2024-04-23 15:39:02 INFO     Subgraph sub_006 Training Epoch 0 | average train loss: 1.4469
+2024-04-23 15:39:02 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_006_AttE.pt
+2024-04-23 15:39:02 INFO     Training subgraph sub_007 in epoch 0 with model ComplEx
+2024-04-23 15:39:07 INFO     Subgraph sub_007 Training Epoch 0 | average train loss: 0.6622
+2024-04-23 15:39:07 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_007_ComplEx.pt
+2024-04-23 15:39:07 INFO     Training subgraph sub_008 in epoch 0 with model ComplEx
+2024-04-23 15:39:13 INFO     Subgraph sub_008 Training Epoch 0 | average train loss: 0.6674
+2024-04-23 15:39:13 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_008_ComplEx.pt
+2024-04-23 15:39:13 INFO     Training subgraph sub_009 in epoch 0 with model RotatE
+2024-04-23 15:39:19 INFO     Subgraph sub_009 Training Epoch 0 | average train loss: 0.6430
+2024-04-23 15:39:19 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_009_RotatE.pt
+2024-04-23 15:39:19 INFO     -\	Training and optimization of epoch 0 finished in 62.241 seconds / 1.037 minutes	/-
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_000 (TransE)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_001 (DistMult)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_002 (RotatE)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_003 (ComplEx)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_004 (AttE)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_005 (RotatE)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_006 (AttE)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_007 (ComplEx)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_008 (ComplEx)
+2024-04-23 15:39:19 INFO     Calculating self-attention for sub_009 (RotatE)
+2024-04-23 15:39:19 INFO     Calculating unified embedding for entities and relation names.
+2024-04-23 15:39:19 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-04-23 15:39:19 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-04-23 15:39:19 DEBUG    Size of general entity embedding, after applying attention:	torch.Size([40943, 32])
+2024-04-23 15:39:19 DEBUG    Size of general relation name embedding, after applying attention:	torch.Size([22, 32])
+2024-04-23 15:39:19 INFO     Training subgraph sub_000 in epoch 1 with model TransE
+2024-04-23 15:39:22 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 0.4211
+2024-04-23 15:39:22 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_000_TransE.pt
+2024-04-23 15:39:22 INFO     Training subgraph sub_001 in epoch 1 with model DistMult
+2024-04-23 15:39:26 INFO     Subgraph sub_001 Training Epoch 1 | average train loss: 0.5999
+2024-04-23 15:39:26 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_001_DistMult.pt
+2024-04-23 15:39:26 INFO     Training subgraph sub_002 in epoch 1 with model RotatE
+2024-04-23 15:39:32 INFO     Subgraph sub_002 Training Epoch 1 | average train loss: 0.5098
+2024-04-23 15:39:32 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_002_RotatE.pt
+2024-04-23 15:39:32 INFO     Training subgraph sub_003 in epoch 1 with model ComplEx
+2024-04-23 15:39:37 INFO     Subgraph sub_003 Training Epoch 1 | average train loss: 0.5264
+2024-04-23 15:39:37 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_003_ComplEx.pt
+2024-04-23 15:39:38 INFO     Training subgraph sub_004 in epoch 1 with model AttE
+2024-04-23 15:39:47 INFO     Subgraph sub_004 Training Epoch 1 | average train loss: 0.1203
+2024-04-23 15:39:47 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_004_AttE.pt
+2024-04-23 15:39:47 INFO     Training subgraph sub_005 in epoch 1 with model RotatE
+2024-04-23 15:39:54 INFO     Subgraph sub_005 Training Epoch 1 | average train loss: 0.4988
+2024-04-23 15:39:54 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_005_RotatE.pt
+2024-04-23 15:39:54 INFO     Training subgraph sub_006 in epoch 1 with model AttE
+2024-04-23 15:40:04 INFO     Subgraph sub_006 Training Epoch 1 | average train loss: 0.0958
+2024-04-23 15:40:04 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_006_AttE.pt
+2024-04-23 15:40:04 INFO     Training subgraph sub_007 in epoch 1 with model ComplEx
+2024-04-23 15:40:09 INFO     Subgraph sub_007 Training Epoch 1 | average train loss: 0.5320
+2024-04-23 15:40:09 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_007_ComplEx.pt
+2024-04-23 15:40:09 INFO     Training subgraph sub_008 in epoch 1 with model ComplEx
+2024-04-23 15:40:15 INFO     Subgraph sub_008 Training Epoch 1 | average train loss: 0.5459
+2024-04-23 15:40:15 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_008_ComplEx.pt
+2024-04-23 15:40:15 INFO     Training subgraph sub_009 in epoch 1 with model RotatE
+2024-04-23 15:40:21 INFO     Subgraph sub_009 Training Epoch 1 | average train loss: 0.5052
+2024-04-23 15:40:21 INFO     Saving new model saved at epoch None
+D:\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N10_min0.1\results\model_files\model_sub_009_RotatE.pt
+2024-04-23 15:40:21 INFO     -\	Training and optimization of epoch 1 finished in 61.946 seconds / 1.032 minutes	/-
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_000 (TransE)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_001 (DistMult)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_002 (RotatE)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_003 (ComplEx)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_004 (AttE)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_005 (RotatE)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_006 (AttE)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_007 (ComplEx)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_008 (ComplEx)
+2024-04-23 15:40:21 INFO     Calculating self-attention for sub_009 (RotatE)
+2024-04-23 15:40:21 INFO     Calculating unified embedding for entities and relation names.
+2024-04-23 15:40:21 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-04-23 15:40:21 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-04-23 15:40:21 DEBUG    Size of general entity embedding, after applying attention:	torch.Size([40943, 32])
+2024-04-23 15:40:21 DEBUG    Size of general relation name embedding, after applying attention:	torch.Size([22, 32])
+2024-04-23 15:40:21 INFO     -\	Successfully finished training and optimizing all subgraphs in 125.145 seconds / 2.086 minutes	/-
+2024-04-23 15:40:21 INFO     Testing the ensemble with the score aggregation method "maximum score".
+2024-04-23 15:40:24 INFO     Combining scores of all models with maximum score.
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 0: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 1: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 2: torch.Size([134, 40942])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 3: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 4: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 5: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 6: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 7: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 8: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: rhs	Size of score set 9: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 0: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 1: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 2: torch.Size([134, 40942])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 3: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 4: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 5: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 6: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 7: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 8: torch.Size([134, 40943])
+2024-04-23 15:40:24 ERROR    Mode: lhs	Size of score set 9: torch.Size([134, 40943])
+2024-04-23 15:40:24 INFO     	 test MR: 1.00 | MRR: 1.000 | H@1: 1.000 | H@3: 1.000 | H@10: 1.000 | AMRI: nan | MR_deviation: 0.000
