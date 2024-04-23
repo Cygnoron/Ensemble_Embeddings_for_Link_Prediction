@@ -12,7 +12,7 @@ if __name__ == "__main__":
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 10
+    subgraph_amount = 3
     subgraph_size_range = (0.1, 0.7)
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
@@ -75,8 +75,10 @@ if __name__ == "__main__":
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
+        allowed_kge_models = [{Constants.TRANS_E: [0, 'all'], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
                                Constants.COMPL_EX: [3], Constants.ATT_E: [4]}]
+        #TODO add check for dict with allowed_kge
+
         # # for i in range(1):
         # #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
         # #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
@@ -89,7 +91,7 @@ if __name__ == "__main__":
         for models in allowed_kge_models:
             try:
                 run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-                          learning_rate=0.01, kge_models=models, max_epochs=2, batch_size=800,
+                          learning_rate=0.01, kge_models=models, max_epochs=1, batch_size=1000,
                           rank=32, debug=False)
             except RuntimeError:
                 logging.error(traceback.format_exc())

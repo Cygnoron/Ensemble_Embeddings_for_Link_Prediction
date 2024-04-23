@@ -377,8 +377,8 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
     # logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
-    # logging.info(format_metrics(test_metrics, split="test"))
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    logging.info(format_metrics(test_metrics, split="test"))
 
     # --- Testing with aggregated scores ---
 
@@ -399,13 +399,10 @@ def test_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode
         return
 
     # calculate scores for all models
-    embedding_models = score_combination.calculate_scores(embedding_models, examples, batch_size=batch_size)
-
-    # set target scores from first embedding model, as these are all the same
-    targets = {'rhs': embedding_models[0]['targets']['rhs'], 'lhs': embedding_models[0]['targets']['lhs']}
+    embedding_models, targets = score_combination.calculate_scores(embedding_models, examples, batch_size=batch_size)
 
     # combine the calculated scores from all models, according to the given aggregation method
-    aggregated_scores = score_combination.combine_scores(embedding_models, aggregation_method)
+    aggregated_scores = score_combination.combine_scores(embedding_models, aggregation_method, batch_size=batch_size)
 
     # compute the ranks for all queries
     filters = embedding_models[0]["filters"]
