@@ -5,15 +5,14 @@ import logging
 import os
 import time
 
-import numpy as np
 import torch
 from torch import nn
 
 import models as models
 from datasets.kg_dataset import KGDataset
-from ensemble import Constants, util_files, util, Attention_mechanism
+from ensemble import Constants, util_files, util, Attention_mechanism, score_combination
 from optimizers import regularizers as regularizers, KGOptimizer
-from utils.train import count_params, format_metrics, avg_both
+from utils.train import count_params, avg_both, format_metrics
 
 try:
     # path on pc
@@ -110,6 +109,7 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
         args_subgraph = copy.copy(args)
         args_subgraph.model = subgraph_embedding_mapping[subgraph_num]
         args_subgraph.model_name = args_subgraph.model
+        args_subgraph.subgraph_num = subgraph_num
         subgraph = f"sub_{subgraph_num:03d}"
 
         logging.info(f"-/\tCreating new model from embedding method {args_subgraph.model} for subgraph {subgraph}\t\\-")
@@ -220,29 +220,28 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                          f"average train loss: {train_loss:.4f}")
 
             # TODO fully implement validation -> correct datasets and maybe adapting process
+            #  validate all models together -> implement validation and testing process for all models
             # Valid step
-            model.eval()
-            valid_loss = embedding_model['optimizer'].calculate_valid_loss(embedding_model["valid_examples"])
-            logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {epoch} | "
-                         f"average train loss: {valid_loss:.4f}")
+            # model.eval()
+            # valid_loss = embedding_model['optimizer'].calculate_valid_loss(embedding_model["valid_examples"])
+            # logging.info(f"Subgraph {embedding_model['subgraph']} Validation Epoch {epoch} | "
+            #              f"average train loss: {valid_loss:.4f}")
 
             if (epoch + 1) % args.valid == 0:
-                # TODO fully implement validation -> correct datasets and maybe adapting process
-                valid_metrics = avg_both(*model.compute_metrics(embedding_model["valid_examples"],
-                                                                embedding_model['filters']))
-                logging.info(format_metrics(valid_metrics, split="valid"))
-
-                valid_mrr = valid_metrics["MRR"]
-                if not args.best_mrr or valid_mrr > args.best_mrr:
-                    args.best_mrr = valid_mrr
-                    args.counter = 0
-                    args.best_epoch = epoch
+                # valid_metrics = avg_both(*model.compute_metrics(embedding_model["valid_examples"],
+                #                                                 embedding_model['filters']))
+                # logging.info(format_metrics(valid_metrics, split="valid"))
+                #
+                # valid_mrr = valid_metrics["MRR"]
+                # if not args.best_mrr or valid_mrr > args.best_mrr:
+                #     args.best_mrr = valid_mrr
+                #     args.counter = 0
+                #     args.best_epoch = epoch
                 logging.info(f"Saving model at epoch {epoch} in {info_directory}")
                 torch.save(embedding_model['model'].cpu().state_dict(),
                            f"{model_file_dir}\\model_{args.subgraph}_"f"{args.model_name}.pt")
                 embedding_model['model'].cuda()
 
-                # TODO fully implement validation -> correct datasets and maybe adapting process
             else:
                 args.counter += 1
                 if args.counter == args.patience:
@@ -250,8 +249,8 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
                     break
                 elif args.counter == args.patience // 2:
                     pass
-            logging.info(f"\t Reducing learning rate")
-            embedding_model['optimizer'].reduce_lr()
+                    # logging.info(f"\t Reducing learning rate")
+                    # embedding_model['optimizer'].reduce_lr()
 
             if not args.best_mrr:
                 logging.info(f"Saving new model saved at epoch {args.best_epoch}\n{model_file_dir}\\model_"
@@ -266,6 +265,8 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
 
             embedding_model['model'].cuda()
             embedding_model['model'].eval()
+
+        # validation step
 
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
@@ -294,76 +295,125 @@ def train(info_directory, dataset="WN18RR", dataset_directory="data\\WN18RR", kg
 
     # TODO adapt to new training process
     # Update mappings for already trained embeddings, in order to skip already trained subgraphs
-    with (open(s_e_mapping_dir, 'r+') as s_e_mapping_file,
-          open(e_s_mapping_dir, 'r+') as e_s_mapping_file):
-
-        # Load subgraph_embedding_mapping from file and convert to dictionary
-        try:
-            s_e_mapping = dict(json.loads(s_e_mapping_file.read()))
-        except:
-            s_e_mapping = {}
-
-        # Update s_e_mapping with subgraph_embedding_mapping
-        for sub_num in subgraph_embedding_mapping:
-            if str(sub_num) not in list(s_e_mapping.keys()):
-                s_e_mapping[str(sub_num)] = []
-            if subgraph_embedding_mapping[sub_num] not in s_e_mapping[str(sub_num)]:
-                s_e_mapping[str(sub_num)].append(subgraph_embedding_mapping[sub_num])
-                # TODO also change to numpy array?
-
-        # Write updated s_e_mapping back to file
-        s_e_mapping_file.seek(0)
-        json.dump(s_e_mapping, s_e_mapping_file)
-        logging.info(f"Updated mapping from subgraphs to embedding methods in {s_e_mapping_file.name}.")
-
-        # Get the inverse mapping of subgraph_embedding_mapping
-        inverse_mapping = util.inverse_dict(subgraph_embedding_mapping)
-
-        try:
-            e_s_mapping = dict(json.loads(e_s_mapping_file.read()))
-        except:
-            e_s_mapping = {}
-
-        # Update e_s_mapping with inverse_mapping
-        for sub_num in inverse_mapping:
-            if str(sub_num) not in list(e_s_mapping.keys()):
-                e_s_mapping[str(sub_num)] = []
-            if inverse_mapping[sub_num] not in e_s_mapping[str(sub_num)]:
-                e_s_mapping[str(sub_num)] = list(
-                    np.unique(np.append(e_s_mapping[str(sub_num)], (inverse_mapping[sub_num]))).astype(int).astype(str))
-
-        # Write updated e_s_mapping back to file
-        e_s_mapping_file.seek(0)
-        json.dump(e_s_mapping, e_s_mapping_file)
-        logging.info(f"Updated mapping from embedding methods to subgraphs in {e_s_mapping_file.name}.")
-
-    if len(models_to_load) > 0:
-        logging.info(f"-/\tLoading {len(models_to_load)} models from storage.\t\\-")
-
-        for embedding_model in models_to_load:
-            args_subgraph = embedding_model['args']
-            logging.info(f"Loading model {args_subgraph.model_name} for subgraph {args_subgraph.subgraph}")
-
-            embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args_subgraph.subgraph}_"
-                                                                f"{args_subgraph.model_name}.pt"))
-
-        logging.info(f"-\\\tSuccessfully loaded {len(models_to_load)} models from storage.\t/-")
+    # with (open(s_e_mapping_dir, 'r+') as s_e_mapping_file,
+    #       open(e_s_mapping_dir, 'r+') as e_s_mapping_file):
+    #
+    #     # Load subgraph_embedding_mapping from file and convert to dictionary
+    #     try:
+    #         s_e_mapping = dict(json.loads(s_e_mapping_file.read()))
+    #     except:
+    #         s_e_mapping = {}
+    #
+    #     # Update s_e_mapping with subgraph_embedding_mapping
+    #     for sub_num in subgraph_embedding_mapping:
+    #         if str(sub_num) not in list(s_e_mapping.keys()):
+    #             s_e_mapping[str(sub_num)] = []
+    #         if subgraph_embedding_mapping[sub_num] not in s_e_mapping[str(sub_num)]:
+    #             s_e_mapping[str(sub_num)].append(subgraph_embedding_mapping[sub_num])
+    #             # TODO also change to numpy array?
+    #
+    #     # Write updated s_e_mapping back to file
+    #     s_e_mapping_file.seek(0)
+    #     json.dump(s_e_mapping, s_e_mapping_file)
+    #     logging.info(f"Updated mapping from subgraphs to embedding methods in {s_e_mapping_file.name}.")
+    #
+    #     # Get the inverse mapping of subgraph_embedding_mapping
+    #     inverse_mapping = util.inverse_dict(subgraph_embedding_mapping)
+    #
+    #     try:
+    #         e_s_mapping = dict(json.loads(e_s_mapping_file.read()))
+    #     except:
+    #         e_s_mapping = {}
+    #
+    #     # Update e_s_mapping with inverse_mapping
+    #     for sub_num in inverse_mapping:
+    #         if str(sub_num) not in list(e_s_mapping.keys()):
+    #             e_s_mapping[str(sub_num)] = []
+    #         if inverse_mapping[sub_num] not in e_s_mapping[str(sub_num)]:
+    #             e_s_mapping[str(sub_num)] = list(
+    #                 np.unique(np.append(e_s_mapping[str(sub_num)], (inverse_mapping[sub_num]))).astype(int).astype(str))
+    #
+    #     # Write updated e_s_mapping back to file
+    #     e_s_mapping_file.seek(0)
+    #     json.dump(e_s_mapping, e_s_mapping_file)
+    #     logging.info(f"Updated mapping from embedding methods to subgraphs in {e_s_mapping_file.name}.")
+    #
+    # if len(models_to_load) > 0:
+    #     logging.info(f"-/\tLoading {len(models_to_load)} models from storage.\t\\-")
+    #
+    #     for embedding_model in models_to_load:
+    #         args_subgraph = embedding_model['args']
+    #         logging.info(f"Loading model {args_subgraph.model_name} for subgraph {args_subgraph.subgraph}")
+    #
+    #         embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args_subgraph.subgraph}_"
+    #                                                             f"{args_subgraph.model_name}.pt"))
+    #
+    #     logging.info(f"-\\\tSuccessfully loaded {len(models_to_load)} models from storage.\t/-")
 
     # TODO fix dimension error with AttH
 
+    # # TODO fully implement validation and testing metrics -> correct datasets and maybe adapting process
+    # for embedding_model in embedding_models:
+    #     model = embedding_model["model"]
+    #     valid_examples = embedding_model["valid_examples"]
+    #     test_examples = embedding_model["test_examples"]
+    #     filters = embedding_model["filters"]
+    #
+    #     # Validation metrics
+    #     valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+    #     logging.info(format_metrics(valid_metrics, split="valid"))
+    #
+    #     # Test metrics
+    #     test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    #     logging.info(format_metrics(test_metrics, split="test"))
+
+    model = embedding_models[0]["model"]
+    valid_examples = embedding_models[0]["valid_examples"]
+    test_examples = embedding_models[0]["test_examples"]
+    filters = embedding_models[0]["filters"]
+
+    # Validation metrics
+    # valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+    # logging.info(format_metrics(valid_metrics, split="valid"))
+
+    # Test metrics
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    logging.info(format_metrics(test_metrics, split="test"))
+
     # --- Testing with aggregated scores ---
 
-    # TODO fully implement validation and testing metrics -> correct datasets and maybe adapting process
-    for embedding_model in embedding_models:
-        model = embedding_model["model"]
-        valid_examples = embedding_model["valid_examples"]
-        test_examples = embedding_model["test_examples"]
-        filters = embedding_model["filters"]
+    test_ensemble(embedding_models)
 
-        # Validation metrics
-        valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
-        logging.info(format_metrics(valid_metrics, split="valid"))
 
-        # Test metrics
-        test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
-        logging.info(format_metrics(test_metrics, split="test"))
+def test_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode="test", batch_size=500):
+    # TODO move filter, test_examples, valid_examples files to general location
+
+    if mode == "test":
+        logging.info(f"Testing the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        examples = embedding_models[0]["test_examples"]
+    elif mode == "valid":
+        logging.info(f"Validating the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        examples = embedding_models[0]["valid_examples"]
+    else:
+        logging.error(f"The given mode \"{mode}\" does not exist!")
+        return
+    filters = embedding_models[0]["filters"]
+
+    # calculate scores for all models
+    embedding_models = score_combination.calculate_scores(embedding_models, examples, batch_size=batch_size)
+
+    # set target scores from first embedding model, as these are all the same
+    targets = {'rhs': embedding_models[0]['targets']['rhs'], 'lhs': embedding_models[0]['targets']['lhs']}
+
+    # combine the calculated scores from all models, according to the given aggregation method
+    aggregated_scores = score_combination.combine_scores(embedding_models, aggregation_method)
+
+    # compute the ranks for all queries
+    ranks = score_combination.compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
+                                            batch_size=batch_size)
+
+    # calculate metrics from the ranks
+    # test_metrics = avg_both(*compute_metrics_from_ranks(ranks))
+    # logging.info(format_metrics(test_metrics, split="test"))
+
+    return
