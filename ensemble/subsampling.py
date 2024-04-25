@@ -93,7 +93,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
             os.makedirs(f"{dataset_out_dir}\\sub_{subgraph_num:03d}", exist_ok=True)
 
             logging.info(f"-/\tSampling subgraph {dataset_out_dir}\\sub_{subgraph_num:03d} from {dataset_in} with "
-                         f"params:\n\t\t{sampling_method[1]}{hyperparameter_str} and {subgraph_size_range} "
+                         f"params:\n\t\t\t\t\t\t\t {sampling_method[1]}{hyperparameter_str} and {subgraph_size_range} "
                          f"relative subgraph size.\t\\-")
 
             with (open(os.path.abspath(f"{dataset_out_dir}\\sub_{subgraph_num:03d}\\train.pickle"),
@@ -137,9 +137,9 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 time_stop_sub = time.time()
 
                 # save statistics of subgraph to config file:
-                # ['original_kg', 'sampling_method', 'relation_names_rho', 'directory', 'sampling_time',
-                #   'subgraph_size_range', 'subgraph_size_rel', 'subgraph_num', 'subgraph_triples_amount',
-                #   'subgraph_entities_amount', 'subgraph_relation_names_amount', 'embedded_by']
+                # original_kg sampling_method relation_names_rho directory sampling_time subgraph_size_range
+                # subgraph_size_rel subgraph_num subgraph_triples_amount subgraph_entities_amount
+                # subgraph_relation_names_amount subgraph_relation_names
 
                 with open(config_directory, 'a') as config_file:
                     config_file.write(f"\n{dataset_in};{sampling_method[1]};{relation_name_amount};"
@@ -204,6 +204,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
 
     # -- delta creation for Entity Sampling --
     if sampling_method[0] == Constants.ENTITY_SAMPLING[0]:
+        # TODO revise sampling to better reflect formula E_sampled x R x E_sampled
         # select entities with respect to subgraph size:
         # select e_1 -> check size of effected triples in dataset
         # size > subgraph_size?: (yes)->select e_2, repeat; (no)->end selection process
@@ -258,7 +259,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         # select e_1 -> check size of effected triples in dataset
         # size > subgraph_size?: (yes)->select e_2, repeat; (no)->end selection process
 
-        logging.info(f"Missing Relation Names: {relation_name_ids_unused}")
+        logging.info(f"Missing Relation Names: {list(relation_name_ids_unused)}")
 
         # after most subgraphs are sampled, check if entities or relation names are missing
         if subgraph_amount - subgraph_num <= 3:
@@ -337,6 +338,11 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         logging.info(f"Created subgraph {subgraph_num} with {len(entity_ids_unused)} entities and "
                      f"{len(relation_name_ids_unused)} relation names left unused and a relative subgraph size "
                      f"{len(delta) / len(dataset)}.")
+        return delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names
+
+    elif sampling_method[0] == Constants.DEBUG_SAMPLING[0]:
+        # TODO Debug sampling, for only letting through specific entity or relation name ids
+        logging.critical(f"{Constants.DEBUG_SAMPLING[1]} wasn't implemented yet!")
         return delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names
 
     # If no legal sampling method was given, return -1
@@ -490,8 +496,8 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
 
     except IndexError:
         logging.error("Received IndexError")
-    # except KeyError as key:
-    #     logging.error(f"Received KeyError with key {key}")
+    except KeyError as key:
+        logging.error(f"Received KeyError with key {key}")
 
     except Exception as error:
         logging.error(f"{error}\t{traceback.format_exc()}")
@@ -500,7 +506,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
 
     if unique_before == unique_after:
         removed_ids_counter += 1
-        # logging.critical(f"No indices were added to delta")
+        # logging.debug(f"No indices were added to delta")
 
     # update progress bar
     progress_bar.n = len(delta)

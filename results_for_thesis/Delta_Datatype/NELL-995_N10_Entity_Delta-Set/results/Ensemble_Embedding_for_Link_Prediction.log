@@ -1,0 +1,74 @@
+2024-04-03 19:08:39 INFO     ### Saving logs in: D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results ###
+2024-04-03 19:08:39 INFO     Sampling 10 subgraphs with a relative size (0.6, 0.7) from NELL-995 with Entity sampling
+2024-04-03 19:08:40 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_000 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:09:17 INFO     Current subgraph size 0.7011199113653037 reached or exceeded target size 0.7.
+2024-04-03 19:09:17 INFO     Created subgraph 0 with 15796 entities and 0 relation names left unused and a relative subgraph size 0.7011199113653037.
+2024-04-03 19:09:18 CRITICAL Length of delta: 93657	Unnecessary sampling steps: 4705
+2024-04-03 19:09:18 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 000, sampling took 37.55 sec	/-
+
+2024-04-03 19:09:18 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_001 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:10:01 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:10:01 INFO     Created subgraph 1 with 4612 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:10:02 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 4434
+2024-04-03 19:10:02 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 001, sampling took 43.645 sec	/-
+
+2024-04-03 19:10:02 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_002 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:10:46 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:10:46 INFO     Created subgraph 2 with 1387 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:10:47 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 5283
+2024-04-03 19:10:47 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 002, sampling took 44.754 sec	/-
+
+2024-04-03 19:10:48 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_003 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:11:43 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:11:43 INFO     Created subgraph 3 with 353 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:11:45 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 5468
+2024-04-03 19:11:45 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 003, sampling took 56.752 sec	/-
+
+2024-04-03 19:11:45 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_004 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:12:35 INFO     Current subgraph size 0.7000194637001991 reached or exceeded target size 0.7.
+2024-04-03 19:12:35 INFO     Created subgraph 4 with 95 entities and 0 relation names left unused and a relative subgraph size 0.7000194637001991.
+2024-04-03 19:12:36 CRITICAL Length of delta: 93510	Unnecessary sampling steps: 5055
+2024-04-03 19:12:36 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 004, sampling took 50.894 sec	/-
+
+2024-04-03 19:12:37 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_005 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:13:26 INFO     Current subgraph size 0.700011977661661 reached or exceeded target size 0.7.
+2024-04-03 19:13:26 INFO     Created subgraph 5 with 30 entities and 0 relation names left unused and a relative subgraph size 0.700011977661661.
+2024-04-03 19:13:26 CRITICAL Length of delta: 93509	Unnecessary sampling steps: 4943
+2024-04-03 19:13:26 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 005, sampling took 49.946 sec	/-
+
+2024-04-03 19:13:27 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_006 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:14:16 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:14:16 INFO     Created subgraph 6 with 13 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:14:17 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 4807
+2024-04-03 19:14:17 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 006, sampling took 49.507 sec	/-
+
+2024-04-03 19:14:17 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_007 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:14:17 INFO     Enforcing 13 entities to be present in the subgraph.
+2024-04-03 19:15:07 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:15:07 INFO     Created subgraph 7 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:15:07 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 5061
+2024-04-03 19:15:07 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 007, sampling took 50.342 sec	/-
+
+2024-04-03 19:15:08 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_008 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:15:58 INFO     Current subgraph size 0.700011977661661 reached or exceeded target size 0.7.
+2024-04-03 19:15:58 INFO     Created subgraph 8 with 0 entities and 0 relation names left unused and a relative subgraph size 0.700011977661661.
+2024-04-03 19:15:59 CRITICAL Length of delta: 93509	Unnecessary sampling steps: 4631
+2024-04-03 19:15:59 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 008, sampling took 50.888 sec	/-
+
+2024-04-03 19:15:59 INFO     -/	Sampling subgraph data\NELL-995_Entity_sampling_N10_min0.6\sub_009 from NELL-995 with params:
+		Entity sampling and (0.6, 0.7) relative subgraph size.	\-
+2024-04-03 19:16:49 INFO     Current subgraph size 0.7000044916231228 reached or exceeded target size 0.7.
+2024-04-03 19:16:49 INFO     Created subgraph 9 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000044916231228.
+2024-04-03 19:16:50 CRITICAL Length of delta: 93508	Unnecessary sampling steps: 4773
+2024-04-03 19:16:50 INFO     -\	Updated config file D:\OneDrive - bwedu\MASTER\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\NELL-995_Entity_sampling_N10_min0.6\results\subgraph_config.csv for subgraph 009, sampling took 50.12 sec	/-
+
+2024-04-03 19:16:50 INFO     ### Successfully created 10 subgraphs of the relative size (0.6, 0.7) from the original KG "NELL-995" in a total of 490.194 seconds (avg: 49.019 sec) ###
