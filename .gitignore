@@ -9,4 +9,4 @@ venv/
 **/*.pickle
 **/**.drawio**
 /to_discuss/outline_training_testing_process.png
-*.pyc
+**.pyc
