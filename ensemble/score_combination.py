@@ -8,36 +8,61 @@ from ensemble import Constants
 
 
 def calculate_scores(embedding_models, examples, batch_size=500):
-    # -- calculate scores for all queries and all models --
+    """
+       Calculate scores for all queries and models provided.
+
+       Args:
+           embedding_models (list): A list of dictionaries, each containing an embedding model
+               and its corresponding arguments.
+           examples (torch.Tensor): Tensor containing query examples.
+           batch_size (int, optional): Batch size for processing queries. Defaults to 500.
+
+       Returns:
+           tuple: A tuple containing:
+               - embedding_models (list): The updated list of embedding models, each containing
+                 the calculated scores.
+               - targets (dict): Dictionary containing target scores for both lhs and rhs directions.
+    """
+
+    # Initialize progress bar for tracking progress
     progress_bar_testing = tqdm(total=len(embedding_models), desc=f"Calculating test scores", unit=" embedding models")
 
+    # Initialize variables to store target scores
     targets_lhs = None
     targets_rhs = None
-    candidate_answers = None
 
+    # Iterate over each embedding model
     for embedding_model in embedding_models:
         model = embedding_model['model']
         args = embedding_model['args']
+
+        # Get the number of candidate answers
         candidate_answers = len(model.get_rhs(examples, eval_mode=True)[0])
+
+        # Initialize tensors to store scores and targets
         scores_rhs = torch.zeros((len(examples), candidate_answers))
         scores_lhs = torch.zeros((len(examples), candidate_answers))
 
         targets_rhs = torch.zeros((len(examples), candidate_answers))
         targets_lhs = torch.zeros((len(examples), candidate_answers))
 
+        # Update progress bar
         progress_bar_testing.n = args.subgraph_num
         progress_bar_testing.refresh()
 
         # calculate scores, adapted from base.compute_metrics() and base.get_rankings()
+        # Iterate over each mode (rhs and lhs)
         for mode in ["rhs", "lhs"]:
             queries = examples.clone()
 
+            # Swap subject and object for lhs mode
             if mode == "lhs":
                 tmp = torch.clone(queries[:, 0])
                 queries[:, 0] = queries[:, 2]
                 queries[:, 2] = tmp
                 queries[:, 1] += model.sizes[1] // 2
 
+            # Disable gradient computation for inference
             with torch.no_grad():
                 b_begin = 0
                 candidates = model.get_rhs(queries, eval_mode=True)
@@ -50,6 +75,7 @@ def calculate_scores(embedding_models, examples, batch_size=500):
                     scores = model.score(q, candidates, eval_mode=True)
                     targets = model.score(q, rhs, eval_mode=False)
 
+                    # Store scores and targets based on mode
                     if mode == "lhs":
                         scores_lhs[b_begin:b_begin + batch_size] = scores
                         targets_lhs[b_begin:b_begin + batch_size] = targets
@@ -62,15 +88,17 @@ def calculate_scores(embedding_models, examples, batch_size=500):
                                                           f"{scores_rhs[b_begin:b_begin + batch_size]}")
 
                     b_begin += batch_size
-
+        # Update embedding model dictionary with calculated scores
         embedding_model['scores_lhs'] = scores_lhs
         embedding_model['scores_rhs'] = scores_rhs
         embedding_model['targets_lhs'] = targets_lhs
         embedding_model['targets_rhs'] = targets_rhs
         embedding_model['candidate_answers'] = candidate_answers
 
+    # Aggregate target scores into a dictionary
     targets = {'rhs': targets_rhs, 'lhs': targets_lhs}
 
+    # Complete progress bar and close
     progress_bar_testing.n = progress_bar_testing.total
     progress_bar_testing.refresh()
     progress_bar_testing.close()
@@ -79,34 +107,62 @@ def calculate_scores(embedding_models, examples, batch_size=500):
 
 
 def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, batch_size=500):
-    aggregated_scores = {}
-    progress_bar_combination = tqdm(total=embedding_models[0]['candidate_answers'], desc=f"Combine test scores",
-                                    unit=" queries")
-    logging.info(f"Combining scores of all models with {aggregation_method[1]}.")
-    # TODO FIX
-    # TODO include batch_size, also include progressbar
+    """
+        Combine scores from multiple models using the specified aggregation method.
 
+        Args:
+            embedding_models (list): A list of dictionaries, each containing an embedding model
+                and its corresponding arguments. Each dictionary should have the following keys:
+                    - 'scores_lhs': Tensor containing scores for lhs direction.
+                    - 'scores_rhs': Tensor containing scores for rhs direction.
+            aggregation_method (tuple, optional): A tuple containing the aggregation method and its name.
+                Defaults to Constants.MAX_SCORE.
+            batch_size (int, optional): Batch size for processing queries. Defaults to 500.
+
+        Returns:
+            dict: Dictionary containing aggregated scores for both lhs and rhs directions.
+
+    """
+
+    logging.info(f"-/\tCombining scores of all models with {aggregation_method[1]}\t\\-")
+
+    # Get the size of scores for rhs and lhs directions
+    size = {'rhs': embedding_models[0]['scores_rhs'].size(),
+            'lhs': embedding_models[0]['scores_lhs'].size()}
+
+    # Initialize progress bar for tracking progress
+    progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine test scores",
+                                    unit=" queries")
+
+    # Initialize dictionary to store aggregated scores
+    aggregated_scores = {'rhs': torch.zeros(size['rhs']),
+                         'lhs': torch.zeros(size['lhs'])}
+
+    # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
+        logging.debug(f"Aggregating {mode}, with a size {size[mode]}")
         b_begin = 0
 
-        # update progressbar
-        if mode == 'lhs':
-            progress_bar_combination.n = b_begin + embedding_models[0]['candidate_answers']
-        else:
-            progress_bar_combination.n = b_begin
-        progress_bar_combination.refresh()
-
+        # Iterate over each batch of queries
         while b_begin < len(embedding_models[0]['scores_lhs']):
+            # Update progress bar
+            if mode == 'lhs':
+                progress_bar_combination.n = b_begin + size['rhs'][0]
+            else:
+                progress_bar_combination.n = b_begin
+            progress_bar_combination.refresh()
 
-            # aggregate saved scores based on aggregation_method
+            # Collect scores from all models
+            model_scores = []
+            for embedding_model in embedding_models:
+                if mode == "lhs":
+                    model_scores += [embedding_model['scores_lhs'][b_begin:b_begin + batch_size]]
+                else:
+                    model_scores += [embedding_model['scores_rhs'][b_begin:b_begin + batch_size]]
+
+            # Aggregate scores based on the specified method
             if aggregation_method[0] == Constants.MAX_SCORE[0]:
                 # select maximum score between all models
-                model_scores = []
-                for embedding_model in embedding_models:
-                    if mode == "lhs":
-                        model_scores += [embedding_model['scores_lhs'][b_begin:b_begin + batch_size]]
-                    else:
-                        model_scores += [embedding_model['scores_rhs'][b_begin:b_begin + batch_size]]
                 try:
                     stacked_scores = torch.stack(model_scores, dim=1)
                     logging.log(Constants.DATA_LEVEL, f"Stacked scores:\n{stacked_scores}")
@@ -115,21 +171,20 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, bat
                     logging.log(Constants.DATA_LEVEL, f"Size:\t{aggregated_scores[mode].size()}\t\t"
                                                       f"Aggregated scores:\n{aggregated_scores[mode]}")
                 except Exception as e:
-                    logging.error(traceback.format_exception(e))
                     for index, score in enumerate(model_scores):
                         logging.error(f"Mode: {mode}\tSize of score set {index}: {score.size()}")
-
+                    logging.error(traceback.format_exception(e))
 
             elif aggregation_method[0] == Constants.AVERAGE_SCORE[0]:
+                # average the score across all models
                 logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
                 # TODO implement average score
-                # average the score across all models
                 pass
 
             elif aggregation_method[0] == Constants.ATTENTION_SCORE[0]:
+                # calculate attention between all models and average scores based on this attention
                 logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
                 # TODO implement attention score
-                # calculate attention between all models and average scores based on this attention
                 pass
 
             else:
@@ -137,40 +192,67 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, bat
 
             b_begin += batch_size
 
+    # Update progress bar and close
     progress_bar_combination.n = progress_bar_combination.total
     progress_bar_combination.refresh()
     progress_bar_combination.close()
 
-    logging.error(f"Aggregated scores: {aggregated_scores['rhs'].size()}\n\n{aggregated_scores['lhs'].size()}")
+    logging.info(f"-\\\tSuccessfully aggregated all scores with aggregation method {aggregation_method[1]}\t/-")
+
     return aggregated_scores
 
 
 def compute_ranks(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500):
-    queries = examples.clone()
-    ranks = {'rhs': torch.ones(len(queries)), 'lhs': torch.ones(len(queries))}
+    """
+        Compute ranks for each query based on the aggregated scores, targets, and filters.
 
+        Args:
+            embedding_models (list): A list of dictionaries, each containing an embedding model
+                and its corresponding arguments. Each dictionary should have the following keys:
+                    - 'scores_lhs': Tensor containing scores for lhs direction.
+                    - 'scores_rhs': Tensor containing scores for rhs direction.
+            examples (torch.Tensor): Tensor containing query examples.
+            filters (dict): Dictionary containing filters for lhs and rhs directions.
+            targets (dict): Dictionary containing target scores for lhs and rhs directions.
+            aggregated_scores (dict): Dictionary containing aggregated scores for lhs and rhs directions.
+            batch_size (int, optional): Batch size for processing queries. Defaults to 500.
+
+        Returns:
+            dict: Dictionary containing computed ranks for both lhs and rhs directions.
+
+    """
+
+    # Initialize dictionary for ranks
+    queries = examples.clone()
+    ranks = {'rhs': torch.zeros(len(queries)),
+             'lhs': torch.zeros(len(queries))}
+
+    # Initialize progress bar for tracking progress
     progress_bar_ranking = tqdm(total=len(queries) * 2, desc=f"Computing ranking", unit=" queries")
 
+    # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
-
+        # Disable gradient computation for inference
         with torch.no_grad():
             b_begin = 0
             queries = examples.clone()
+
+            # Swap subject and object for lhs mode
             if mode == "lhs":
                 tmp = torch.clone(queries[:, 0])
                 queries[:, 0] = queries[:, 2]
                 queries[:, 2] = tmp
                 queries[:, 1] += embedding_models[0]['model'].sizes[1] // 2
 
+            # Iterate over each batch of queries
             while b_begin < len(queries):
-                # update progressbar
+                # Update progress bar
                 if mode == 'lhs':
                     progress_bar_ranking.n = b_begin + len(queries)
                 else:
                     progress_bar_ranking.n = b_begin
                 progress_bar_ranking.refresh()
 
-                # try:
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
                 # set filtered and true scores to -1e6 to be ignored
@@ -182,11 +264,10 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
                      targets[mode][b_begin:b_begin + batch_size]).float(),
                     dim=1).cpu()
-                # except KeyError:
-                #     print(f"ERROR\t{b_begin}")
 
                 b_begin += batch_size
 
+        # Complete progress bar and close
         progress_bar_ranking.n = progress_bar_ranking.total
         progress_bar_ranking.refresh()
         progress_bar_ranking.close()
@@ -196,26 +277,49 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
 
 
 def compute_metrics_from_ranks(ranks_dict):
+    """
+        Compute various evaluation metrics based on the computed ranks.
+
+        Args:
+            ranks_dict (dict): Dictionary containing computed ranks for both lhs and rhs directions.
+
+        Returns:
+            tuple: A tuple containing:
+                - mean_rank (dict): Mean rank for lhs and rhs directions.
+                - mean_reciprocal_rank (dict): Mean reciprocal rank for lhs and rhs directions.
+                - hits_at (dict): Dictionary containing hits at different positions for lhs and rhs directions.
+                - amri (dict): Average Mean Rank Improvement for lhs and rhs directions.
+                - mr_deviation (dict): Mean Rank Deviation for lhs and rhs directions.
+
+    """
+
+    # Initialize dictionaries for metrics
     mean_rank = {}
     mean_reciprocal_rank = {}
     hits_at = {}
     amri = {}
     mr_deviation = {}
+
+    # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
         ranks = ranks_dict[mode]
 
+        # Compute mean rank
         mean_rank[mode] = torch.mean(ranks).item()
+
+        # Compute mean reciprocal rank
         mean_reciprocal_rank[mode] = torch.mean(1. / ranks).item()
+
+        # Compute hits@1, hits@3 and hits@10
         hits_at[mode] = torch.FloatTensor((list(map(
-            lambda x: torch.mean((ranks <= x).float()).item(),
-            (1, 3, 10)
+            lambda x: torch.mean((ranks <= x).float()).item(), (1, 3, 10)
         ))))
 
-        # Calculate AMRI
+        # Compute AMRI
         expected_rank = torch.mean(ranks - 1)  # Expectation of MR - 1
         amri[mode] = 1 - ((mean_rank[mode] - 1) / expected_rank)
 
-        # Calculate MR_deviation
+        # Compute MR_deviation
         optimistic_rank = torch.min(ranks) - 1
         pessimistic_rank = torch.max(ranks) - 1
         mr_deviation[mode] = optimistic_rank - pessimistic_rank
