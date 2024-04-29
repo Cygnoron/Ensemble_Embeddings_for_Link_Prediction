@@ -14,13 +14,9 @@ from tqdm import tqdm
 from ensemble import Constants, util, util_files
 from ensemble.util import get_unique_triple_ids
 
-# from util import get_unique_triple_ids
-
-removed_ids_counter = 0
-
 
 def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sampling_method, subgraph_amount=10,
-                 subgraph_size_range=(0.1, 0.7), relation_name_amount=-1, max_indices_per_step="max"):
+                 subgraph_size_range=(0.1, 0.7), relation_name_amount=-1, entities_per_step=1):
     """
     The sample_graph function takes in a dataset name, an output directory, and two optional parameters:
     subgraph_amount (default 10) - the number of subgraphs to create from the original dataset
@@ -33,10 +29,8 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     :param subgraph_amount: Determine how many subgraphs should be created
     :param subgraph_size_range: Determine the range for the percentage of triples that will be kept in the subgraph
     :param relation_name_amount: how many entities should be selected compared to relation names, only applied in FEATURE_SAMPLING
-    :param max_indices_per_step: The max amount of indices that may be sampled per step. (int or "max")
+    :param entities_per_step: The max amount of indices that may be sampled per step. (int or "max")
     """
-
-    global removed_ids_counter
 
     util_files.delete_paths(f"{info_directory}", "Ensemble_Embedding_for_Link_Prediction.log")
     dataset_in_train = f"data\\{dataset_in}\\train"
@@ -55,7 +49,8 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     with open(config_directory, 'w') as config_file:
         config_file.write(f"original_kg;sampling_method;relation_names_rho;directory;sampling_time;"
                           f"subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;"
-                          f"subgraph_entities_amount;subgraph_relation_names_amount;subgraph_relation_names")
+                          f"triples_deviation;subgraph_entities_amount;entities_per_step;"
+                          f"subgraph_relation_names_amount;subgraph_relation_names")
 
     # bool to check if init was successful for corresponding error message
     init_successful = False
@@ -106,7 +101,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 # -> force them to be present if missing
                 buffer_var = calculate_delta(subgraph_size_range, data, subgraph_num, subgraph_amount, entity_set,
                                              relation_name_set, entity_ids_unused, relation_name_ids_unused,
-                                             sampling_method, relation_name_amount, max_indices_per_step)
+                                             sampling_method, relation_name_amount, entities_per_step)
                 delta_triples, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = buffer_var
 
                 # Initialize a mask with False values
@@ -138,18 +133,19 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
                 # save statistics of subgraph to config file:
                 # original_kg sampling_method relation_names_rho directory sampling_time subgraph_size_range
-                # subgraph_size_rel subgraph_num subgraph_triples_amount subgraph_entities_amount
-                # subgraph_relation_names_amount subgraph_relation_names
+                # subgraph_size_rel subgraph_num subgraph_triples_amount triples_deviation subgraph_entities_amount
+                # entities_per_step subgraph_relation_names_amount subgraph_relation_names
 
                 with open(config_directory, 'a') as config_file:
+                    triples_deviation = len(delta_triples) - math.ceil(len(data) * subgraph_size_range[1])
                     config_file.write(f"\n{dataset_in};{sampling_method[1]};{relation_name_amount};"
                                       f"{dataset_out_dir}\\sub_{subgraph_num:03d};"
                                       f"{round(time_stop_sub - time_start_sub, 3)};{subgraph_size_range};"
                                       f"{round(len(delta_triples) / len(data), 3)};{subgraph_num};"
-                                      f"{len(delta_triples)};{len(used_entity_set)};{len(used_relation_name_set)};"
-                                      f"{subgraph_relation_names}")
-                    logging.critical(f"Length of delta: {len(delta_triples)}\t"
-                                     f"Unnecessary sampling steps: {removed_ids_counter}")
+                                      f"{len(delta_triples)};{triples_deviation};{len(used_entity_set)};"
+                                      f"{entities_per_step};{len(used_relation_name_set)};{subgraph_relation_names}")
+                    logging.info(f"Length of delta: {len(delta_triples)}\t\t"
+                                 f"Deviation from target size: {triples_deviation}")
                     logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}, "
                                  f"sampling took {round(time_stop_sub - time_start_sub, 3)} sec\t/-\n")
                     removed_ids_counter = 0
@@ -172,7 +168,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
 def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount, entity_set, relation_name_set,
                     entity_ids_unused, relation_name_ids_unused, sampling_method, relation_name_amount,
-                    max_indices_per_step):
+                    entities_per_step):
     """
     The calculate_delta function calculates, which triples will be deleted from the input dataset and returns the
     indices of these triples as array.
@@ -187,7 +183,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
     :param relation_name_ids_unused: List containing all relation name ids, which are not yet present in any subgraph
     :param sampling_method: The sampling method, which is used to create Delta from the input dataset
     :param relation_name_amount: How many different relation names should be present in the subgraph, only applied in RANDOM_FOREST_SAMPLING
-    :param max_indices_per_step: The max amount of indices that may be sampled per step.
+    :param entities_per_step: The amount triples that will be sampled each step.
     :return: Array of indices, which represent the triples, that are to be deleted from the input dataset
     """
 
@@ -198,6 +194,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
     enforce_relation_names = False
     enforce_entities = False
     subgraph_relation_names = []
+    sampled_entity_ids = set()
 
     # set subgraph_size to standard high value
     subgraph_size = subgraph_size_range[1]
@@ -212,6 +209,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         # reset missing relation names for every subgraph
         relation_name_ids_unused = set(relation_name_set.keys())
         progress_bar = None
+
         # -- sampling process --
         while len(delta) / len(dataset) <= subgraph_size:
             # check whether relation names are missing after most samples were selected
@@ -219,7 +217,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                 # if entities are missing, enforce missing entities and set flag
                 if len(entity_ids_unused) > 0:
                     enforce_entities = True
-                    logging.info(f"Enforcing {len(entity_ids_unused)} entities to be present in the subgraph.")
+
                 # if all entities are selected, reset flag
                 else:
                     enforce_entities = False
@@ -227,8 +225,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
             # if relation names are missing, enforce missing relation names and set flag
             if (len(relation_name_ids_unused) > 0) and (len(delta) / len(dataset) >= (subgraph_size * 0.9)):
                 enforce_relation_names = True
-                logging.info(f"Enforcing {len(relation_name_ids_unused)} relation names to be present "
-                             f"in the subgraph.")
+
             # if all relation names are selected, reset flag
             else:
                 enforce_relation_names = False
@@ -241,8 +238,9 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
             # sample entities
             buffer_var = sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused,
                                   dataset, delta, sampling_method, enforce_relation_names, enforce_entities,
-                                  progress_bar, subgraph_relation_names, max_indices_per_step)
-            entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = buffer_var
+                                  progress_bar, subgraph_relation_names, sampled_entity_ids, entities_per_step)
+            (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused,
+             subgraph_relation_names, sampled_entity_ids) = buffer_var
 
         progress_bar.close()
         logging.info(f"Current subgraph size {len(delta) / len(dataset)} reached or exceeded target size "
@@ -265,8 +263,8 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         if subgraph_amount - subgraph_num <= 3:
             # if entities are missing, enforce missing entities and set flag
             if len(entity_ids_unused) > 0:
-                enforce_entities = entity_ids_unused
-                logging.info(f"Enforcing {len(entity_ids_unused)} entities to be present in the subgraph.")
+                enforce_entities = True
+
             # if all entities are selected, reset flag
             else:
                 enforce_entities = False
@@ -303,10 +301,10 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
             # sample entities and relation names
             buffer_var = sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused,
                                   dataset, delta, sampling_method, enforce_relation_names, enforce_entities,
-                                  progress_bar, subgraph_relation_names, max_indices_per_step,
+                                  progress_bar, subgraph_relation_names, sampled_entity_ids, entities_per_step,
                                   relation_names_amount=relation_name_amount)
             (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused, relation_name_amount,
-             subgraph_relation_names) = buffer_var
+             subgraph_relation_names, sampled_entity_ids) = buffer_var
 
             if (len(relation_name_set) == 0) or (len(entity_set) == 0):
                 if subgraph_size != subgraph_size_range[0]:
@@ -352,172 +350,104 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
 
 def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused, dataset, delta,
              sampling_method, enforce_relation_names, enforce_entities, progress_bar, subgraph_relation_names,
-             max_indices_per_step, relation_names_amount=-1):
+             sampled_entity_ids, entities_per_step, relation_names_amount=-1):
     """
-    Function for sampling from a sampling set using various methods.
+    Perform sampling of entities and relation names for subgraph creation.
 
-    :param entity_set: A dictionary representing the sampling set.
-    :param relation_name_set: Dataset containing triples, in order to enforce remaining relation names.
-    :param entity_ids_unused: A set of entity IDs that have not been used.
-    :param relation_name_ids_unused: A set of relation name IDs that have not been used.
-    :param dataset: The original dataset containing all triples.
-    :param delta: An array representing the indices of the samples.
-    :param sampling_method: A string representing the sampling method to be used.
-    :param enforce_relation_names: A boolean indicating whether to enforce missing relation names.
-    :param enforce_entities: A boolean indicating whether to enforce missing entities.
-    :param progress_bar: A progress_bar, which shows the progress of the sampling.
-    :param subgraph_relation_names: A set containing all relation names used in the current subgraph.
-    :param relation_names_amount: Hyperparameter to set the ratio of relation names for Feature Sampling.
-    :param max_indices_per_step: The max amount of indices that may be sampled per step.
-    :return: The updated samples, delta, entity_ids_unused, and relation_name_ids_unused.
+    Args:
+        entity_set (dict): Dictionary containing entity IDs with corresponding triple indices.
+        relation_name_set (dict): Dictionary containing relation name IDs with corresponding triple indices.
+        entity_ids_unused (set): Set containing IDs of unused entities.
+        relation_name_ids_unused (set): Set containing IDs of unused relation names.
+        dataset (list): Original dataset containing triples.
+        delta (set): Set representing the sampled triples.
+        sampling_method (tuple): Tuple representing the sampling method and its description.
+        enforce_relation_names (bool): Flag indicating whether to enforce missing relation names.
+        enforce_entities (bool): Flag indicating whether to enforce missing entities.
+        progress_bar (tqdm.tqdm): Progress bar for sampling progress visualization.
+        subgraph_relation_names (list): List to store relation names present in the subgraph.
+        sampled_entity_ids (set): Set containing IDs of sampled entities.
+        entities_per_step (int): Maximum number of entities to sample per step.
+        relation_names_amount (int, optional): Number of relation names to include in Feature Sampling. Defaults to -1.
+
+    Returns:
+        tuple: Tuple containing updated entity and relation name sets, delta set, lists of unused entity and relation name IDs,
+               list of relation names in the subgraph, and set of sampled entity IDs.
     """
 
-    global removed_ids_counter
-    unique_before = 0
-    unique_after = 0
+    samples = set()
+    # samples an entity id as sampled_entity_id
+    # -- enforce relation names in case of Entity sampling --
+    if (enforce_relation_names and sampling_method == Constants.ENTITY_SAMPLING and
+            len(relation_name_ids_unused) > 0):
+        logging.info(f"Enforcing {len(relation_name_ids_unused)} relation names to be present in the subgraph.")
+        for missing_relation_name in relation_name_ids_unused:
+            candidates = relation_name_set[missing_relation_name]
+            # iterate through all candidate triples
+            for candidate in candidates:
+                head, _, tail = dataset[candidate]
+                # Add tail entity to samples if head was already sampled
+                if head in sampled_entity_ids:
+                    samples.add(tail)
+                    break
+                # Add head entity to samples if tail was already sampled
+                elif tail in sampled_entity_ids:
+                    samples.add(head)
+                    break
 
-    try:
-        # -- enforce relation names in case of Entity sampling --
-        if (enforce_relation_names and sampling_method == Constants.ENTITY_SAMPLING and
-                len(relation_name_ids_unused) > 0):
-            # copy relation_name_ids_unused to avoid RuntimeError: Set changed size during iteration
-            relation_name_ids_iterator_set = relation_name_ids_unused.copy()
-            # sample random triple for each missing relation name
-            for enforced_relation_name_id in relation_name_ids_iterator_set:
-                # sample = random.choice(list(relation_name_set[enforced_relation_name_id]))
-                sample = relation_name_set[enforced_relation_name_id].pop()
-                # add sampled triple index to delta
-                delta.add(sample)
+    # -- enforce entities --
+    if enforce_entities and len(entity_ids_unused) > 0:
+        logging.info(f"Enforcing {len(entity_ids_unused)} entities to be present in the subgraph")
+        # Add all unused entity ids to samples
+        while len(entity_ids_unused) > 0:
+            samples.add(entity_ids_unused.pop())
+        logging.log(Constants.DATA_LEVEL, f"Enforced the following entities:\n{samples}")
 
-                # get head entity, relation name and tail entity of sampled triple
-                head_entity, relation_name, tail_entity = dataset[sample]
+    # only sample additional entities, if more entities for this sampling step are allowed
+    if entities_per_step > len(samples):
+        # add entities_per_step times sampled_entity_id to sampled_entity_id_set
+        for i in range(entities_per_step):
+            sampled_entity_id = random.choice(list(entity_set.keys()))
+            samples.add(sampled_entity_id)
+            logging.log(Constants.DATA_LEVEL, f"Sampled entity id {sampled_entity_id}.")
 
-                if sample in relation_name_set[relation_name]:
-                    relation_name_set[relation_name].discard(sample)
-
-                # remove head entity from list of unused entities
-                if head_entity in entity_ids_unused:
-                    entity_ids_unused.discard(head_entity)
-                # remove relation name from list of unused relation names or add to list of contained relation names
-                if (relation_name in relation_name_ids_unused) or (relation_name not in subgraph_relation_names):
-                    relation_name_ids_unused.discard(relation_name)
-                    subgraph_relation_names.append(relation_name)
-                # remove tail entity from list of unused entities
-                if tail_entity in entity_ids_unused:
-                    entity_ids_unused.discard(tail_entity)
-
-        # -- enforce entities --
-        if enforce_entities and len(entity_ids_unused) > 0:
-            # copy entity_ids_unused to avoid RuntimeError: Set changed size during iteration
-            entity_ids_iterator_set = entity_ids_unused.copy()
-            # sample random triple for each missing entity
-            for enforced_entity_id in entity_ids_iterator_set:
-                if enforced_entity_id in entity_set:
-                    # sample = random.choice(list(entity_set[enforced_entity_id]))
-                    sample = entity_set[enforced_entity_id].pop()
-
-                    # add sampled triple index to delta
-                    delta.add(sample)
-
-                    # get head entity, relation name and tail entity of sampled triple
-                    head_entity, relation_name, tail_entity = dataset[sample]
-
-                    if sample in relation_name_set[relation_name]:
-                        relation_name_set[relation_name].discard(sample)
-
-                    # remove head entity from list of unused entities
-                    if head_entity in entity_ids_unused:
-                        entity_ids_unused.discard(head_entity)
-                    # remove relation name from list of unused relation names or add to list of contained relation names
-                    if (relation_name in relation_name_ids_unused) or (
-                            relation_name not in subgraph_relation_names):
-                        relation_name_ids_unused.discard(relation_name)
-                        subgraph_relation_names.append(relation_name)
-                    # remove tail entity from list of unused entities
-                    if tail_entity in entity_ids_unused:
-                        entity_ids_unused.discard(tail_entity)
-
-        # -- regular sampling process --
-        # if not (enforce_relation_names or enforce_entities):
-        if len(entity_set) == 0:
-            raise IndexError("No entity in entity set.")
-        sampling_set = entity_set
-        entity_sampling = True
-
-        # take a sample from the sampling set
-        sample = random.choice(list(sampling_set.keys()))
-
-        sample_triple_indices = []
-        # set all entries of sampling_set[sample] as sampled triples and clear the key "sample" in the dict
-        if max_indices_per_step == "max":
-            sample_triple_indices = sampling_set[sample]
-            sampling_set[sample] = set()
+    safety_counter = 0
+    for sampled_entity_id in samples:
+        # check if sampled_entity_id is still in entity_set
+        if sampled_entity_id in entity_set:
+            candidates_list = entity_set[sampled_entity_id]
         else:
-            while len(sample_triple_indices) < max_indices_per_step and len(sampling_set[sample]) > 0:
-                sample_triple_indices.append(sampling_set[sample].pop())
+            # raise error if trapped in else statement
+            safety_counter += 1
+            if safety_counter > 200:
+                raise KeyError(f"There were entities enforced, which are not present in the subgraph. "
+                               f"Try increasing the relative subgraph size.\n"
+                               f"Sample {sampled_entity_id} was attempted {safety_counter} times, without success!")
+            continue
 
-        if relation_names_amount > 0 and sampling_method == Constants.FEATURE_SAMPLING:
-            relation_names_amount -= 1
-        if len(sampling_set[sample]) == 0 or sampling_set[sample] == set():
-            del sampling_set[sample]
-        # add all indices of the sample to delta
-        unique_before = len(delta)
-        delta.update(sample_triple_indices)
-        unique_after = len(delta)
+        # iterate through all candidate triples
+        for candidate in candidates_list:
+            head, relation, tail = dataset[candidate]
+            if head in sampled_entity_ids or tail in sampled_entity_ids:
+                relation_name_ids_unused.discard(relation)
+                delta.add(candidate)
 
-        # remove sample from entity_ids_unused and relation_name_ids_unused
-        for index, triple in enumerate(dataset[list(sample_triple_indices)]):
-            # get head entity, relation name and tail entity of sampled triple
-            head_entity, relation_name, tail_entity = triple
-
-            # remove remaining triple indices from entity and relation name sets
-            if head_entity in entity_set:
-                entity_set[head_entity].discard(sample)
-            if relation_name in relation_name_set:
-                relation_name_set[relation_name].discard(sample)
-            if tail_entity in entity_set:
-                entity_set[tail_entity].discard(sample)
-
-            # remove head entity from list of unused entities
-            if head_entity in entity_ids_unused:
-                entity_ids_unused.discard(head_entity)
-            # remove relation name from list of unused relation names or add to list of contained relation names
-            if (relation_name in relation_name_ids_unused) or (relation_name not in subgraph_relation_names):
-                relation_name_ids_unused.discard(relation_name)
-                subgraph_relation_names.append(relation_name)
-            # remove tail entity from list of unused entities
-            if tail_entity in entity_ids_unused:
-                entity_ids_unused.discard(tail_entity)
-
-        if entity_sampling:
-            entity_set = sampling_set
-        else:
-            relation_name_set = sampling_set
-
-    except IndexError:
-        logging.error("Received IndexError")
-    except KeyError as key:
-        logging.error(f"Received KeyError with key {key}")
-
-    except Exception as error:
-        logging.error(f"{error}\t{traceback.format_exc()}")
-
-    # ensure delta only has unique triple indices
-
-    if unique_before == unique_after:
-        removed_ids_counter += 1
-        # logging.debug(f"No indices were added to delta")
+        # add sampled_entity_id to set of sampled_entity_ids, and remove it from unused entity ids
+        sampled_entity_ids.add(sampled_entity_id)
+        entity_ids_unused.discard(sampled_entity_id)
+        del entity_set[sampled_entity_id]
 
     # update progress bar
     progress_bar.n = len(delta)
     progress_bar.refresh()
+
     # return all changed lists for the different sampling methods
     if sampling_method == Constants.FEATURE_SAMPLING:
         return (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused,
-                relation_names_amount, subgraph_relation_names)
+                relation_names_amount, subgraph_relation_names, sampled_entity_ids)
     else:
         return (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused,
-                subgraph_relation_names)
+                subgraph_relation_names, sampled_entity_ids)
 
 
 def get_relation_name_amount(relation_name_set, factor):

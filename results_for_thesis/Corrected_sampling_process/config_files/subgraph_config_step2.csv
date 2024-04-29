@@ -1,0 +1,11 @@
+original_kg;sampling_method;relation_names_rho;directory;sampling_time;subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;triples_deviation;subgraph_entities_amount;entities_per_step;subgraph_relation_names_amount;subgraph_relation_names
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_000;13.784;(0.1, 0.7);0.7;0;60785;0;32641;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_001;15.116;(0.1, 0.7);0.7;1;60785;0;32549;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_002;14.124;(0.1, 0.7);0.7;2;60785;0;32528;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_003;12.931;(0.1, 0.7);0.7;3;60786;1;32533;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_004;12.854;(0.1, 0.7);0.7;4;60788;3;32745;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_005;13.003;(0.1, 0.7);0.7;5;60788;3;32590;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_006;12.949;(0.1, 0.7);0.701;6;60867;82;32580;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_007;13.232;(0.1, 0.7);0.7;7;60785;0;32521;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_008;13.443;(0.1, 0.7);0.701;8;60867;82;32590;2;11;[]
+WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N10_min0.1\sub_009;13.295;(0.1, 0.7);0.7;9;60786;1;32495;2;11;[]

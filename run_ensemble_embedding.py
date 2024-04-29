@@ -1,8 +1,6 @@
-import logging
 import os
-import traceback
 
-from ensemble import Constants, util_files, util, run, subsampling
+from ensemble import Constants, util_files, util, subsampling
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
@@ -12,12 +10,12 @@ if __name__ == "__main__":
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 3
-    subgraph_size_range = (0.1, 0.7)
-    sampling_method = Constants.ENTITY_SAMPLING
-    # sampling_method = Constants.FEATURE_SAMPLING
+    subgraph_amount = 10
+    subgraph_size_range = (0.1,0.7)
+    # sampling_method = Constants.ENTITY_SAMPLING
+    sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
-    max_indices_per_step = "max"
+    max_indices_per_step = 100
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -41,6 +39,8 @@ if __name__ == "__main__":
         util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
                            logging_level="debug")
 
+        # --- if a new debugging dataset was created ---
+
         # util_files.csv_to_file("D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
         #                        "ensemble\\Random_Triples.csv",
         #                        "D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
@@ -50,20 +50,35 @@ if __name__ == "__main__":
         #                          f"data\\{dataset_in}\\train.pickle",
         #                          f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
         #                          f"data\\{dataset_in}\\train_readable.csv", ';')
-        #
+
+        # --- create files for insights in dataset ---
+
         # util.create_entity_and_relation_name_set_file(f"data\\{dataset_in}")
 
         # for dataset in os.scandir("data"):
         #     print(dataset.name)
         #     util.create_entity_and_relation_name_set_file(dataset.name)
-        #
-        # subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
-        #                          subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
-        #                          relation_name_amount=relation_name_amount,
-        #                          max_indices_per_step=max_indices_per_step)
+
+        # --- sampling process ---
+
+        subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
+                                 subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
+                                 relation_name_amount=relation_name_amount)
+
+        # sampling_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
+        #                   150, 200, 300, 400, 500]
+        # for i in sampling_sizes:
+        #     subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
+        #                              subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
+        #                              relation_name_amount=relation_name_amount,
+        #                              entities_per_step=i)
+
+        # --- create .graphml files for dataset visualization ---
 
         # create .graphml files for visualizing the subgraphs
         # plotting.create_graphml(info_directory, os.path.abspath(dataset_out_dir))
+
+        # --- setup for model training ---
 
         # allowed_kge_models = {Constants.TRANS_E: [1,2], Constants.DIST_MULT: [3, 4], Constants.ROTAT_E: [5, 6],
         #                       Constants.COMPL_EX: [7, 8], Constants.ATT_E: [9, 0]}
@@ -77,7 +92,9 @@ if __name__ == "__main__":
 
         allowed_kge_models = [{Constants.TRANS_E: [0, 'all'], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
                                Constants.COMPL_EX: [3], Constants.ATT_E: [4]}]
-        #TODO add check for dict with allowed_kge
+        # TODO add check for dict with allowed_kge (max_given_index == subgraph_amount)
+
+        # --- training process ---
 
         # # for i in range(1):
         # #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
@@ -88,10 +105,10 @@ if __name__ == "__main__":
         #                       # {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
         #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}]
         # #
-        for models in allowed_kge_models:
-            try:
-                run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-                          learning_rate=0.01, kge_models=models, max_epochs=1, batch_size=1000,
-                          rank=32, debug=False)
-            except RuntimeError:
-                logging.error(traceback.format_exc())
+        # for models in allowed_kge_models:
+        #     try:
+        #         run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
+        #                   learning_rate=0.01, kge_models=models, max_epochs=1, batch_size=1000,
+        #                   rank=32, debug=False)
+        #     except RuntimeError:
+        #         logging.error(traceback.format_exc())
