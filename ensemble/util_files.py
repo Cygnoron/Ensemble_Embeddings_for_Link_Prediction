@@ -191,3 +191,46 @@ def csv_to_file(input_csv_path, output_pickle_path, delim=';', only_unique=False
                 continue
         # Dump examples to pickle file after converting to numpy array of int64
         pickle.dump(np.array(examples).astype("int64"), output_pickle_file)
+
+
+def copy_test_valid_filter_data(dataset_in: str, info_directory: str):
+    """
+      Copy necessary files from the input dataset directory to the info directory for all subgraphs.
+
+      Args:
+          dataset_in (str): The name of the dataset containing the files to be copied.
+          info_directory (str): The directory where the files will be copied.
+
+      Raises:
+          FileNotFoundError: If any of the required files are not found in the dataset directory or fail to copy.
+
+      Returns:
+          None
+      """
+    # List of files to copy from the dataset directory
+    files_to_copy = ["test.pickle", "valid.pickle", "to_skip.pickle"]
+    # List to store names of successfully copied files
+    copied_files = []
+    # Source directory where files are located within the dataset
+    source_dir = f"data\\{dataset_in}"
+    # Target directory where files will be copied to
+    target_dir = f"{info_directory}\\data"
+    # Create the target directory if it doesn't exist
+    check_directory(target_dir)
+
+    # Iterate over files in the source directory
+    for file_name in os.listdir(source_dir):
+        # Check if the file is in the list of files to copy
+        if file_name in files_to_copy:
+            # Copy the file from the source directory to the target directory
+            shutil.copy(os.path.join(source_dir, file_name),
+                        os.path.join(target_dir, file_name))
+            # Add the file to the list of successfully copied files
+            copied_files += [file_name]
+
+    # Check if all required files were copied successfully
+    for file_to_copy in files_to_copy:
+        if file_to_copy not in copied_files:
+            # Raise an error if any required file was not copied successfully
+            raise FileNotFoundError(f"The file \"{file_to_copy}\" was not correctly copied to \"{target_dir}\", "
+                                    f"or did not exist in \"{source_dir}\"")

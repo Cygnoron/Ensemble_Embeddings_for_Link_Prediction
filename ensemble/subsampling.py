@@ -3,7 +3,6 @@ import math
 import os
 import pickle
 import random
-import shutil
 import time
 import traceback
 from builtins import round
@@ -116,15 +115,6 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 for triple in sampled_data:
                     output_file_raw.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
 
-                # TODO not necessarily needed, change when implementing training/testing process
-                # copy necessary files to the folder of the subgraph
-                files_to_copy = ["test.pickle", "valid.pickle", "to_skip.pickle"]
-                source_dir = f"data\\{dataset_in}"
-                for file_name in os.listdir(source_dir):
-                    if file_name in files_to_copy:
-                        shutil.copy(os.path.join(source_dir, file_name),
-                                    os.path.join(f"{dataset_out_dir}\\sub_{subgraph_num:03d}", file_name))
-
                 # get used entity and relation name ids for the current subgraph
                 used_entity_set, used_relation_name_set = get_unique_triple_ids(sampled_data, h=True, r=True, t=True)
 
@@ -148,7 +138,9 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                                  f"Deviation from target size: {triples_deviation}")
                     logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}, "
                                  f"sampling took {round(time_stop_sub - time_start_sub, 3)} sec\t/-\n")
-                    removed_ids_counter = 0
+
+        # copy necessary files
+        util_files.copy_test_valid_filter_data(dataset_in, info_directory)
 
     except FileNotFoundError:
         if not init_successful:
