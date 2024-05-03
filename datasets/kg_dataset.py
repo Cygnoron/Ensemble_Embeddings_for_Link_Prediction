@@ -10,22 +10,31 @@ import torch
 class KGDataset(object):
     """Knowledge Graph dataset class."""
 
-    def __init__(self, data_path, debug):
+    def __init__(self, data_path, debug, info_directory=""):
         """Creates KG dataset object for data loading.
 
         Args:
              data_path: Path to directory containing train/valid/test pickle files produced by process.py
              debug: boolean indicating whether to use debug mode or not
              if true, the dataset will only contain 1000 examples for debugging.
+             info_directory: Possible path to valid/test and to_skip pickle files created from sampling process
         """
         self.data_path = data_path
         self.debug = debug
         self.data = {}
         for split in ["train", "test", "valid"]:
-            file_path = os.path.join(self.data_path, split + ".pickle")
-            with open(file_path, "rb") as in_file:
-                self.data[split] = pkl.load(in_file)
-        filters_file = open(os.path.join(self.data_path, "to_skip.pickle"), "rb")
+            try:
+                file_path = os.path.join(self.data_path, split + ".pickle")
+                with open(file_path, "rb") as in_file:
+                    self.data[split] = pkl.load(in_file)
+            except FileNotFoundError:
+                file_path = os.path.join(info_directory, "data", split + ".pickle")
+                with open(file_path, "rb") as in_file:
+                    self.data[split] = pkl.load(in_file)
+        try:
+            filters_file = open(os.path.join(self.data_path, "to_skip.pickle"), "rb")
+        except FileNotFoundError:
+            filters_file = open(os.path.join(info_directory, "data", "to_skip.pickle"), "rb")
         self.to_skip = pkl.load(filters_file)
         filters_file.close()
         max_axis = np.max(self.data["train"], axis=0)
