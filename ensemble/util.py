@@ -141,7 +141,7 @@ def inverse_dict(dictionary):
     return dict(inverse_dictionary)
 
 
-def assign_model_to_subgraph(kge_models, args):
+def assign_model_to_subgraph(kge_models, args, subgraph_amount):
     """
     Assign embedding models to subgraphs based on the given dictionary of kge_models.
 
@@ -174,6 +174,21 @@ def assign_model_to_subgraph(kge_models, args):
     # Initial setup
     subgraph_embedding_mapping = {}
     kge_models_adjusted = list(kge_models.keys()).copy()
+
+    logging.debug(f"kge_models before checking for illegal assignments:\n{kge_models}")
+    # check for illegal subgraph assignment and remove if any were found
+    for embedding_model in list(kge_models.keys()):
+        buffer_assignments = kge_models[embedding_model].copy()
+        for assignment in buffer_assignments:
+            if type(assignment) is int:
+                if assignment > subgraph_amount:
+                    logging.debug(f"Removed illegal assignment \"{assignment}\"")
+                    kge_models[embedding_model].remove(assignment)
+            elif type(assignment) is str:
+                if assignment != "all" and assignment != "rest":
+                    logging.debug(f"Removed illegal assignment \"{assignment}\"")
+                    kge_models[embedding_model].remove(assignment)
+    logging.debug(f"kge_models after checking for illegal assignments:\n{kge_models}")
 
     logging.debug("Checking if 'all' or 'rest' was specified")
     for embedding_model in list(kge_models.keys()):
