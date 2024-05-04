@@ -5,6 +5,7 @@ import torch
 from tqdm import tqdm
 
 from ensemble import Constants
+from utils.train import avg_both, format_metrics
 
 
 def calculate_scores(embedding_models, examples, batch_size=500):
@@ -325,3 +326,56 @@ def compute_metrics_from_ranks(ranks_dict):
         mr_deviation[mode] = optimistic_rank - pessimistic_rank
 
     return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
+
+
+def calculate_valid_loss(embedding_models):
+    valid_loss_dict = {}
+    valid_loss = 0.0
+    # Iterate over all embedding models
+    for embedding_model in embedding_models:
+        # Setup variables
+        model = embedding_model["model"]
+        optimizer = embedding_model["optimizer"]
+        valid_examples = embedding_model["valid_examples"]
+        subgraph = embedding_model["subgraph"]
+
+        # calculate single validation loss
+        model.eval()
+        # save individual valid losses for display
+        valid_loss_dict[subgraph] = optimizer.calculate_valid_loss(valid_examples)
+        # sum up valid losses
+        valid_loss += valid_loss_dict[subgraph]
+
+    # average valid loss over all models
+    valid_loss /= len(embedding_models)
+
+    return valid_loss, valid_loss_dict
+
+
+def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode="test", batch_size=500):
+    if mode == "test":
+        logging.info(f"Testing the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        examples = embedding_models[0]["test_examples"]
+    elif mode == "valid":
+        logging.info(f"Validating the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        examples = embedding_models[0]["valid_examples"]
+    else:
+        logging.error(f"The given mode \"{mode}\" does not exist!")
+        return
+
+    # calculate scores for all models
+    embedding_models, targets = calculate_scores(embedding_models, examples, batch_size=batch_size)
+
+    # combine the calculated scores from all models, according to the given aggregation method
+    aggregated_scores = combine_scores(embedding_models, aggregation_method, batch_size=batch_size)
+
+    # compute the ranks for all queries
+    filters = embedding_models[0]["filters"]
+    ranks = compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
+                                            batch_size=batch_size)
+
+    # calculate metrics from the ranks
+    metrics = avg_both(*compute_metrics_from_ranks(ranks))
+    logging.info(format_metrics(metrics, split=mode))
+
+    return metrics
