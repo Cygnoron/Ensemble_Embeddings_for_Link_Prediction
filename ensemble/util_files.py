@@ -1,3 +1,4 @@
+import argparse
 import csv
 import logging
 import os
@@ -5,6 +6,7 @@ import pickle
 import shutil
 
 import numpy as np
+import torch
 
 from ensemble import Constants
 
@@ -234,3 +236,30 @@ def copy_test_valid_filter_data(dataset_in: str, info_directory: str):
             # Raise an error if any required file was not copied successfully
             raise FileNotFoundError(f"The file \"{file_to_copy}\" was not correctly copied to \"{target_dir}\", "
                                     f"or did not exist in \"{source_dir}\"")
+
+
+def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, model_file_dir):
+    """
+    Save or load trained models based on the validation arguments provided.
+
+    Parameters:
+        embedding_models (list): List of dictionaries containing trained embedding models and their arguments.
+        valid_args (argparse.Namespace): Validation arguments saved in Namespace object.
+        model_file_dir (str): Directory where the models will be saved or loaded from.
+    """
+    if not valid_args.best_mrr:
+        logging.info(f"Saving new models saved at epoch {valid_args.best_epoch}.")
+        # Iterate over models
+        for embedding_model in embedding_models:
+            args = embedding_model["args"]
+            # Save the model
+            torch.save(embedding_model['model'].cpu().state_dict(), f"{model_file_dir}\\model_{args.subgraph}_"
+                                                                    f"{args.model_name}.pt")
+    else:
+        logging.info(f"Loading best models saved at epoch {valid_args.best_epoch}")
+        # Iterate over models
+        for embedding_model in embedding_models:
+            args = embedding_model["args"]
+            # Load the best model
+            embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args.subgraph}_"
+                                                                f"{args.model_name}.pt"))
