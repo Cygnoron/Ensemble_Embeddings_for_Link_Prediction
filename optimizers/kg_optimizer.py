@@ -76,8 +76,6 @@ class KGOptimizer(object):
             loss: torch.Tensor with negative sampling embedding loss
             factors: torch.Tensor with embeddings weights to regularize
         """
-        # TODO aggregate scores?
-
         # positive samples
         positive_score, factors = self.model(input_batch)
         positive_score = F.logsigmoid(positive_score)
@@ -99,8 +97,6 @@ class KGOptimizer(object):
             loss: torch.Tensor with embedding loss
             factors: torch.Tensor with embeddings weights to regularize
         """
-        # TODO aggregate scores?
-
         predictions, factors = self.model(input_batch, eval_mode=True)
         truth = input_batch[:, 2]
         log_prob = F.logsigmoid(-predictions)
@@ -141,7 +137,6 @@ class KGOptimizer(object):
         Returns:
             loss: torch.Tensor with loss averaged over all validation examples
         """
-        # TODO Validation metrics/datasets
         b_begin = 0
         loss = 0.0
         counter = 0
