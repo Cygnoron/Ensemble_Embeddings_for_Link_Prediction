@@ -136,7 +136,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                                       f"{entities_per_step};{len(used_relation_name_set)};{subgraph_relation_names}")
                     logging.info(f"Length of delta: {len(delta_triples)}\t\t"
                                  f"Deviation from target size: {triples_deviation}")
-                    logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}, "
+                    logging.info(f"-\\\tUpdated config file \"{config_directory}\" for subgraph {subgraph_num:03d}, "
                                  f"sampling took {util.format_time(time_start_sub, time_stop_sub)}\t/-\n")
 
         # copy necessary files

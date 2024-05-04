@@ -1,6 +1,9 @@
+import logging
 import os
+import time
+import traceback
 
-from ensemble import Constants, util_files, util, subsampling
+from ensemble import Constants, util_files, util, run, subsampling
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
@@ -10,10 +13,10 @@ if __name__ == "__main__":
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 10
-    subgraph_size_range = (0.1,0.7)
-    # sampling_method = Constants.ENTITY_SAMPLING
-    sampling_method = Constants.FEATURE_SAMPLING
+    subgraph_amount = 5
+    subgraph_size_range = (0.3, 0.7)
+    sampling_method = Constants.ENTITY_SAMPLING
+    # sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
     max_indices_per_step = 100
 
@@ -22,7 +25,8 @@ if __name__ == "__main__":
     #     subgraph_size_range_list.append((i / 100, 0.7))
 
     for subgraph_size_range in subgraph_size_range_list:
-        # try:
+
+        time_process_start = time.time()
 
         if sampling_method == Constants.FEATURE_SAMPLING:
             dataset_out = (f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}_rho{relation_name_amount}"
@@ -90,9 +94,8 @@ if __name__ == "__main__":
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, 'all'], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
-                               Constants.COMPL_EX: [3], Constants.ATT_E: [4]}]
-        # TODO add check for dict with allowed_kge (max_given_index == subgraph_amount)
+        allowed_kge_models = [{Constants.TRANS_E: [0, 'all'], Constants.DIST_MULT: [1, "rest"], Constants.ROTAT_E: [2],
+                               Constants.COMPL_EX: [3, 12], Constants.ATT_E: [4, 50]}]
 
         # --- training process ---
 
@@ -105,10 +108,15 @@ if __name__ == "__main__":
         #                       # {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
         #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}]
         # #
-        # for models in allowed_kge_models:
-        #     try:
-        #         run.train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        #                   learning_rate=0.01, kge_models=models, max_epochs=1, batch_size=1000,
-        #                   rank=32, debug=False)
-        #     except RuntimeError:
-        #         logging.error(traceback.format_exc())
+        for models in allowed_kge_models:
+            try:
+                run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
+                          learning_rate=0.01, kge_models=models, max_epochs=3, batch_size=1000,
+                          rank=32, aggregation_method=Constants.MAX_SCORE, debug=False)
+            except RuntimeError:
+                logging.error(traceback.format_exc())
+
+        time_process_end = time.time()
+
+        logging.info(f"The entire process including sampling, training and testing took "
+                     f"{util.format_time(time_process_start, time_process_end)}.")

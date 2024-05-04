@@ -1,4 +1,5 @@
 import logging
+import math
 import os
 import pickle
 import random
@@ -446,7 +447,7 @@ def difference_embeddings(embedding_before, embedding_after, output_path, ent=Fa
             output_file.write(output_string + "\n")
 
 
-def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
+def format_time(time_total_start, time_total_end, divisor=1, multiplier=1, precision=2):
     """
     Format the total time elapsed between two given time points into hours, minutes, and seconds.
 
@@ -455,6 +456,7 @@ def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
         time_total_end (float): The end time in seconds.
         divisor (float, optional): Divisor to scale the time difference. Defaults to 1.
         multiplier (float, optional): Multiplier to scale the time difference. Defaults to 1.
+        precision (int, optional): Number of decimal places of seconds that will be displayed. Defaults to 2.
 
     Returns:
         str: A string representing the formatted total time in hours, minutes, and seconds.
@@ -495,6 +497,8 @@ def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
     format_previous = False
     if total_time_hours > 0:
         format_previous = True
+        # Set to whole number
+        total_time_hours = int(total_time_hours)
         # Check for case singular
         if total_time_hours == 1:
             output_time_str += f"{total_time_hours} hour"
@@ -507,6 +511,8 @@ def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
         if format_previous:
             output_time_str += ", "
         format_previous = True
+        # Set to whole number
+        total_time_minutes = int(total_time_minutes)
         # Check for case singular
         if total_time_minutes == 1:
             output_time_str += f"{total_time_minutes} minute"
@@ -518,6 +524,7 @@ def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
         # Add separator if previous time is displayed
         if format_previous:
             output_time_str += ", "
+        total_time_seconds = round(total_time_seconds, precision)
         # Check for case singular
         if total_time_seconds == 1:
             output_time_str += f"{total_time_seconds} second"

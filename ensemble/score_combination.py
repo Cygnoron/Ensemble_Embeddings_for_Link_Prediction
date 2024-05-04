@@ -1,14 +1,15 @@
 import logging
+import time
 import traceback
 
 import torch
 from tqdm import tqdm
 
-from ensemble import Constants
+from ensemble import Constants, util
 from utils.train import avg_both, format_metrics
 
 
-def calculate_scores(embedding_models, examples, batch_size=500):
+def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test"):
     """
        Calculate scores for all queries and models provided.
 
@@ -26,7 +27,8 @@ def calculate_scores(embedding_models, examples, batch_size=500):
     """
 
     # Initialize progress bar for tracking progress
-    progress_bar_testing = tqdm(total=len(embedding_models), desc=f"Calculating test scores", unit=" embedding models")
+    progress_bar_testing = tqdm(total=len(embedding_models), desc=f"Calculating {eval_mode} scores",
+                                unit=" embedding models")
 
     # Initialize variables to store target scores
     targets_lhs = None
@@ -107,7 +109,7 @@ def calculate_scores(embedding_models, examples, batch_size=500):
     return embedding_models, targets
 
 
-def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, batch_size=500):
+def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, batch_size=500, eval_mode="test"):
     """
         Combine scores from multiple models using the specified aggregation method.
 
@@ -125,15 +127,15 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, bat
 
     """
 
-    logging.info(f"-/\tCombining scores of all models with {aggregation_method[1]}\t\\-")
+    logging.info(f"Combining scores of all models with {aggregation_method[1]}.")
 
     # Get the size of scores for rhs and lhs directions
     size = {'rhs': embedding_models[0]['scores_rhs'].size(),
             'lhs': embedding_models[0]['scores_lhs'].size()}
 
     # Initialize progress bar for tracking progress
-    progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine test scores",
-                                    unit=" queries")
+    progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine {eval_mode} scores",
+                                    unit=" scores")
 
     # Initialize dictionary to store aggregated scores
     aggregated_scores = {'rhs': torch.zeros(size['rhs']),
@@ -198,12 +200,12 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE, bat
     progress_bar_combination.refresh()
     progress_bar_combination.close()
 
-    logging.info(f"-\\\tSuccessfully aggregated all scores with aggregation method {aggregation_method[1]}\t/-")
+    logging.info(f"Successfully aggregated all scores with aggregation method {aggregation_method[1]}.")
 
     return aggregated_scores
 
 
-def compute_ranks(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500):
+def compute_ranks(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500, eval_mode="test"):
     """
         Compute ranks for each query based on the aggregated scores, targets, and filters.
 
@@ -229,7 +231,7 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
              'lhs': torch.zeros(len(queries))}
 
     # Initialize progress bar for tracking progress
-    progress_bar_ranking = tqdm(total=len(queries) * 2, desc=f"Computing ranking", unit=" queries")
+    progress_bar_ranking = tqdm(total=len(queries) * 2, desc=f"Computing {eval_mode} ranking", unit=" queries")
 
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
@@ -342,9 +344,10 @@ def calculate_valid_loss(embedding_models):
         # calculate single validation loss
         model.eval()
         # save individual valid losses for display
-        valid_loss_dict[subgraph] = optimizer.calculate_valid_loss(valid_examples)
+        valid_loss_sub = optimizer.calculate_valid_loss(valid_examples)
         # sum up valid losses
-        valid_loss += valid_loss_dict[subgraph]
+        valid_loss += valid_loss_sub
+        valid_loss_dict[subgraph] = valid_loss_sub.item()
 
     # average valid loss over all models
     valid_loss /= len(embedding_models)
@@ -353,29 +356,39 @@ def calculate_valid_loss(embedding_models):
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE, mode="test", batch_size=500):
+    mode_str = ""
     if mode == "test":
-        logging.info(f"Testing the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]
+        mode_str = "Test"
     elif mode == "valid":
-        logging.info(f"Validating the ensemble with the score aggregation method \"{aggregation_method[1]}\".")
+        logging.info(f"-/\tValidating the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["valid_examples"]
+        mode_str = "Validat"
     else:
         logging.error(f"The given mode \"{mode}\" does not exist!")
         return
 
+    time_eval_start = time.time()
+
     # calculate scores for all models
-    embedding_models, targets = calculate_scores(embedding_models, examples, batch_size=batch_size)
+    embedding_models, targets = calculate_scores(embedding_models, examples, batch_size=batch_size, eval_mode=mode)
 
     # combine the calculated scores from all models, according to the given aggregation method
-    aggregated_scores = combine_scores(embedding_models, aggregation_method, batch_size=batch_size)
+    aggregated_scores = combine_scores(embedding_models, aggregation_method, batch_size=batch_size, eval_mode=mode)
 
     # compute the ranks for all queries
     filters = embedding_models[0]["filters"]
     ranks = compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
-                                            batch_size=batch_size)
+                          batch_size=batch_size, eval_mode=mode)
 
     # calculate metrics from the ranks
     metrics = avg_both(*compute_metrics_from_ranks(ranks))
     logging.info(format_metrics(metrics, split=mode))
+
+    time_eval_stop = time.time()
+
+    logging.info(f"-\\\tFinished {mode_str.lower()}ing the ensemble in "
+                 f"{util.format_time(time_eval_start, time_eval_stop)}\t/-")
 
     return metrics
