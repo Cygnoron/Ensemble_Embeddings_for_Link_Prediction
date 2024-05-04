@@ -429,3 +429,84 @@ def difference_embeddings(embedding_before, embedding_after, output_path, ent=Fa
 
             # write to output_file
             output_file.write(output_string + "\n")
+
+
+def format_time(time_total_start, time_total_end, divisor=1, multiplier=1):
+    """
+    Format the total time elapsed between two given time points into hours, minutes, and seconds.
+
+    Parameters:
+        time_total_start (float): The start time in seconds.
+        time_total_end (float): The end time in seconds.
+        divisor (float, optional): Divisor to scale the time difference. Defaults to 1.
+        multiplier (float, optional): Multiplier to scale the time difference. Defaults to 1.
+
+    Returns:
+        str: A string representing the formatted total time in hours, minutes, and seconds.
+
+    Example:
+        # Example 1: Default case
+        total_time_str = format_time(1000, 1050)
+        print(total_time_str)  # Output: "0 hours, 0 minutes, 50 seconds"
+
+        # Example 2: Using a divisor to scale time (e.g., converting milliseconds to seconds)
+        total_time_str = format_time(1000, 3000, divisor=1000)
+        print(total_time_str)  # Output: "0 hours, 0 minutes, 2 seconds"
+
+        # Example 3: Using a multiplier to scale time (e.g., counting time in half)
+        total_time_str = format_time(1000, 1050, multiplier=0.5)
+        print(total_time_str)  # Output: "0 hours, 0 minutes, 25 seconds"
+
+        # Example 4: Combining divisor and multiplier
+        total_time_str = format_time(1000, 2000, divisor=1000, multiplier=2)
+        print(total_time_str)  # Output: "0 hours, 0 minutes, 2 seconds"
+    """
+
+    # Handle division by zero error
+    if divisor == 0:
+        divisor = 1
+
+    # Calculate time difference including divisor and multiplier
+    total_time_seconds = ((time_total_end - time_total_start) / divisor) * multiplier
+
+    # Calculate hours, minutes, and seconds
+    total_time_hours, total_time_seconds = divmod(total_time_seconds, 3600)
+    total_time_minutes, total_time_seconds = divmod(total_time_seconds, 60)
+
+    # Initialize the output string
+    output_time_str = ""
+
+    # Formatting hours
+    format_previous = False
+    if total_time_hours > 0:
+        format_previous = True
+        # Check for case singular
+        if total_time_hours == 1:
+            output_time_str += f"{total_time_hours} hour"
+        else:
+            output_time_str += f"{total_time_hours} hours"
+
+    # Formatting minutes
+    if total_time_minutes > 0:
+        # Add separator if previous time is displayed
+        if format_previous:
+            output_time_str += ", "
+        format_previous = True
+        # Check for case singular
+        if total_time_minutes == 1:
+            output_time_str += f"{total_time_minutes} minute"
+        else:
+            output_time_str += f"{total_time_minutes} minutes"
+
+    # Formatting seconds
+    if total_time_seconds > 0:
+        # Add separator if previous time is displayed
+        if format_previous:
+            output_time_str += ", "
+        # Check for case singular
+        if total_time_seconds == 1:
+            output_time_str += f"{total_time_seconds} second"
+        else:
+            output_time_str += f"{total_time_seconds} seconds"
+
+    return output_time_str
