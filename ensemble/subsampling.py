@@ -3,7 +3,6 @@ import math
 import os
 import pickle
 import random
-import shutil
 import time
 import traceback
 from builtins import round
@@ -116,15 +115,6 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 for triple in sampled_data:
                     output_file_raw.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
 
-                # TODO not necessarily needed, change when implementing training/testing process
-                # copy necessary files to the folder of the subgraph
-                files_to_copy = ["test.pickle", "valid.pickle", "to_skip.pickle"]
-                source_dir = f"data\\{dataset_in}"
-                for file_name in os.listdir(source_dir):
-                    if file_name in files_to_copy:
-                        shutil.copy(os.path.join(source_dir, file_name),
-                                    os.path.join(f"{dataset_out_dir}\\sub_{subgraph_num:03d}", file_name))
-
                 # get used entity and relation name ids for the current subgraph
                 used_entity_set, used_relation_name_set = get_unique_triple_ids(sampled_data, h=True, r=True, t=True)
 
@@ -146,9 +136,11 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                                       f"{entities_per_step};{len(used_relation_name_set)};{subgraph_relation_names}")
                     logging.info(f"Length of delta: {len(delta_triples)}\t\t"
                                  f"Deviation from target size: {triples_deviation}")
-                    logging.info(f"-\\\tUpdated config file {config_directory} for subgraph {subgraph_num:03d}, "
-                                 f"sampling took {round(time_stop_sub - time_start_sub, 3)} sec\t/-\n")
-                    removed_ids_counter = 0
+                    logging.info(f"-\\\tUpdated config file \"{config_directory}\" for subgraph {subgraph_num:03d}, "
+                                 f"sampling took {util.format_time(time_start_sub, time_stop_sub)}\t/-\n")
+
+        # copy necessary files
+        util_files.copy_test_valid_filter_data(dataset_in, info_directory)
 
     except FileNotFoundError:
         if not init_successful:
@@ -162,8 +154,8 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     # stop timer for whole subgraph creation
     time_stop = time.time()
     logging.info(f"### Successfully created {str(subgraph_amount)} subgraphs of the relative size {subgraph_size_range}"
-                 f" from the original KG \"{dataset_in}\" in a total of {round(time_stop - time_start, 3)} seconds "
-                 f"(avg: {round((time_stop - time_start) / subgraph_amount, 3)} sec) ###")
+                 f" from the original KG \"{dataset_in}\" in a total of {util.format_time(time_start, time_stop)} "
+                 f"(avg: {util.format_time(time_start,time_stop, divisor=subgraph_amount)}) ###")
 
 
 def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount, entity_set, relation_name_set,
@@ -310,6 +302,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                 if subgraph_size != subgraph_size_range[0]:
                     subgraph_size = subgraph_size_range[0]
                     logging.info(f"Changing relative subgraph size to minimum subgraph size {subgraph_size}.")
+                    progress_bar.total = math.ceil(len(dataset) * subgraph_size)
 
                 if len(delta) / len(dataset) >= subgraph_size:
                     progress_bar.close()
@@ -419,10 +412,11 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         else:
             # raise error if trapped in else statement
             safety_counter += 1
-            if safety_counter > 200:
-                raise KeyError(f"There were entities enforced, which are not present in the subgraph. "
-                               f"Try increasing the relative subgraph size.\n"
-                               f"Sample {sampled_entity_id} was attempted {safety_counter} times, without success!")
+            if safety_counter >= 20:
+                continue
+                # raise KeyError(f"There were entities enforced, which are not present in the subgraph. "
+                #                f"Try increasing the relative subgraph size.\n"
+                #                f"Sample {sampled_entity_id} was attempted {safety_counter} times, without success!")
             continue
 
         # iterate through all candidate triples
@@ -430,6 +424,8 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
             head, relation, tail = dataset[candidate]
             if head in sampled_entity_ids or tail in sampled_entity_ids:
                 relation_name_ids_unused.discard(relation)
+                if relation not in subgraph_relation_names:
+                    subgraph_relation_names.append(relation)
                 delta.add(candidate)
 
         # add sampled_entity_id to set of sampled_entity_ids, and remove it from unused entity ids
