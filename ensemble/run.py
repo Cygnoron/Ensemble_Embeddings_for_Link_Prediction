@@ -294,6 +294,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
                 valid_args.best_epoch = epoch
                 logging.info(f"Saving models at epoch {epoch} in {model_file_dir}")
                 for embedding_model in embedding_models:
+                    args = embedding_model['args']
                     torch.save(embedding_model['model'].cpu().state_dict(), f"{model_file_dir}\\model_{args.subgraph}_"
                                                                             f"{args.model_name}.pt")
                     embedding_model['model'].cuda()
