@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import traceback
+from datetime import datetime
 
 from ensemble import Constants, util_files, util, run, subsampling
 
@@ -18,23 +19,26 @@ if __name__ == "__main__":
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
-    max_indices_per_step = 100
+    time_dependent_file_path = False
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
     #     subgraph_size_range_list.append((i / 100, 0.7))
 
     for subgraph_size_range in subgraph_size_range_list:
-
         time_process_start = time.time()
 
+        dataset_out = ""
         if sampling_method == Constants.FEATURE_SAMPLING:
             dataset_out = (f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}_rho{relation_name_amount}"
                            f"_min{subgraph_size_range[0]}")
-        else:
+        elif sampling_method == Constants.ENTITY_SAMPLING:
             dataset_out = f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}_min{subgraph_size_range[0]}"
-        dataset_out_dir = f"data\\{dataset_out}"
 
+        if time_dependent_file_path:
+            dataset_out += datetime.now().strftime('_mm%m_dd%d__HH%H_MM%M')
+
+        dataset_out_dir = f"data\\{dataset_out}"
         info_directory = os.path.abspath(f"{dataset_out_dir}")
         util_files.check_directory(info_directory)
         info_directory = os.path.abspath(f"{dataset_out_dir}\\results")
@@ -94,8 +98,8 @@ if __name__ == "__main__":
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, 'all'], Constants.DIST_MULT: [1, "rest"], Constants.ROTAT_E: [2],
-                               Constants.COMPL_EX: [3, 12], Constants.ATT_E: [4, 50]}]
+        allowed_kge_models = [{Constants.TRANS_E: [0], Constants.DIST_MULT: [1, "rest"], Constants.ROTAT_E: [2],
+                               Constants.COMPL_EX: [3, 12, "all"], Constants.ATT_E: [4, 50]}]
 
         # --- training process ---
 
@@ -111,9 +115,17 @@ if __name__ == "__main__":
         for models in allowed_kge_models:
             try:
                 run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
-                          learning_rate=0.01, kge_models=models, max_epochs=3, batch_size=1000,
-                          rank=32, aggregation_method=Constants.MAX_SCORE, debug=False)
-            except RuntimeError:
+                          learning_rate=0.1, kge_models=models, max_epochs=100, batch_size=800,
+                          rank=32, aggregation_method=Constants.MAX_SCORE_AGGREGATION, debug=False,
+                          reg=0.05,
+                          patience=15,
+                          valid=2,
+                          neg_sample_size=-1,
+                          init_size=0.001,
+                          bias="none",
+                          dtype="single"
+                          )
+            except Exception:
                 logging.error(traceback.format_exc())
 
         time_process_end = time.time()
