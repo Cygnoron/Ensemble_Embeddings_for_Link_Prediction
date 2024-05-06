@@ -1,4 +1,5 @@
 import logging
+import os.path
 import time
 import traceback
 
@@ -10,7 +11,7 @@ from utils.train import avg_both, format_metrics
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
-                      batch_size=500):
+                      print_metrics_to_file=False, batch_size=500):
     mode_str = ""
     if mode == "test":
         logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
@@ -40,6 +41,11 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     # calculate metrics from the ranks
     metrics = avg_both(*compute_metrics_from_ranks(ranks_opt, ranks_pes))
     logging.info(format_metrics(metrics, split=mode))
+
+    if print_metrics_to_file:
+        # TODO output .csv with all metrics (epoch - metric)
+        #  also output files with train/valid loss to see improvement over time?
+        pass
 
     time_eval_stop = time.time()
 
@@ -324,8 +330,6 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                 #     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
                 #      targets[mode][b_begin:b_begin + batch_size]).float(), dim=1).cpu()
 
-                b_begin += batch_size
-
                 # Calculate optimistic rank
                 ranks_opt[mode][b_begin:b_begin + batch_size] = torch.sum(
                     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
@@ -339,6 +343,8 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                 target_subtraction = torch.sum((aggregated_scores[mode][b_begin:b_begin + batch_size] ==
                                                 targets[mode][b_begin:b_begin + batch_size]).float(), dim=1)
                 ranks_pes[mode][b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
+
+                b_begin += batch_size
 
         # Complete progress bar and close
         progress_bar_ranking.n = progress_bar_ranking.total
@@ -359,6 +365,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
         Args:
             ranks_opt (dict): Dictionary containing computed optimistic ranks for both lhs and rhs directions.
             ranks_pes (dict): Dictionary containing computed pessimistic ranks for both lhs and rhs directions.
+
         Returns:
             tuple: A tuple containing:
                 - mean_rank (dict): Mean rank for lhs and rhs directions.
@@ -376,7 +383,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
     amri = {}
     mr_deviation = {}
 
-    # TODO check/correct calculation of MRR, AMRI and MR_Deviation
+    # TODO check/correct calculation of MRR, AMRI
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
         optimistic_rank = ranks_opt[mode]
@@ -394,8 +401,15 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
         ))))
 
         # Compute AMRI
-        expected_rank = torch.mean(optimistic_rank - 1)  # Expectation of MR - 1
-        amri[mode] = 1 - ((mean_rank[mode] - 1) / expected_rank)
+        # valid_ranks = ranks_opt[ranks_opt > 0]  # Exclude ranks where the target was not found
+        sum_ranks = torch.sum(ranks_opt[mode] - 1)  # Subtract 1 to match the formula
+        sum_valid_ranks = torch.sum(torch.ones_like(ranks_opt[mode]))
+        expected_rank = sum_ranks / sum_valid_ranks
+        amri[mode] = 1 - (mean_rank[mode] - 1) / (expected_rank - 1)
+
+        # Compute AMRI
+        # expected_rank = torch.mean(optimistic_rank - 1)  # Expectation of MR - 1
+        # amri[mode] = 1 - ((mean_rank[mode] - 1) / expected_rank)
 
         # Compute MR_deviation
         mr_deviation[mode] = torch.sum(optimistic_rank - pessimistic_rank)
