@@ -34,11 +34,11 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
 
     # compute the ranks for all queries
     filters = embedding_models[0]["filters"]
-    ranks = compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
-                          batch_size=batch_size, eval_mode=mode)
+    ranks_opt, ranks_pes = compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
+                                         batch_size=batch_size, eval_mode=mode)
 
     # calculate metrics from the ranks
-    metrics = avg_both(*compute_metrics_from_ranks(ranks))
+    metrics = avg_both(*compute_metrics_from_ranks(ranks_opt, ranks_pes))
     logging.info(format_metrics(metrics, split=mode))
 
     time_eval_stop = time.time()
@@ -280,8 +280,11 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
 
     # Initialize dictionary for ranks
     queries = examples.clone()
-    ranks = {'rhs': torch.zeros(len(queries)),
-             'lhs': torch.zeros(len(queries))}
+    ranks_opt = {'rhs': torch.zeros(len(queries)),
+                 'lhs': torch.zeros(len(queries))}
+
+    ranks_pes = {'rhs': torch.zeros(len(queries)),
+                 'lhs': torch.zeros(len(queries))}
 
     # Initialize progress bar for tracking progress
     progress_bar_ranking = tqdm(total=len(queries) * 2, desc=f"Computing {eval_mode} ranking", unit=" queries")
@@ -316,30 +319,46 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                     filter_out = filters[mode][(query[0].item(), query[1].item())]
                     filter_out += [queries[b_begin + i, 2].item()]
                     aggregated_scores[mode][i, torch.LongTensor(filter_out)] = -1e6
-                ranks[mode][b_begin:b_begin + batch_size] += torch.sum(
-                    (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
-                     targets[mode][b_begin:b_begin + batch_size]).float(),
-                    dim=1).cpu()
+
+                # ranks[mode][b_begin:b_begin + batch_size] += torch.sum(
+                #     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
+                #      targets[mode][b_begin:b_begin + batch_size]).float(), dim=1).cpu()
 
                 b_begin += batch_size
+
+                # Calculate optimistic rank
+                ranks_opt[mode][b_begin:b_begin + batch_size] = torch.sum(
+                    (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
+                     targets[mode][b_begin:b_begin + batch_size]).float(), dim=1).cpu()
+
+                # Calculate pessimistic rank
+                pessimistic_rank = torch.sum((aggregated_scores[mode][b_begin:b_begin + batch_size] >
+                                              targets[mode][b_begin:b_begin + batch_size]).float(), dim=1)
+
+                # Adjust for pessimistic rank (subtract 1 if target score is included)
+                target_subtraction = torch.sum((aggregated_scores[mode][b_begin:b_begin + batch_size] ==
+                                                targets[mode][b_begin:b_begin + batch_size]).float(), dim=1)
+                ranks_pes[mode][b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
 
         # Complete progress bar and close
         progress_bar_ranking.n = progress_bar_ranking.total
         progress_bar_ranking.refresh()
         progress_bar_ranking.close()
 
-        logging.log(Constants.DATA_LEVEL_LOGGING,
-                    f"Mode:\t{mode}\t\tSize:\t{ranks[mode].size()}\t\tRanks:\n{ranks[mode]}")
-    return ranks
+        logging.log(Constants.DATA_LEVEL_LOGGING, f"Optimistic rank - Mode:\t{mode}\t\t"
+                                                  f"Size:\t{ranks_opt[mode].size()}\t\tRanks:\n{ranks_opt[mode]}")
+        logging.log(Constants.DATA_LEVEL_LOGGING, f"Pessimistic rank - Mode:\t{mode}\t\t"
+                                                  f"Size:\t{ranks_pes[mode].size()}\t\tRanks:\n{ranks_pes[mode]}")
+    return ranks_opt, ranks_pes
 
 
-def compute_metrics_from_ranks(ranks_dict):
+def compute_metrics_from_ranks(ranks_opt, ranks_pes):
     """
         Compute various evaluation metrics based on the computed ranks.
 
         Args:
-            ranks_dict (dict): Dictionary containing computed ranks for both lhs and rhs directions.
-
+            ranks_opt (dict): Dictionary containing computed optimistic ranks for both lhs and rhs directions.
+            ranks_pes (dict): Dictionary containing computed pessimistic ranks for both lhs and rhs directions.
         Returns:
             tuple: A tuple containing:
                 - mean_rank (dict): Mean rank for lhs and rhs directions.
@@ -357,30 +376,29 @@ def compute_metrics_from_ranks(ranks_dict):
     amri = {}
     mr_deviation = {}
 
-    # TODO check/correct calculation of MRR AMRI and MR_Deviation
+    # TODO check/correct calculation of MRR, AMRI and MR_Deviation
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
-        ranks = ranks_dict[mode]
+        optimistic_rank = ranks_opt[mode]
+        pessimistic_rank = ranks_pes[mode]
 
         # Compute mean rank
-        mean_rank[mode] = torch.mean(ranks).item()
+        mean_rank[mode] = torch.mean(optimistic_rank).item()
 
         # Compute mean reciprocal rank
-        mean_reciprocal_rank[mode] = torch.mean(1. / ranks).item()
+        mean_reciprocal_rank[mode] = torch.mean(1. / optimistic_rank).item()
 
         # Compute hits@1, hits@3 and hits@10
         hits_at[mode] = torch.FloatTensor((list(map(
-            lambda x: torch.mean((ranks <= x).float()).item(), (1, 3, 10)
+            lambda x: torch.mean((optimistic_rank <= x).float()).item(), (1, 3, 10)
         ))))
 
         # Compute AMRI
-        expected_rank = torch.mean(ranks - 1)  # Expectation of MR - 1
+        expected_rank = torch.mean(optimistic_rank - 1)  # Expectation of MR - 1
         amri[mode] = 1 - ((mean_rank[mode] - 1) / expected_rank)
 
         # Compute MR_deviation
-        optimistic_rank = torch.min(ranks) - 1
-        pessimistic_rank = torch.max(ranks) - 1
-        mr_deviation[mode] = optimistic_rank - pessimistic_rank
+        mr_deviation[mode] = torch.sum(optimistic_rank - pessimistic_rank)
 
     return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
 
