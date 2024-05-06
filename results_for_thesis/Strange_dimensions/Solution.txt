@@ -1,0 +1,9 @@
+Some embeddings were missing a few entries when combining the sores
+-> e.g. sub_000-sub_003 had size [40943, 32], while sub_004 had size [40942, 32]
+this lead to an error when combining the scores of all models, since the tensors couldn't be stacked due to the differnt dimensions
+
+The error occoured, because when a new KGDataset is created, the internal size is set to the maximum id found with all embeddings/relation names.
+If a subgraph the highest entity id gererally is 500, but the highest entity id in a subgraph is 499, the internal size is set to 499, regardles of the size of the embeddings, which is set afterwards.
+
+Solution:
+When generating the general embeddings, also return the shape of the parent dataset. Then set this general size for all subgraphs, in order to have the correct internal size set everywhere

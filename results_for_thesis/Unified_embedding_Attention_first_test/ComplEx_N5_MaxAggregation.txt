@@ -1,0 +1,34 @@
+2024-05-06 18:19:33,952 INFO     	 valid MR: 19013.36 | MRR: inf | H@1: 0.119 | H@3: 0.215 | H@10: 0.269 | AMRI: 0.000000 | MR_deviation: -40943.000
+2024-05-06 18:19:33,952 INFO     -\	Finished validating the ensemble in 8.06 seconds	/-
+2024-05-06 18:19:33,952 INFO     -\	Training and optimization of epoch 49 finished in 31.08 seconds	/-
+
+Run1
+valid MR: 19013.36 | MRR: inf | H@1: 0.119 | H@3: 0.215 | H@10: 0.269 | AMRI: 0.000000 | MR_deviation: -40943.000
+valid MR: 19114.24 | MRR: inf | H@1: 0.123 | H@3: 0.216 | H@10: 0.272 | AMRI: -0.000000 | MR_deviation: -40943.000
+
+Run2
+valid MR: 16709.97 | MRR: inf | H@1: 0.171 | H@3: 0.178 | H@10: 0.194 | AMRI: -0.000000 | MR_deviation: 397.000
+valid MR: 16136.78 | MRR: inf | H@1: 0.174 | H@3: 0.191 | H@10: 0.218 | AMRI: 0.000000 | MR_deviation: 443.000
+valid MR: 15848.66 | MRR: inf | H@1: 0.179 | H@3: 0.211 | H@10: 0.254 | AMRI: 0.000000 | MR_deviation: 483.000
+
+ComplEx Example for reference
+valid MR: 6019.77 | MRR: 0.403 | H@1: 0.382 | H@3: 0.412 | H@10: 0.439 | AMRI: 0.000000 | MR_deviation: -40552.000
+
+Traceback (most recent call last):
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\run_ensemble_embedding.py", line 117, in <module>
+    run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\ensemble\run.py", line 317, in train
+    util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir)
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\ensemble\util_files.py", line 264, in save_load_trained_models
+    embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args.subgraph}_"
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\venv\Lib\site-packages\torch\serialization.py", line 997, in load
+    with _open_file_like(f, 'rb') as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\venv\Lib\site-packages\torch\serialization.py", line 444, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\venv\Lib\site-packages\torch\serialization.py", line 425, in __init__
+    super().__init__(open(name, mode))
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data\\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH17_MM56\\results\\model_files\\model_sub_000_ComplEx.pt'

@@ -1,0 +1,635 @@
+2024-05-06 16:24:46 INFO     ### Saving logs in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results ###
+2024-05-06 16:24:46 DEBUG    ### Debug messages are enabled ###
+2024-05-06 16:24:46 DEBUG    Deleting unwanted files and directories
+2024-05-06 16:24:46 INFO     Sampling 5 subgraphs with a relative size (0.3, 0.7) from WN18RR with Entity sampling
+2024-05-06 16:24:46 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:24:47 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:24:47 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\sub_000 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-06 16:25:00 INFO     Current subgraph size 0.7000748546093165 reached or exceeded target size 0.7.
+2024-05-06 16:25:00 INFO     Created subgraph 0 with 6801 entities and 0 relation names left unused and a relative subgraph size 0.7000748546093165.
+2024-05-06 16:25:00 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:00 INFO     Length of delta: 60791		Deviation from target size: 6
+2024-05-06 16:25:00 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\subgraph_config.csv" for subgraph 000, sampling took 13.57 seconds	/-
+
+2024-05-06 16:25:00 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:01 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\sub_001 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-06 16:25:14 INFO     Current subgraph size 0.7000633385155756 reached or exceeded target size 0.7.
+2024-05-06 16:25:14 INFO     Created subgraph 1 with 1106 entities and 0 relation names left unused and a relative subgraph size 0.7000633385155756.
+2024-05-06 16:25:14 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:14 INFO     Length of delta: 60790		Deviation from target size: 5
+2024-05-06 16:25:14 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\subgraph_config.csv" for subgraph 001, sampling took 13.75 seconds	/-
+
+2024-05-06 16:25:14 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:14 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\sub_002 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-06 16:25:14 INFO     Enforcing 1106 entities to be present in the subgraph
+2024-05-06 16:25:29 INFO     Current subgraph size 0.7000633385155756 reached or exceeded target size 0.7.
+2024-05-06 16:25:29 INFO     Created subgraph 2 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000633385155756.
+2024-05-06 16:25:29 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:29 INFO     Length of delta: 60790		Deviation from target size: 5
+2024-05-06 16:25:29 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\subgraph_config.csv" for subgraph 002, sampling took 14.72 seconds	/-
+
+2024-05-06 16:25:29 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:29 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\sub_003 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-06 16:25:43 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-05-06 16:25:43 INFO     Created subgraph 3 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705.
+2024-05-06 16:25:44 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:44 INFO     Length of delta: 60785		Deviation from target size: 0
+2024-05-06 16:25:44 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\subgraph_config.csv" for subgraph 003, sampling took 14.45 seconds	/-
+
+2024-05-06 16:25:44 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:44 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\sub_004 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-06 16:25:58 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-05-06 16:25:58 INFO     Created subgraph 4 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705.
+2024-05-06 16:25:58 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-06 16:25:58 INFO     Length of delta: 60785		Deviation from target size: 0
+2024-05-06 16:25:58 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\subgraph_config.csv" for subgraph 004, sampling took 14.26 seconds	/-
+
+2024-05-06 16:25:58 INFO     ### Successfully created 5 subgraphs of the relative size (0.3, 0.7) from the original KG "WN18RR" in a total of 1 minute, 11.86 seconds (avg: 14.37 seconds) ###
+2024-05-06 16:25:58 INFO     ### Saving .json config files of models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\model_setup_configs ###
+2024-05-06 16:25:58 INFO     ### Saving .pt files of stored models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N5_min0.3_mm05_dd06__HH16_MM24\results\model_files ###
+2024-05-06 16:25:58 DEBUG    Given dataset was sampled by Entity sampling, returning original name WN18RR
+2024-05-06 16:25:58 DEBUG    Creating general embeddings and context vectors.
+2024-05-06 16:25:59 INFO     -/	Setting up embedding models	\-
+2024-05-06 16:25:59 DEBUG    kge_models before checking for illegal assignments:
+{'TransE': [0], 'DistMult': [1, 'rest'], 'RotatE': [2], 'ComplEx': [3, 12, 'all'], 'AttE': [4, 50]}
+2024-05-06 16:25:59 DEBUG    Removed illegal assignment "12"
+2024-05-06 16:25:59 DEBUG    Removed illegal assignment "50"
+2024-05-06 16:25:59 DEBUG    kge_models after checking for illegal assignments:
+{'TransE': [0], 'DistMult': [1, 'rest'], 'RotatE': [2], 'ComplEx': [3, 'all'], 'AttE': [4]}
+2024-05-06 16:25:59 DEBUG    Checking if 'all' or 'rest' was specified
+2024-05-06 16:25:59 DEBUG    'rest' was found for embedding model DistMult
+2024-05-06 16:25:59 DEBUG    'all' was found for embedding model ComplEx
+2024-05-06 16:25:59 INFO     All subgraphs will be embedded by ComplEx
+2024-05-06 16:25:59 INFO     Setting ComplEx as embedding method for subgraph sub_000.
+2024-05-06 16:25:59 INFO     Setting ComplEx as embedding method for subgraph sub_001.
+2024-05-06 16:25:59 INFO     Setting ComplEx as embedding method for subgraph sub_002.
+2024-05-06 16:25:59 INFO     Setting ComplEx as embedding method for subgraph sub_003.
+2024-05-06 16:25:59 INFO     Setting ComplEx as embedding method for subgraph sub_004.
+2024-05-06 16:25:59 INFO     Mapping from embedding methods to subgraphs: {'ComplEx': [0, 1, 2, 3, 4]}
+2024-05-06 16:25:59 INFO     No already trained models found.
+2024-05-06 16:25:59 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_000	\-
+2024-05-06 16:25:59 INFO     Loading data for subgraph sub_000.
+2024-05-06 16:25:59 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-06 16:25:59 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-06 16:25:59 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-06 16:25:59 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-06 16:25:59 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-06 16:25:59 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_001	\-
+2024-05-06 16:25:59 INFO     Loading data for subgraph sub_001.
+2024-05-06 16:26:00 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-06 16:26:00 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-06 16:26:00 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-06 16:26:00 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-06 16:26:00 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-06 16:26:00 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_002	\-
+2024-05-06 16:26:00 INFO     Loading data for subgraph sub_002.
+2024-05-06 16:26:00 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-06 16:26:00 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-06 16:26:00 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-06 16:26:00 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-06 16:26:00 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-06 16:26:00 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_003	\-
+2024-05-06 16:26:00 INFO     Loading data for subgraph sub_003.
+2024-05-06 16:26:01 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-06 16:26:01 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-06 16:26:01 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-06 16:26:01 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-06 16:26:01 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-06 16:26:01 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_004	\-
+2024-05-06 16:26:01 INFO     Loading data for subgraph sub_004.
+2024-05-06 16:26:01 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-06 16:26:01 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-06 16:26:01 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-06 16:26:01 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-06 16:26:01 INFO     -\	Total number of parameters: 4014428	/-
+2024-05-06 16:26:01 INFO     -\	Successfully created all models in 2.3 seconds	/-
+2024-05-06 16:26:01 INFO     -/	Starting training	\-
+2024-05-06 16:26:01 INFO     -/	Start training sub_000 with ComplEx	\-
+2024-05-06 16:26:03 INFO     -/	Start training sub_001 with ComplEx	\-
+2024-05-06 16:26:03 INFO     -/	Start training sub_002 with ComplEx	\-
+2024-05-06 16:26:03 INFO     -/	Start training sub_003 with ComplEx	\-
+2024-05-06 16:26:03 INFO     -/	Start training sub_004 with ComplEx	\-
+2024-05-06 16:26:03 INFO     Training subgraph sub_000 in epoch 0 with model ComplEx
+2024-05-06 16:26:07 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 0.6921
+2024-05-06 16:26:07 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:07 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:07 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:07 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:07 INFO     Training subgraph sub_001 in epoch 0 with model ComplEx
+2024-05-06 16:26:09 INFO     Subgraph sub_001 Training Epoch 0 | average train loss: 0.6921
+2024-05-06 16:26:09 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:09 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:09 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:09 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:09 INFO     Training subgraph sub_002 in epoch 0 with model ComplEx
+2024-05-06 16:26:12 INFO     Subgraph sub_002 Training Epoch 0 | average train loss: 0.6921
+2024-05-06 16:26:12 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:12 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:12 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:12 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:12 INFO     Training subgraph sub_003 in epoch 0 with model ComplEx
+2024-05-06 16:26:15 INFO     Subgraph sub_003 Training Epoch 0 | average train loss: 0.6920
+2024-05-06 16:26:15 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:15 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:15 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:15 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:15 INFO     Training subgraph sub_004 in epoch 0 with model ComplEx
+2024-05-06 16:26:17 INFO     Subgraph sub_004 Training Epoch 0 | average train loss: 0.6920
+2024-05-06 16:26:17 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:17 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:17 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-06 16:26:17 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-06 16:26:17 INFO     Calculating self-attention for sub_000 (ComplEx)
+2024-05-06 16:26:18 INFO     Calculating self-attention for sub_001 (ComplEx)
+2024-05-06 16:26:18 INFO     Calculating self-attention for sub_002 (ComplEx)
+2024-05-06 16:26:18 INFO     Calculating self-attention for sub_003 (ComplEx)
+2024-05-06 16:26:18 INFO     Calculating self-attention for sub_004 (ComplEx)
+2024-05-06 16:26:18 INFO     Calculating unified embedding for entities and relation names.
+2024-05-06 16:26:18 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:18 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:18 DEBUG    Size of general entity embedding, after applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:18 DEBUG    Size of general relation name embedding, after applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:18 DEBUG    Validation Epoch 0 per subgraph | average valid losses: {'sub_000': 0.6880608672291955, 'sub_001': 0.6879844868501412, 'sub_002': 0.687657982677637, 'sub_003': 0.6877216797921355, 'sub_004': 0.6877164613189231}
+2024-05-06 16:26:18 INFO     Validation Epoch 0 | average valid loss: 0.6878
+2024-05-06 16:26:18 INFO     -\	Training and optimization of epoch 0 finished in 15.2 seconds	/-
+2024-05-06 16:26:18 INFO     Training subgraph sub_000 in epoch 1 with model ComplEx
+2024-05-06 16:26:20 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 0.6790
+2024-05-06 16:26:20 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:20 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:20 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:20 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:20 INFO     Training subgraph sub_001 in epoch 1 with model ComplEx
+2024-05-06 16:26:23 INFO     Subgraph sub_001 Training Epoch 1 | average train loss: 0.6792
+2024-05-06 16:26:23 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:23 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:23 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:23 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:23 INFO     Training subgraph sub_002 in epoch 1 with model ComplEx
+2024-05-06 16:26:26 INFO     Subgraph sub_002 Training Epoch 1 | average train loss: 0.6785
+2024-05-06 16:26:26 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:26 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:26 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:26 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:26 INFO     Training subgraph sub_003 in epoch 1 with model ComplEx
+2024-05-06 16:26:29 INFO     Subgraph sub_003 Training Epoch 1 | average train loss: 0.6784
+2024-05-06 16:26:29 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:29 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:29 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:29 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:29 INFO     Training subgraph sub_004 in epoch 1 with model ComplEx
+2024-05-06 16:26:31 INFO     Subgraph sub_004 Training Epoch 1 | average train loss: 0.6786
+2024-05-06 16:26:31 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:31 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:31 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-06 16:26:31 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-06 16:26:31 INFO     Calculating self-attention for sub_000 (ComplEx)
+2024-05-06 16:26:31 INFO     Calculating self-attention for sub_001 (ComplEx)
+2024-05-06 16:26:31 INFO     Calculating self-attention for sub_002 (ComplEx)
+2024-05-06 16:26:31 INFO     Calculating self-attention for sub_003 (ComplEx)
+2024-05-06 16:26:31 INFO     Calculating self-attention for sub_004 (ComplEx)
+2024-05-06 16:26:31 INFO     Calculating unified embedding for entities and relation names.
+2024-05-06 16:26:31 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:31 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:31 DEBUG    Size of general entity embedding, after applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:31 DEBUG    Size of general relation name embedding, after applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:31 DEBUG    Validation Epoch 1 per subgraph | average valid losses: {'sub_000': 0.6659637086286568, 'sub_001': 0.6657180440006706, 'sub_002': 0.6641936885047187, 'sub_003': 0.6648583141649056, 'sub_004': 0.6652817512363689}
+2024-05-06 16:26:31 INFO     Validation Epoch 1 | average valid loss: 0.6652
+2024-05-06 16:26:31 INFO     -\	Training and optimization of epoch 1 finished in 13.59 seconds	/-
+2024-05-06 16:26:31 INFO     Training subgraph sub_000 in epoch 2 with model ComplEx
+2024-05-06 16:26:34 INFO     Subgraph sub_000 Training Epoch 2 | average train loss: 0.6527
+2024-05-06 16:26:34 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:34 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:34 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:34 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:34 INFO     Training subgraph sub_001 in epoch 2 with model ComplEx
+2024-05-06 16:26:37 INFO     Subgraph sub_001 Training Epoch 2 | average train loss: 0.6532
+2024-05-06 16:26:37 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:37 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:37 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:37 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:37 INFO     Training subgraph sub_002 in epoch 2 with model ComplEx
+2024-05-06 16:26:39 INFO     Subgraph sub_002 Training Epoch 2 | average train loss: 0.6518
+2024-05-06 16:26:39 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:39 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:39 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:39 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:39 INFO     Training subgraph sub_003 in epoch 2 with model ComplEx
+2024-05-06 16:26:42 INFO     Subgraph sub_003 Training Epoch 2 | average train loss: 0.6518
+2024-05-06 16:26:42 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:42 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:42 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:42 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:42 INFO     Training subgraph sub_004 in epoch 2 with model ComplEx
+2024-05-06 16:26:45 INFO     Subgraph sub_004 Training Epoch 2 | average train loss: 0.6524
+2024-05-06 16:26:45 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:45 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:45 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-06 16:26:45 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-06 16:26:45 INFO     Calculating self-attention for sub_000 (ComplEx)
+2024-05-06 16:26:45 INFO     Calculating self-attention for sub_001 (ComplEx)
+2024-05-06 16:26:45 INFO     Calculating self-attention for sub_002 (ComplEx)
+2024-05-06 16:26:45 INFO     Calculating self-attention for sub_003 (ComplEx)
+2024-05-06 16:26:45 INFO     Calculating self-attention for sub_004 (ComplEx)
+2024-05-06 16:26:45 INFO     Calculating unified embedding for entities and relation names.
+2024-05-06 16:26:45 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:45 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:45 DEBUG    Size of general entity embedding, after applying attention:	torch.Size([40943, 32])
+2024-05-06 16:26:45 DEBUG    Size of general relation name embedding, after applying attention:	torch.Size([22, 32])
+2024-05-06 16:26:45 DEBUG    Validation Epoch 2 per subgraph | average valid losses: {'sub_000': 0.6341005004149411, 'sub_001': 0.6336597852468445, 'sub_002': 0.6307157598750572, 'sub_003': 0.6320506635181243, 'sub_004': 0.63332344122149}
+2024-05-06 16:26:45 INFO     Validation Epoch 2 | average valid loss: 0.6328
+2024-05-06 16:26:45 INFO     -/	Validating the ensemble with the score aggregation method "maximum score".	\-
+2024-05-06 16:26:55 INFO     Combining scores of all models with maximum score.
+2024-05-06 16:26:57 DEBUG    Aggregating rhs, with a size torch.Size([3034, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 0: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 1: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 2: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 3: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: rhs	Size of score set 4: torch.Size([34, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [34, 40943] at entry 0 and [34, 40942] at entry 4\n']
+2024-05-06 16:26:59 DEBUG    Aggregating lhs, with a size torch.Size([3034, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([100, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([100, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [100, 40943] at entry 0 and [100, 40942] at entry 4\n']
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 0: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 1: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 2: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 3: torch.Size([34, 40943])
+2024-05-06 16:26:59 ERROR    Aggregation method: maximum score	Mode: lhs	Size of score set 4: torch.Size([34, 40942])
+2024-05-06 16:26:59 ERROR    ['Traceback (most recent call last):\n', '  File "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\ensemble\\score_combination.py", line 211, in combine_scores\n    stacked_scores = torch.stack(model_scores, dim=1)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n', 'RuntimeError: stack expects each tensor to be equal size, but got [34, 40943] at entry 0 and [34, 40942] at entry 4\n']
+2024-05-06 16:26:59 INFO     Successfully aggregated all scores with aggregation method maximum score.
+2024-05-06 16:26:59 ERROR    Traceback (most recent call last):
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\run_ensemble_embedding.py", line 117, in <module>
+    run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\ensemble\run.py", line 282, in train
+    valid_metrics = evaluate_ensemble(embedding_models, aggregation_method, mode="valid")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\ensemble\score_combination.py", line 37, in evaluate_ensemble
+    ranks = compute_ranks(embedding_models, examples, filters, targets, aggregated_scores,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\ensemble\score_combination.py", line 318, in compute_ranks
+    (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: The size of tensor a (40943) must match the size of tensor b (40942) at non-singleton dimension 1
+
