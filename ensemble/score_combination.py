@@ -81,6 +81,7 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
 
         # Get the number of candidate answers
         candidate_answers = len(model.get_rhs(examples, eval_mode=True)[0])
+        logging.debug(f"Candidate answers for {args.subgraph}: {candidate_answers}")
 
         # Initialize tensors to store scores and targets
         scores_rhs = torch.zeros((len(examples), candidate_answers))
@@ -122,12 +123,12 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
                     if mode == "lhs":
                         scores_lhs[b_begin:b_begin + batch_size] = scores
                         targets_lhs[b_begin:b_begin + batch_size] = targets
-                        logging.log(Constants.DATA_LEVEL_LOGGING, f"From {b_begin} to {b_begin + batch_size}:\n"
+                        logging.log(Constants.DATA_LEVEL_LOGGING, f"From {b_begin} to {b_begin + batch_size} lhs:\n"
                                                                   f"{scores_lhs[b_begin:b_begin + batch_size]}")
                     else:
                         scores_rhs[b_begin:b_begin + batch_size] = scores
                         targets_rhs[b_begin:b_begin + batch_size] = targets
-                        logging.log(Constants.DATA_LEVEL_LOGGING, f"From {b_begin} to {b_begin + batch_size}:\n"
+                        logging.log(Constants.DATA_LEVEL_LOGGING, f"From {b_begin} to {b_begin + batch_size} rhs:\n"
                                                                   f"{scores_rhs[b_begin:b_begin + batch_size]}")
 
                     b_begin += batch_size
@@ -219,6 +220,7 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
                         logging.error(f"Aggregation method: {aggregation_method[1]}\tMode: {mode}\t"
                                       f"Size of score set {index}: {score.size()}")
                     logging.error(traceback.format_exception(e))
+                    return
 
             elif aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
                 # average the score across all models

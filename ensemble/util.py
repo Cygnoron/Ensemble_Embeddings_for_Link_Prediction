@@ -364,7 +364,7 @@ def generate_general_embeddings(general_dataset: str, args):
     theta_ent.to("cuda")
     theta_rel.to("cuda")
 
-    return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel
+    return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel, dataset.get_shape()
 
 
 def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False, file_identifier=""):

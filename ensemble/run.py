@@ -13,7 +13,7 @@ from datasets.kg_dataset import KGDataset
 from ensemble import Constants, util_files, util, Attention_mechanism, score_combination
 from ensemble.score_combination import evaluate_ensemble
 from optimizers import regularizers as regularizers, KGOptimizer
-from utils.train import count_params, avg_both, format_metrics
+from utils.train import count_params
 
 try:
     # path on pc
@@ -86,8 +86,8 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     # get original dataset name
     dataset_general = util.get_dataset_name(dataset)
     # create model using original dataset and sizes, use returned embeddings in new models as initialization
-    buffer_var = util.generate_general_embeddings(dataset_general, args)
-    embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel = buffer_var
+    embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape \
+        = util.generate_general_embeddings(dataset_general, args)
 
     # --- setting up embedding models ---
     logging.info("-/\tSetting up embedding models\t\\-")
@@ -127,7 +127,13 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         valid_examples = dataset.get_examples("valid")
         test_examples = dataset.get_examples("test")
         filters = dataset.get_filters()
-        args_subgraph.sizes = dataset.get_shape()
+        # args_subgraph.sizes = dataset.get_shape()
+        # set shape of dataset to that of the general
+        #  -> calculation of size in KGDataset is with max id
+        #  -> if max id is 500 and the highest sampled id was 499, shape would be 499
+        args_subgraph.sizes = general_dataset_shape
+
+        logging.critical(f"Sizes: old {dataset.get_shape()}\tnew {args_subgraph.sizes}")
 
         # create model
         model = getattr(models, args_subgraph.model)(args_subgraph)
@@ -135,15 +141,20 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
         # set embeddings
         model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim)
-        model.entity.weight.data = embedding_general_ent.weight.data.clone()
+        model.entity.weight.data = torch.rand(embedding_general_ent.weight.data.size())
         model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
-        model.rel.weight.data = embedding_general_rel.weight.data.clone()
+        model.rel.weight.data = torch.rand(embedding_general_rel.weight.data.size())
 
         # set context vectors
         model.theta_ent = nn.Embedding(theta_general_ent.num_embeddings, theta_general_ent.embedding_dim)
-        model.theta_ent.weight.data = theta_general_ent.weight.data.clone()
+        model.theta_ent.weight.data = torch.rand(theta_general_ent.weight.data.size())
         model.theta_rel = nn.Embedding(theta_general_rel.num_embeddings, theta_general_rel.embedding_dim)
-        model.theta_rel.weight.data = theta_general_rel.weight.data.clone()
+        model.theta_rel.weight.data = torch.rand(theta_general_rel.weight.data.size())
+
+        logging.debug(f"Entity size: {model.entity.weight.data.size()}")
+        logging.debug(f"Relation size: {model.rel.weight.data.size()}")
+        logging.debug(f"Theta_ent size: {model.theta_ent.weight.data.size()}")
+        logging.debug(f"Theta_rel size: {model.theta_rel.weight.data.size()}")
 
         logging.info(f"-\\\tTotal number of parameters: {total}\t/-")
         device = "cuda"
@@ -251,6 +262,11 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
                     torch.save(model.cpu().state_dict(), os.path.join(file_dir, f"model_{args.subgraph}_"
                                                                                 f"{args.model_name}_epoch{epoch}.pt"))
                     logging.debug(f"Saved model for {args.subgraph} ({args.model}) at epoch {epoch}.")
+
+            logging.debug(f"Entity size epoch {epoch}: {model.entity.weight.data.size()}")
+            logging.debug(f"Relation size epoch {epoch}: {model.rel.weight.data.size()}")
+            logging.debug(f"Theta_ent size epoch {epoch}: {model.theta_ent.weight.data.size()}")
+            logging.debug(f"Theta_rel size epoch {epoch}: {model.theta_rel.weight.data.size()}")
 
             model.cuda()
             model.eval()
