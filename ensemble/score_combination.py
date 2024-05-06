@@ -326,12 +326,8 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                     filter_out += [queries[b_begin + i, 2].item()]
                     aggregated_scores[mode][i, torch.LongTensor(filter_out)] = -1e6
 
-                # ranks[mode][b_begin:b_begin + batch_size] += torch.sum(
-                #     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
-                #      targets[mode][b_begin:b_begin + batch_size]).float(), dim=1).cpu()
-
                 # Calculate optimistic rank
-                ranks_opt[mode][b_begin:b_begin + batch_size] = torch.sum(
+                ranks_opt[mode][b_begin:b_begin + batch_size] += torch.sum(
                     (aggregated_scores[mode][b_begin:b_begin + batch_size] >=
                      targets[mode][b_begin:b_begin + batch_size]).float(), dim=1).cpu()
 
@@ -342,6 +338,7 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
                 # Adjust for pessimistic rank (subtract 1 if target score is included)
                 target_subtraction = torch.sum((aggregated_scores[mode][b_begin:b_begin + batch_size] ==
                                                 targets[mode][b_begin:b_begin + batch_size]).float(), dim=1)
+
                 ranks_pes[mode][b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
 
                 b_begin += batch_size

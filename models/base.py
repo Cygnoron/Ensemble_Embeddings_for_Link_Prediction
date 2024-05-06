@@ -164,9 +164,12 @@ class KGModel(nn.Module, ABC):
             batch_size: int for evaluation batch size
 
         Returns:
-            ranks: torch.Tensor with ranks or correct entities
+            ranks_opt: torch.Tensor with optimistic ranks or correct entities
+            ranks_pes: torch.Tensor with pessimistic ranks or correct entities
         """
-        ranks = torch.ones(len(queries))
+        ranks_opt = torch.ones(len(queries))
+        ranks_pes = torch.ones((len(queries)))
+
         with torch.no_grad():
             b_begin = 0
             candidates = self.get_rhs(queries, eval_mode=True)
@@ -184,11 +187,19 @@ class KGModel(nn.Module, ABC):
                     filter_out = filters[(query[0].item(), query[1].item())]
                     filter_out += [queries[b_begin + i, 2].item()]
                     scores[i, torch.LongTensor(filter_out)] = -1e6
-                ranks[b_begin:b_begin + batch_size] += torch.sum(
-                    (scores >= targets).float(), dim=1
-                ).cpu()
+
+                # Calculate optimistic rank
+                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).float(), dim=1).cpu()
+
+                # Calculate pessimistic rank
+                pessimistic_rank = torch.sum((scores > targets).float(), dim=1)
+                # Adjust for pessimistic rank (subtract 1 if target score is included)
+                target_subtraction = torch.sum((scores == targets).float(), dim=1)
+
+                ranks_pes[b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
+
                 b_begin += batch_size
-        return ranks
+        return ranks_opt, ranks_pes
 
     def compute_metrics(self, examples, filters, batch_size=500):
         """Compute ranking-based evaluation metrics.
@@ -215,21 +226,21 @@ class KGModel(nn.Module, ABC):
                 q[:, 2] = tmp
                 q[:, 1] += self.sizes[1] // 2
 
-            ranks = self.get_ranking(q, filters[m], batch_size=batch_size)
-            mean_rank[m] = torch.mean(ranks).item()
-            mean_reciprocal_rank[m] = torch.mean(1. / ranks).item()
+            ranks_opt, ranks_pes = self.get_ranking(q, filters[m], batch_size=batch_size)
+            mean_rank[m] = torch.mean(ranks_opt).item()
+            mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
             hits_at[m] = torch.FloatTensor((list(map(
-                lambda x: torch.mean((ranks <= x).float()).item(),
+                lambda x: torch.mean((ranks_opt <= x).float()).item(),
                 (1, 3, 10)
             ))))
 
             # Calculate AMRI
-            expected_rank = torch.mean(ranks - 1)  # Expectation of MR - 1
-            amri[m] = 1 - ((mean_rank[m] - 1) / expected_rank)
+            sum_ranks = torch.sum(ranks_opt - 1)  # Subtract 1 to match the formula
+            sum_valid_ranks = torch.sum(torch.ones_like(ranks_opt))
+            expected_rank = sum_ranks / sum_valid_ranks
+            amri[m] = 1 - (mean_rank[m] - 1) / (expected_rank - 1)
 
-            # Calculate MR_deviation
-            optimistic_rank = torch.min(ranks) - 1
-            pessimistic_rank = torch.max(ranks) - 1
-            mr_deviation[m] = optimistic_rank - pessimistic_rank
+            # Compute MR_deviation
+            mr_deviation[m] = torch.sum(ranks_opt - ranks_pes)
 
         return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
