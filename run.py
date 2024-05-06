@@ -11,6 +11,7 @@ import torch.optim
 import models as models
 import optimizers.regularizers as regularizers
 from datasets.kg_dataset import KGDataset
+from ensemble import util
 from models import all_models
 from optimizers.kg_optimizer import KGOptimizer
 from utils.train import get_savedir, avg_both, format_metrics, count_params
@@ -98,21 +99,23 @@ parser.add_argument(
 def train(args):
     save_dir = get_savedir(args.model, args.dataset)
 
-    # file logger
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
-        filename=os.path.join(save_dir, "train.log")
-    )
+    util.setup_logging(f"logs\\{args.model}_{args.dataset}", "train.log")
 
-    # stdout logger
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
-    console.setFormatter(formatter)
-    logging.getLogger("").addHandler(console)
-    logging.info("Saving logs in: {}".format(save_dir))
+    # # file logger
+    # logging.basicConfig(
+    #     format="%(asctime)s %(levelname)-8s %(message)s",
+    #     level=logging.INFO,
+    #     datefmt="%Y-%m-%d %H:%M:%S",
+    #     filename=os.path.join(save_dir, "train.log")
+    # )
+    #
+    # # stdout logger
+    # console = logging.StreamHandler()
+    # console.setLevel(logging.INFO)
+    # formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
+    # console.setFormatter(formatter)
+    # logging.getLogger("").addHandler(console)
+    # logging.info("Saving logs in: {}".format(save_dir))
 
     # create dataset
     dataset_path = os.path.join(DATA_PATH, args.dataset)

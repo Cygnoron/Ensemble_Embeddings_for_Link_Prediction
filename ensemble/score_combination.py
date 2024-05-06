@@ -398,6 +398,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
         ))))
 
         # Compute AMRI
+        # TODO fix AMRI
         # valid_ranks = ranks_opt[ranks_opt > 0]  # Exclude ranks where the target was not found
         sum_ranks = torch.sum(ranks_opt[mode] - 1)  # Subtract 1 to match the formula
         sum_valid_ranks = torch.sum(torch.ones_like(ranks_opt[mode]))

@@ -234,9 +234,11 @@ class KGModel(nn.Module, ABC):
                 (1, 3, 10)
             ))))
 
+            # TODO fix AMRI
             # Calculate AMRI
-            sum_ranks = torch.sum(ranks_opt - 1)  # Subtract 1 to match the formula
-            sum_valid_ranks = torch.sum(torch.ones_like(ranks_opt))
+            valid_ranks = ranks_opt[ranks_opt > 0]
+            sum_ranks = torch.sum(valid_ranks - 1)  # Subtract 1 to match the formula
+            sum_valid_ranks = torch.sum(torch.ones_like(valid_ranks))
             expected_rank = sum_ranks / sum_valid_ranks
             amri[m] = 1 - (mean_rank[m] - 1) / (expected_rank - 1)
 
