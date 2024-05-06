@@ -164,14 +164,14 @@ def csv_to_file(input_csv_path, output_pickle_path, delim=';', only_unique=False
                 if triple not in unique_triples:
                     unique_triples.append(triple)
                 # Log the processed triple and its index
-                logging.log(Constants.DATA_LEVEL, f"Triple: {triple}\tIndex: {index}")
+                logging.log(Constants.DATA_LEVEL_LOGGING, f"Triple: {triple}\tIndex: {index}")
                 last_row = index + 1
 
             # Log information about excluded duplicates
             if last_row - len(unique_triples) > 0:
                 logging.debug(f"Excluded {last_row - len(unique_triples)} duplicates.")
             else:
-                logging.log(Constants.DATA_LEVEL, "No duplicate triples found")
+                logging.log(Constants.DATA_LEVEL_LOGGING, "No duplicate triples found")
 
             # Write unique triples to output file
             for triple in unique_triples:

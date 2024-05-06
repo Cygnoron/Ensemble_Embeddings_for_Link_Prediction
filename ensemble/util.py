@@ -196,7 +196,7 @@ def assign_model_to_subgraph(kge_models, args, subgraph_amount):
         # Handle case "all" if specified in kge_models
         if "all" in kge_models[embedding_model]:
             logging.debug(f"'all' was found for embedding model {embedding_model}")
-            logging.info(f"All subgraphs will be embedded by {kge_models_adjusted[0]}")
+            logging.info(f"All subgraphs will be embedded by {embedding_model}")
             # Clear mapping, if some subgraphs were already mapped (-> "all" overrides all other specifications)
             subgraph_embedding_mapping.clear()
 
@@ -281,7 +281,7 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
     #  INFO - 20
     #  DEBUG - 10
     #  DATA - 5
-    logging.addLevelName(Constants.DATA_LEVEL, "DATA")
+    logging.addLevelName(Constants.DATA_LEVEL_LOGGING, "DATA")
     logging_level = logging_level.lower()
     if logging_level == "critical":
         logging_level = logging.CRITICAL
@@ -294,7 +294,7 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
     elif logging_level == "debug":
         logging_level = logging.DEBUG
     elif logging_level == "data":
-        logging_level = Constants.DATA_LEVEL
+        logging_level = Constants.DATA_LEVEL_LOGGING
     else:
         raise ValueError("Invalid logging level")
 
@@ -315,7 +315,7 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info")
     logging.getLogger("").addHandler(console)
     logging.info(f"### Saving logs in: {info_directory} ###")
     logging.debug(f"### Debug messages are enabled ###")
-    logging.log(Constants.DATA_LEVEL, "### Logging data ###")
+    logging.log(Constants.DATA_LEVEL_LOGGING, "### Logging data ###")
 
 
 def get_dataset_name(dataset: str):

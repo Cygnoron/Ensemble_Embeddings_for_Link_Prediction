@@ -28,7 +28,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
           regularizer="N3", reg=0, optimizer="Adagrad", max_epochs=50, patience=10, valid=3, rank=1000,
           batch_size=1000, neg_sample_size=50, dropout=0, init_size=1e-3, learning_rate=1e-1, gamma=0,
           bias="constant", dtype="double", double_neg=False, debug=False, multi_c=True,
-          aggregation_method=Constants.MAX_SCORE, save_models=False, load_pretrained_models=False):
+          aggregation_method=Constants.MAX_SCORE_AGGREGATION, save_models=False, load_pretrained_models=False):
     """
     The train function is a wrapper for the general train function in the general run.py file.
     It allows us to run multiple models at once, and save them all in one folder with

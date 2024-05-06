@@ -29,8 +29,8 @@ def calculate_self_attention(embedding_models):
         embedding_model["att_weights_ent"] = activation(embedding_model["att_weights_ent"])
         embedding_model["att_weights_rel"] = activation(embedding_model["att_weights_rel"])
 
-        logging.log(Constants.DATA_LEVEL, f"Attention weights entity embeddings:\n{embedding_model['att_weights_ent']}")
-        logging.log(Constants.DATA_LEVEL, f"Attention weights relation name embeddings:\n"
+        logging.log(Constants.DATA_LEVEL_LOGGING, f"Attention weights entity embeddings:\n{embedding_model['att_weights_ent']}")
+        logging.log(Constants.DATA_LEVEL_LOGGING, f"Attention weights relation name embeddings:\n"
                                           f"{embedding_model['att_weights_rel']}")
 
     return

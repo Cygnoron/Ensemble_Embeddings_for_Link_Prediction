@@ -394,7 +394,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         # Add all unused entity ids to samples
         while len(entity_ids_unused) > 0:
             samples.add(entity_ids_unused.pop())
-        logging.log(Constants.DATA_LEVEL, f"Enforced the following entities:\n{samples}")
+        logging.log(Constants.DATA_LEVEL_LOGGING, f"Enforced the following entities:\n{samples}")
 
     # only sample additional entities, if more entities for this sampling step are allowed
     if entities_per_step > len(samples):
@@ -402,7 +402,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         for i in range(entities_per_step):
             sampled_entity_id = random.choice(list(entity_set.keys()))
             samples.add(sampled_entity_id)
-            logging.log(Constants.DATA_LEVEL, f"Sampled entity id {sampled_entity_id}.")
+            logging.log(Constants.DATA_LEVEL_LOGGING, f"Sampled entity id {sampled_entity_id}.")
 
     safety_counter = 0
     for sampled_entity_id in samples:
