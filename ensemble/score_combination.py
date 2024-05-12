@@ -1,5 +1,4 @@
 import logging
-import os.path
 import time
 import traceback
 
@@ -11,8 +10,7 @@ from utils.train import avg_both, format_metrics
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
-                      print_metrics_to_file=False, batch_size=500):
-    mode_str = ""
+                      metrics_file_path="", batch_size=500, epoch="final"):
     if mode == "test":
         logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]
@@ -42,10 +40,14 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     metrics = avg_both(*compute_metrics_from_ranks(ranks_opt, ranks_pes))
     logging.info(format_metrics(metrics, split=mode))
 
-    if print_metrics_to_file:
-        # TODO output .csv with all metrics (epoch - metric)
-        #  also output files with train/valid loss to see improvement over time?
-        pass
+    if metrics_file_path != "":
+        with open(f"{metrics_file_path}", 'a') as metrics_file:
+            logging.debug(f"Printing metrics to {metrics_file_path}.")
+            metrics_file.write(f"{epoch};{mode};{metrics['MR']};{metrics['MRR']};{metrics['hits@[1,3,10]'][0]};"
+                               f"{metrics['hits@[1,3,10]'][1]};{metrics['hits@[1,3,10]'][2]};{metrics['AMRI']};"
+                               f"{metrics['MR_deviation']}")
+
+            metrics_file.write("\n")
 
     time_eval_stop = time.time()
 
@@ -390,6 +392,11 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
         mean_rank[mode] = torch.mean(optimistic_rank).item()
 
         # Compute mean reciprocal rank
+        with open("data\\WN18RR_Entity_sampling_N4_min0.3\\results\\MRR.csv", 'w')as MRR_file:
+            for rank in optimistic_rank:
+                MRR_file.write(f"{rank}\n")
+        # TODO rank=0 possible -> divide by 0 error -> MRR=inf
+        #  check scores, check KGEmb implementation
         mean_reciprocal_rank[mode] = torch.mean(1. / optimistic_rank).item()
 
         # Compute hits@1, hits@3 and hits@10
@@ -415,7 +422,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes):
     return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
 
 
-def calculate_valid_loss(embedding_models):
+def calculate_valid_loss(embedding_models, valid_loss_dir, epoch):
     valid_loss_dict = {}
     valid_loss = 0.0
     # Iterate over all embedding models
@@ -436,5 +443,13 @@ def calculate_valid_loss(embedding_models):
 
     # average valid loss over all "len(embedding_models)" models
     valid_loss /= len(embedding_models)
+
+    with open(valid_loss_dir, 'a') as valid_loss_file:
+        valid_loss_str = f"{epoch};{valid_loss}"
+        for valid_loss_sub in valid_loss_dict:
+            valid_loss_str += f";{valid_loss_dict[valid_loss_sub]}"
+
+        valid_loss_file.write(valid_loss_str)
+        valid_loss_file.write("\n")
 
     return valid_loss, valid_loss_dict

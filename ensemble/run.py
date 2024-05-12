@@ -77,6 +77,16 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     s_e_mapping_dir = util_files.check_file(f"{info_directory}\\subgraph_embedding_mapping.json")
     e_s_mapping_dir = util_files.check_file(f"{info_directory}\\embedding_subgraph_mapping.json")
 
+    valid_loss_file_path = util_files.check_file(f"{info_directory}\\valid_loss.csv")
+    metrics_file_path = util_files.check_file(f"{info_directory}\\metrics_valid.csv")
+
+    with (open(valid_loss_file_path, "w") as valid_loss_file, open(metrics_file_path, "w") as metrics_file):
+        subgraphs_str = ""
+        for sub_num in range(subgraph_amount):
+            subgraphs_str += f";sub_{sub_num:03d}"
+        valid_loss_file.write(f"epoch;average valid loss{subgraphs_str}\n")
+        metrics_file.write(f"epoch;mode;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;MR_deviation\n")
+
     logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
     logging.info(f"### Saving .pt files of stored models in: {model_file_dir} ###")
 
@@ -160,7 +170,6 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         device = "cuda"
         model.to(device)
 
-
         # Handle already trained embedding models
         if s_e_mapping:
             if subgraph_embedding_mapping[subgraph_num] in s_e_mapping[str(subgraph_num)]:
@@ -172,8 +181,8 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
                 if load_pretrained_models:
                     # file_name = f"model_{args.subgraph}_{args.model_name}_epoch{epoch}.pt"
-                    embedding_model["pretrained_model_path"] = (f"{model_file_dir}\\model_"
-                                                                f"{args.subgraph}_{args.model_name}")
+                    embedding_model["pretrained_model_path"] = (f"{model_file_dir}\\"
+                                                                f"model_{args.subgraph}_{args.model_name}")
 
                 if embedding_model['load_from_file']:
                     file_path = f"{model_setup_config_dir}\\config_{subgraph}_{embedding_model['args'].model_name}.json"
@@ -247,6 +256,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
             logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
+            # TODO save train loss in file
 
             # save embeddings of the model each epoch for later training processes
             if epoch % 1 == 0 or epoch == max_epochs - 1:
@@ -280,14 +290,16 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
                                                                   cands_att_dict)
 
         # Valid step
-        valid_loss, valid_loss_dict = score_combination.calculate_valid_loss(embedding_models)
+        valid_loss, valid_loss_dict = score_combination.calculate_valid_loss(embedding_models, valid_loss_file_path,
+                                                                             epoch)
 
         logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses: {valid_loss_dict}")
         logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
 
         if (epoch + 1) % valid_args.valid == 0:
 
-            valid_metrics = evaluate_ensemble(embedding_models, aggregation_method, mode="valid")
+            valid_metrics = evaluate_ensemble(embedding_models, aggregation_method, mode="valid",
+                                              metrics_file_path=metrics_file_path, epoch=epoch)
 
             valid_mrr = valid_metrics["MRR"]
             if not valid_args.best_mrr or valid_mrr > valid_args.best_mrr:
@@ -413,7 +425,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
     # --- Testing with aggregated scores ---
 
-    evaluate_ensemble(embedding_models)
+    evaluate_ensemble(embedding_models, metrics_file_path=metrics_file_path)
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
