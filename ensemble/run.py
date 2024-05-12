@@ -68,7 +68,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
                               optimizer=optimizer, max_epochs=max_epochs, patience=patience, valid=valid, rank=rank,
                               batch_size=batch_size, neg_sample_size=neg_sample_size, dropout=dropout,
                               init_size=init_size, learning_rate=learning_rate, gamma=gamma, bias=bias, dtype=dtype,
-                              double_neg=double_neg, debug=debug, multi_c=multi_c)
+                              double_neg=double_neg, debug=debug, multi_c=multi_c, subgraph_amount=subgraph_amount)
 
     # set directories and ensure that they exist
     model_setup_config_dir = util_files.check_directory(f"{info_directory}\\model_setup_configs")
@@ -93,7 +93,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     logging.info("-/\tSetting up embedding models\t\\-")
     time_start_model_creation = time.time()
 
-    subgraph_embedding_mapping = util.assign_model_to_subgraph(kge_models, args, subgraph_amount)
+    subgraph_embedding_mapping = util.assign_model_to_subgraph(kge_models, args)
 
     # create dataset and model objects and save them to list of dictionaries
     embedding_models = []
@@ -159,6 +159,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         logging.info(f"-\\\tTotal number of parameters: {total}\t/-")
         device = "cuda"
         model.to(device)
+
 
         # Handle already trained embedding models
         if s_e_mapping:
@@ -272,10 +273,11 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             model.eval()
 
         # Calculate unified embedding
-        Attention_mechanism.calculate_self_attention(embedding_models)
+        cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models)
         Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
                                                                   embedding_general_rel,
-                                                                  embedding_models)
+                                                                  embedding_models,
+                                                                  cands_att_dict)
 
         # Valid step
         valid_loss, valid_loss_dict = score_combination.calculate_valid_loss(embedding_models)

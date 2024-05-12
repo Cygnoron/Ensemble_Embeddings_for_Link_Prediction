@@ -155,12 +155,12 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     time_stop = time.time()
     logging.info(f"### Successfully created {str(subgraph_amount)} subgraphs of the relative size {subgraph_size_range}"
                  f" from the original KG \"{dataset_in}\" in a total of {util.format_time(time_start, time_stop)} "
-                 f"(avg: {util.format_time(time_start,time_stop, divisor=subgraph_amount)}) ###")
+                 f"(avg: {util.format_time(time_start, time_stop, divisor=subgraph_amount)}) ###")
 
 
 def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount, entity_set, relation_name_set,
                     entity_ids_unused, relation_name_ids_unused, sampling_method, relation_name_amount,
-                    entities_per_step):
+                    entities_per_step, enforcement=2):
     """
     The calculate_delta function calculates, which triples will be deleted from the input dataset and returns the
     indices of these triples as array.
@@ -205,7 +205,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         # -- sampling process --
         while len(delta) / len(dataset) <= subgraph_size:
             # check whether relation names are missing after most samples were selected
-            if subgraph_amount - subgraph_num <= 3:
+            if subgraph_amount - subgraph_num <= enforcement:
                 # if entities are missing, enforce missing entities and set flag
                 if len(entity_ids_unused) > 0:
                     enforce_entities = True
@@ -252,7 +252,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         logging.info(f"Missing Relation Names: {list(relation_name_ids_unused)}")
 
         # after most subgraphs are sampled, check if entities or relation names are missing
-        if subgraph_amount - subgraph_num <= 3:
+        if subgraph_amount - subgraph_num <= enforcement:
             # if entities are missing, enforce missing entities and set flag
             if len(entity_ids_unused) > 0:
                 enforce_entities = True
@@ -402,7 +402,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         for i in range(entities_per_step):
             sampled_entity_id = random.choice(list(entity_set.keys()))
             samples.add(sampled_entity_id)
-            logging.log(Constants.DATA_LEVEL_LOGGING, f"Sampled entity id {sampled_entity_id}.")
+            # logging.log(Constants.DATA_LEVEL_LOGGING, f"Sampled entity id {sampled_entity_id}.")
 
     safety_counter = 0
     for sampled_entity_id in samples:
