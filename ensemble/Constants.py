@@ -7,6 +7,7 @@ FEATURE_SAMPLING = [2, "Feature sampling", "Feature_sampling"]
 MAX_SCORE_AGGREGATION = [10, "maximum score", "maximum_score"]
 AVERAGE_SCORE_AGGREGATION = [11, "average score", "average_score"]
 ATTENTION_SCORE_AGGREGATION = [12, "attention score", "attention_score"]
+DEBUG_AGGREGATION = [13, "debug score", "debug_score"]
 
 # embedding methods
 COMPL_EX, ROTAT_E = "ComplEx", "RotatE"

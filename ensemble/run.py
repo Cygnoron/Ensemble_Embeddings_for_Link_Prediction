@@ -143,7 +143,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         #  -> if max id is 500 and the highest sampled id was 499, shape would be 499
         args_subgraph.sizes = general_dataset_shape
 
-        logging.critical(f"Sizes: old {dataset.get_shape()}\tnew {args_subgraph.sizes}")
+        logging.debug(f"Sizes: old {dataset.get_shape()}\tnew {args_subgraph.sizes}")
 
         # create model
         model = getattr(models, args_subgraph.model)(args_subgraph)

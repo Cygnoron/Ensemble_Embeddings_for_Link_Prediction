@@ -1,6 +1,7 @@
 """Train Knowledge Graph embeddings for link prediction."""
 
 import argparse
+import datetime
 import json
 import logging
 import os
@@ -98,8 +99,7 @@ parser.add_argument(
 
 def train(args):
     save_dir = get_savedir(args.model, args.dataset)
-
-    util.setup_logging(f"logs\\{args.model}_{args.dataset}", "train.log")
+    util.setup_logging(save_dir, "train.log")
 
     # # file logger
     # logging.basicConfig(
@@ -163,7 +163,7 @@ def train(args):
         logging.info("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
 
         if (step + 1) % args.valid == 0:
-            valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+            valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes))
             logging.info(format_metrics(valid_metrics, split="valid"))
 
             valid_mrr = valid_metrics["MRR"]
@@ -194,11 +194,11 @@ def train(args):
     model.eval()
 
     # Validation metrics
-    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters))
+    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes))
     logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
     logging.info(format_metrics(test_metrics, split="test"))
 
 

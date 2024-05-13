@@ -168,7 +168,7 @@ class KGModel(nn.Module, ABC):
             ranks_pes: torch.Tensor with pessimistic ranks or correct entities
         """
         ranks_opt = torch.ones(len(queries))
-        ranks_pes = torch.ones((len(queries)))
+        ranks_pes = torch.ones(len(queries))
 
         with torch.no_grad():
             b_begin = 0
@@ -201,7 +201,7 @@ class KGModel(nn.Module, ABC):
                 b_begin += batch_size
         return ranks_opt, ranks_pes
 
-    def compute_metrics(self, examples, filters, batch_size=500):
+    def compute_metrics(self, examples, filters, sizes, batch_size=500):
         """Compute ranking-based evaluation metrics.
     
         Args:
@@ -227,6 +227,10 @@ class KGModel(nn.Module, ABC):
                 q[:, 1] += self.sizes[1] // 2
 
             ranks_opt, ranks_pes = self.get_ranking(q, filters[m], batch_size=batch_size)
+
+            ranks_opt = ranks_opt[ranks_opt > 0]
+            ranks_pes = ranks_pes[ranks_pes > 0]
+
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
             hits_at[m] = torch.FloatTensor((list(map(
@@ -234,13 +238,10 @@ class KGModel(nn.Module, ABC):
                 (1, 3, 10)
             ))))
 
-            # TODO fix AMRI
             # Calculate AMRI
-            valid_ranks = ranks_opt[ranks_opt > 0]
-            sum_ranks = torch.sum(valid_ranks - 1)  # Subtract 1 to match the formula
-            sum_valid_ranks = torch.sum(torch.ones_like(valid_ranks))
-            expected_rank = sum_ranks / sum_valid_ranks
-            amri[m] = 1 - (mean_rank[m] - 1) / (expected_rank - 1)
+            sum_ranks = torch.sum(ranks_opt - 1)
+            sum_scores = ranks_opt.size()[0] * sizes[0]
+            amri[m] = 1 - (2 * sum_ranks) / sum_scores
 
             # Compute MR_deviation
             mr_deviation[m] = torch.sum(ranks_opt - ranks_pes)
