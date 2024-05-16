@@ -86,7 +86,7 @@ class RefH(BaseH):
 
 class AttH(BaseH):
     """Hyperbolic attention model combining translations, reflections and rotations"""
-
+    # TODO fix dimension error with AttH
     def __init__(self, args):
         super(AttH, self).__init__(args)
         self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)

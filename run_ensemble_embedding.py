@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.3, 0.99)
+    subgraph_size_range = (0.3, 0.8)
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
@@ -31,9 +31,10 @@ if __name__ == "__main__":
         dataset_out = ""
         if sampling_method == Constants.FEATURE_SAMPLING:
             dataset_out = (f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}_rho{relation_name_amount}"
-                           f"_min{subgraph_size_range[0]}")
+                           f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
         elif sampling_method == Constants.ENTITY_SAMPLING:
-            dataset_out = f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}_min{subgraph_size_range[0]}"
+            dataset_out = (f"{dataset_in}_{sampling_method[2]}_N{subgraph_amount}"
+                           f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
 
         if time_dependent_file_path:
             dataset_out += datetime.now().strftime('_mm%m_dd%d__HH%H_MM%M')
@@ -101,6 +102,8 @@ if __name__ == "__main__":
         allowed_kge_models = [{Constants.TRANS_E: [0], Constants.DIST_MULT: [1, "rest"], Constants.ROTAT_E: [2],
                                Constants.COMPL_EX: [3, 12, "all"], Constants.ATT_E: [4, 50]}]
 
+        print(util.format_dict(allowed_kge_models[0]))
+
         # --- training process ---
 
         # # for i in range(1):
@@ -112,29 +115,29 @@ if __name__ == "__main__":
         #                       # {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
         #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}]
         # #
-        error = False
-        for models in allowed_kge_models:
-            try:
-                run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
-                          learning_rate=0.1, kge_models=models, max_epochs=100, batch_size=800,
-                          rank=32, aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION, debug=True,
-                          reg=0.05,
-                          patience=15,
-                          valid=1,
-                          neg_sample_size=-1,
-                          init_size=0.001,
-                          bias="none",
-                          dtype="double"
-                          )
-            except Exception:
-                logging.error(traceback.format_exc())
-                error = True
-
-        time_process_end = time.time()
-
-        if not error:
-            logging.info(f"The entire process including sampling, training and testing took "
-                         f"{util.format_time(time_process_start, time_process_end)}.")
-        else:
-            logging.info(f"The process ended with an error after "
-                         f"{util.format_time(time_process_start, time_process_end)}")
+        # error = False
+        # for models in allowed_kge_models:
+        #     try:
+        #         run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
+        #                   learning_rate=0.1, kge_models=models, max_epochs=30, batch_size=800,
+        #                   rank=32, aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION, debug=True,
+        #                   reg=0.05,
+        #                   patience=15,
+        #                   valid=1,
+        #                   neg_sample_size=-1,
+        #                   init_size=0.001,
+        #                   bias="none",
+        #                   dtype="double"
+        #                   )
+        #     except Exception:
+        #         logging.error(traceback.format_exc())
+        #         error = True
+        #
+        # time_process_end = time.time()
+        #
+        # if not error:
+        #     logging.info(f"The entire process including sampling, training and testing took "
+        #                  f"{util.format_time(time_process_start, time_process_end)}.")
+        # else:
+        #     logging.info(f"The process ended with an error after "
+        #                  f"{util.format_time(time_process_start, time_process_end)}")
