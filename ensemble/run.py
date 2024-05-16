@@ -340,6 +340,13 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     logging.info(f"-\\\tSuccessfully finished training and optimizing all subgraphs in "
                  f"{util.format_time(time_start_training_total, time_stop_training_total)}\t/-")
 
+    # --- Testing with aggregated scores ---
+
+    evaluate_ensemble(embedding_models, metrics_file_path=metrics_file_path)
+
+    time_total_end = time.time()
+    logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
+
     # TODO adapt to new training process
     #  -> make function
     #  -> update mapping based on existing files
@@ -398,8 +405,6 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     #
     #     logging.info(f"-\\\tSuccessfully loaded {len(models_to_load)} models from storage.\t/-")
 
-    # TODO fix dimension error with AttH
-
     # for embedding_model in embedding_models:
     #     model = embedding_model["model"]
     #     valid_examples = embedding_model["valid_examples"]
@@ -427,9 +432,3 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
     # logging.info(format_metrics(test_metrics, split="test"))
 
-    # --- Testing with aggregated scores ---
-
-    evaluate_ensemble(embedding_models, metrics_file_path=metrics_file_path)
-
-    time_total_end = time.time()
-    logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")

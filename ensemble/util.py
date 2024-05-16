@@ -1,5 +1,4 @@
 import logging
-import math
 import os
 import pickle
 import random
@@ -142,6 +141,43 @@ def inverse_dict(dictionary):
     return dict(inverse_dictionary)
 
 
+def format_dict(dictionary):
+    """
+        Formats a dictionary into a string representation.
+
+        Args:
+            dictionary (dict): A dictionary to be formatted.
+
+        Returns:
+            str: A string representation of the dictionary, where each key-value pair is formatted as follows:
+                - Key is enclosed in single quotes.
+                - Values are separated by commas.
+                - If a value is a string, it is enclosed in single quotes.
+                - Each key-value pair is separated by a tab ('\t').
+                - Each key-value pair is terminated by a newline character ('\n').
+    """
+    out_str = ""
+    # iterate through all keys
+    for key_index, key in enumerate(dictionary):
+        # add key to string
+        out_str += f"'{key}':\t"
+
+        # iterate through values
+        for value_index, value in enumerate(dictionary[key]):
+            # add single quotes to value, if value is string
+            if type(value) is str:
+                value = f"'{value}'"
+            # add value to string and end with newline if it is the last value
+            if value_index == len(dictionary[key]) - 1:
+                if key_index == len(dictionary) - 1:
+                    out_str += f"{value}"
+                else:
+                    out_str += f"{value}\n"
+            else:
+                out_str += f"{value}, "
+    return out_str
+
+
 def assign_model_to_subgraph(kge_models, args):
     """
     Assign embedding models to subgraphs based on the given dictionary of kge_models.
@@ -235,7 +271,7 @@ def assign_model_to_subgraph(kge_models, args):
     # List containing only specific mappings for subgraphs
     mapped_subgraphs = list(subgraph_embedding_mapping.keys())
 
-    logging.info(f"Subgraphs with fixed embedding: {subgraph_embedding_mapping}\n\t\t"
+    logging.info(f"Subgraphs with fixed embedding: {format_dict(subgraph_embedding_mapping)}\n\t\t"
                  f"Remaining subgraphs will be embedded by random embedding methods {kge_models_adjusted}")
 
     for subgraph in os.listdir(os.path.abspath(args.dataset_directory)):
