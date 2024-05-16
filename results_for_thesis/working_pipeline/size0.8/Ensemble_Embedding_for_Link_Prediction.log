@@ -1,0 +1,632 @@
+2024-05-16 11:24:49 INFO     ### Saving logs in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results ###
+2024-05-16 11:24:49 INFO     Sampling 4 subgraphs with a relative size (0.3, 0.8) from WN18RR with Entity sampling
+2024-05-16 11:24:49 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.8\sub_000 from WN18RR with params:
+							 Entity sampling and (0.3, 0.8) relative subgraph size.	\-
+2024-05-16 11:25:01 INFO     Current subgraph size 0.800276386249784 reached or exceeded target size 0.8.
+2024-05-16 11:25:01 INFO     Created subgraph 0 with 4380 entities and 0 relation names left unused and a relative subgraph size 0.800276386249784.
+2024-05-16 11:25:02 INFO     Length of delta: 69492		Deviation from target size: 24
+2024-05-16 11:25:02 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\subgraph_config.csv" for subgraph 000, sampling took 12.42 seconds	/-
+
+2024-05-16 11:25:02 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.8\sub_001 from WN18RR with params:
+							 Entity sampling and (0.3, 0.8) relative subgraph size.	\-
+2024-05-16 11:25:15 INFO     Current subgraph size 0.800023032187482 reached or exceeded target size 0.8.
+2024-05-16 11:25:15 INFO     Created subgraph 1 with 446 entities and 0 relation names left unused and a relative subgraph size 0.800023032187482.
+2024-05-16 11:25:16 INFO     Length of delta: 69470		Deviation from target size: 2
+2024-05-16 11:25:16 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\subgraph_config.csv" for subgraph 001, sampling took 14.14 seconds	/-
+
+2024-05-16 11:25:16 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.8\sub_002 from WN18RR with params:
+							 Entity sampling and (0.3, 0.8) relative subgraph size.	\-
+2024-05-16 11:25:16 INFO     Enforcing 446 entities to be present in the subgraph
+2024-05-16 11:25:29 INFO     Current subgraph size 0.800011516093741 reached or exceeded target size 0.8.
+2024-05-16 11:25:29 INFO     Created subgraph 2 with 0 entities and 0 relation names left unused and a relative subgraph size 0.800011516093741.
+2024-05-16 11:25:30 INFO     Length of delta: 69469		Deviation from target size: 1
+2024-05-16 11:25:30 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\subgraph_config.csv" for subgraph 002, sampling took 13.54 seconds	/-
+
+2024-05-16 11:25:30 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.8\sub_003 from WN18RR with params:
+							 Entity sampling and (0.3, 0.8) relative subgraph size.	\-
+2024-05-16 11:25:44 INFO     Current subgraph size 0.800172741406115 reached or exceeded target size 0.8.
+2024-05-16 11:25:44 INFO     Created subgraph 3 with 0 entities and 0 relation names left unused and a relative subgraph size 0.800172741406115.
+2024-05-16 11:25:45 INFO     Length of delta: 69483		Deviation from target size: 15
+2024-05-16 11:25:45 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\subgraph_config.csv" for subgraph 003, sampling took 14.65 seconds	/-
+
+2024-05-16 11:25:45 INFO     ### Successfully created 4 subgraphs of the relative size (0.3, 0.8) from the original KG "WN18RR" in a total of 55.64 seconds (avg: 13.91 seconds) ###
+2024-05-16 11:25:45 INFO     ### Saving .json config files of models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_setup_configs ###
+2024-05-16 11:25:45 INFO     ### Saving .pt files of stored models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files ###
+2024-05-16 11:25:45 INFO     -/	Setting up embedding models	\-
+2024-05-16 11:25:45 INFO     All subgraphs will be embedded by ComplEx
+2024-05-16 11:25:45 INFO     Setting ComplEx as embedding method for subgraph sub_000.
+2024-05-16 11:25:45 INFO     Setting ComplEx as embedding method for subgraph sub_001.
+2024-05-16 11:25:45 INFO     Setting ComplEx as embedding method for subgraph sub_002.
+2024-05-16 11:25:45 INFO     Setting ComplEx as embedding method for subgraph sub_003.
+2024-05-16 11:25:45 INFO     Mapping from embedding methods to subgraphs: {'ComplEx': [0, 1, 2, 3]}
+2024-05-16 11:25:45 INFO     No already trained models found.
+2024-05-16 11:25:45 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_000	\-
+2024-05-16 11:25:45 INFO     Loading data for subgraph sub_000.
+2024-05-16 11:25:45 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-16 11:25:45 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_001	\-
+2024-05-16 11:25:45 INFO     Loading data for subgraph sub_001.
+2024-05-16 11:25:46 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-16 11:25:46 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_002	\-
+2024-05-16 11:25:46 INFO     Loading data for subgraph sub_002.
+2024-05-16 11:25:47 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-16 11:25:47 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_003	\-
+2024-05-16 11:25:47 INFO     Loading data for subgraph sub_003.
+2024-05-16 11:25:47 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-16 11:25:47 INFO     -\	Successfully created all models in 2.05 seconds	/-
+2024-05-16 11:25:47 INFO     -/	Starting training	\-
+2024-05-16 11:25:47 INFO     -/	Start training sub_000 with ComplEx	\-
+2024-05-16 11:25:48 INFO     -/	Start training sub_001 with ComplEx	\-
+2024-05-16 11:25:48 INFO     -/	Start training sub_002 with ComplEx	\-
+2024-05-16 11:25:48 INFO     -/	Start training sub_003 with ComplEx	\-
+2024-05-16 11:25:48 INFO     Training subgraph sub_000 in epoch 0 with model ComplEx
+2024-05-16 11:26:17 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 11.3465
+2024-05-16 11:26:17 INFO     Training subgraph sub_001 in epoch 0 with model ComplEx
+2024-05-16 11:26:45 INFO     Subgraph sub_001 Training Epoch 0 | average train loss: 11.3351
+2024-05-16 11:26:45 INFO     Training subgraph sub_002 in epoch 0 with model ComplEx
+2024-05-16 11:27:13 INFO     Subgraph sub_002 Training Epoch 0 | average train loss: 11.3539
+2024-05-16 11:27:13 INFO     Training subgraph sub_003 in epoch 0 with model ComplEx
+2024-05-16 11:27:42 INFO     Subgraph sub_003 Training Epoch 0 | average train loss: 11.4097
+2024-05-16 11:27:42 INFO     Calculating self-attention...
+2024-05-16 11:27:46 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:27:46 INFO     Applying general embeddings to all models.
+2024-05-16 11:27:47 INFO     Validation Epoch 0 | average valid loss: 12.7513
+2024-05-16 11:27:47 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:27:58 INFO     Combining scores of all models with average score.
+2024-05-16 11:28:00 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:28:01 INFO     	 valid MR: 12036.28 | MRR: 0.059 | H@1: 0.043 | H@3: 0.062 | H@10: 0.083 | AMRI: 0.412096 | MR_deviation: 8.000
+2024-05-16 11:28:01 INFO     -\	Finished validating the ensemble in 14.71 seconds	/-
+2024-05-16 11:28:01 INFO     Saving models at epoch 0 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:28:02 INFO     -\	Training and optimization of epoch 0 finished in 2 minutes, 13.45 seconds	/-
+2024-05-16 11:28:02 INFO     Training subgraph sub_000 in epoch 1 with model ComplEx
+2024-05-16 11:28:31 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 10.3166
+2024-05-16 11:28:31 INFO     Training subgraph sub_001 in epoch 1 with model ComplEx
+2024-05-16 11:28:59 INFO     Subgraph sub_001 Training Epoch 1 | average train loss: 10.2625
+2024-05-16 11:28:59 INFO     Training subgraph sub_002 in epoch 1 with model ComplEx
+2024-05-16 11:29:27 INFO     Subgraph sub_002 Training Epoch 1 | average train loss: 10.2907
+2024-05-16 11:29:27 INFO     Training subgraph sub_003 in epoch 1 with model ComplEx
+2024-05-16 11:29:55 INFO     Subgraph sub_003 Training Epoch 1 | average train loss: 10.3545
+2024-05-16 11:29:55 INFO     Calculating self-attention...
+2024-05-16 11:29:58 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:29:58 INFO     Applying general embeddings to all models.
+2024-05-16 11:29:59 INFO     Validation Epoch 1 | average valid loss: 13.7298
+2024-05-16 11:29:59 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:30:09 INFO     Combining scores of all models with average score.
+2024-05-16 11:30:11 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:30:14 INFO     	 valid MR: 11215.54 | MRR: 0.054 | H@1: 0.032 | H@3: 0.057 | H@10: 0.092 | AMRI: 0.452188 | MR_deviation: 4.000
+2024-05-16 11:30:14 INFO     -\	Finished validating the ensemble in 15.27 seconds	/-
+2024-05-16 11:30:14 INFO     -\	Training and optimization of epoch 1 finished in 2 minutes, 12.44 seconds	/-
+2024-05-16 11:30:14 INFO     Training subgraph sub_000 in epoch 2 with model ComplEx
+2024-05-16 11:30:43 INFO     Subgraph sub_000 Training Epoch 2 | average train loss: 9.7719
+2024-05-16 11:30:43 INFO     Training subgraph sub_001 in epoch 2 with model ComplEx
+2024-05-16 11:31:11 INFO     Subgraph sub_001 Training Epoch 2 | average train loss: 9.6974
+2024-05-16 11:31:11 INFO     Training subgraph sub_002 in epoch 2 with model ComplEx
+2024-05-16 11:31:39 INFO     Subgraph sub_002 Training Epoch 2 | average train loss: 9.7184
+2024-05-16 11:31:39 INFO     Training subgraph sub_003 in epoch 2 with model ComplEx
+2024-05-16 11:32:09 INFO     Subgraph sub_003 Training Epoch 2 | average train loss: 9.7767
+2024-05-16 11:32:09 INFO     Calculating self-attention...
+2024-05-16 11:32:13 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:32:13 INFO     Applying general embeddings to all models.
+2024-05-16 11:32:14 INFO     Validation Epoch 2 | average valid loss: 14.4285
+2024-05-16 11:32:14 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:32:26 INFO     Combining scores of all models with average score.
+2024-05-16 11:32:30 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:32:34 INFO     	 valid MR: 10601.35 | MRR: 0.072 | H@1: 0.046 | H@3: 0.076 | H@10: 0.123 | AMRI: 0.482190 | MR_deviation: 5.000
+2024-05-16 11:32:34 INFO     -\	Finished validating the ensemble in 20.15 seconds	/-
+2024-05-16 11:32:34 INFO     Saving models at epoch 2 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:32:34 INFO     -\	Training and optimization of epoch 2 finished in 2 minutes, 20.25 seconds	/-
+2024-05-16 11:32:34 INFO     Training subgraph sub_000 in epoch 3 with model ComplEx
+2024-05-16 11:33:04 INFO     Subgraph sub_000 Training Epoch 3 | average train loss: 9.3035
+2024-05-16 11:33:04 INFO     Training subgraph sub_001 in epoch 3 with model ComplEx
+2024-05-16 11:33:34 INFO     Subgraph sub_001 Training Epoch 3 | average train loss: 9.2254
+2024-05-16 11:33:34 INFO     Training subgraph sub_002 in epoch 3 with model ComplEx
+2024-05-16 11:34:04 INFO     Subgraph sub_002 Training Epoch 3 | average train loss: 9.2419
+2024-05-16 11:34:04 INFO     Training subgraph sub_003 in epoch 3 with model ComplEx
+2024-05-16 11:34:32 INFO     Subgraph sub_003 Training Epoch 3 | average train loss: 9.2935
+2024-05-16 11:34:32 INFO     Calculating self-attention...
+2024-05-16 11:34:35 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:34:35 INFO     Applying general embeddings to all models.
+2024-05-16 11:34:36 INFO     Validation Epoch 3 | average valid loss: 14.9066
+2024-05-16 11:34:36 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:34:45 INFO     Combining scores of all models with average score.
+2024-05-16 11:34:49 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:34:51 INFO     	 valid MR: 10214.14 | MRR: 0.098 | H@1: 0.067 | H@3: 0.106 | H@10: 0.156 | AMRI: 0.501105 | MR_deviation: 4.000
+2024-05-16 11:34:51 INFO     -\	Finished validating the ensemble in 15.07 seconds	/-
+2024-05-16 11:34:51 INFO     Saving models at epoch 3 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:34:51 INFO     -\	Training and optimization of epoch 3 finished in 2 minutes, 16.91 seconds	/-
+2024-05-16 11:34:51 INFO     Training subgraph sub_000 in epoch 4 with model ComplEx
+2024-05-16 11:35:22 INFO     Subgraph sub_000 Training Epoch 4 | average train loss: 8.8170
+2024-05-16 11:35:22 INFO     Training subgraph sub_001 in epoch 4 with model ComplEx
+2024-05-16 11:35:51 INFO     Subgraph sub_001 Training Epoch 4 | average train loss: 8.7525
+2024-05-16 11:35:51 INFO     Training subgraph sub_002 in epoch 4 with model ComplEx
+2024-05-16 11:36:24 INFO     Subgraph sub_002 Training Epoch 4 | average train loss: 8.7674
+2024-05-16 11:36:24 INFO     Training subgraph sub_003 in epoch 4 with model ComplEx
+2024-05-16 11:36:52 INFO     Subgraph sub_003 Training Epoch 4 | average train loss: 8.8178
+2024-05-16 11:36:52 INFO     Calculating self-attention...
+2024-05-16 11:36:55 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:36:55 INFO     Applying general embeddings to all models.
+2024-05-16 11:36:56 INFO     Validation Epoch 4 | average valid loss: 15.1991
+2024-05-16 11:36:56 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:37:05 INFO     Combining scores of all models with average score.
+2024-05-16 11:37:07 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:37:09 INFO     	 valid MR: 9930.02 | MRR: 0.129 | H@1: 0.091 | H@3: 0.142 | H@10: 0.200 | AMRI: 0.514983 | MR_deviation: 6.000
+2024-05-16 11:37:09 INFO     -\	Finished validating the ensemble in 13.17 seconds	/-
+2024-05-16 11:37:09 INFO     Saving models at epoch 4 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:37:09 INFO     -\	Training and optimization of epoch 4 finished in 2 minutes, 17.8 seconds	/-
+2024-05-16 11:37:09 INFO     Training subgraph sub_000 in epoch 5 with model ComplEx
+2024-05-16 11:37:37 INFO     Subgraph sub_000 Training Epoch 5 | average train loss: 8.3009
+2024-05-16 11:37:37 INFO     Training subgraph sub_001 in epoch 5 with model ComplEx
+2024-05-16 11:38:05 INFO     Subgraph sub_001 Training Epoch 5 | average train loss: 8.2689
+2024-05-16 11:38:05 INFO     Training subgraph sub_002 in epoch 5 with model ComplEx
+2024-05-16 11:38:32 INFO     Subgraph sub_002 Training Epoch 5 | average train loss: 8.2759
+2024-05-16 11:38:32 INFO     Training subgraph sub_003 in epoch 5 with model ComplEx
+2024-05-16 11:39:00 INFO     Subgraph sub_003 Training Epoch 5 | average train loss: 8.3248
+2024-05-16 11:39:00 INFO     Calculating self-attention...
+2024-05-16 11:39:03 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:39:03 INFO     Applying general embeddings to all models.
+2024-05-16 11:39:04 INFO     Validation Epoch 5 | average valid loss: 15.2815
+2024-05-16 11:39:04 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:39:13 INFO     Combining scores of all models with average score.
+2024-05-16 11:39:15 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:39:17 INFO     	 valid MR: 9818.92 | MRR: 0.163 | H@1: 0.115 | H@3: 0.184 | H@10: 0.252 | AMRI: 0.520410 | MR_deviation: 3.000
+2024-05-16 11:39:17 INFO     -\	Finished validating the ensemble in 13.26 seconds	/-
+2024-05-16 11:39:17 INFO     Saving models at epoch 5 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:39:18 INFO     -\	Training and optimization of epoch 5 finished in 2 minutes, 8.55 seconds	/-
+2024-05-16 11:39:18 INFO     Training subgraph sub_000 in epoch 6 with model ComplEx
+2024-05-16 11:39:47 INFO     Subgraph sub_000 Training Epoch 6 | average train loss: 7.7849
+2024-05-16 11:39:47 INFO     Training subgraph sub_001 in epoch 6 with model ComplEx
+2024-05-16 11:40:16 INFO     Subgraph sub_001 Training Epoch 6 | average train loss: 7.7838
+2024-05-16 11:40:16 INFO     Training subgraph sub_002 in epoch 6 with model ComplEx
+2024-05-16 11:40:44 INFO     Subgraph sub_002 Training Epoch 6 | average train loss: 7.7897
+2024-05-16 11:40:44 INFO     Training subgraph sub_003 in epoch 6 with model ComplEx
+2024-05-16 11:41:14 INFO     Subgraph sub_003 Training Epoch 6 | average train loss: 7.8235
+2024-05-16 11:41:14 INFO     Calculating self-attention...
+2024-05-16 11:41:18 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:41:18 INFO     Applying general embeddings to all models.
+2024-05-16 11:41:19 INFO     Validation Epoch 6 | average valid loss: 15.2189
+2024-05-16 11:41:19 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:41:30 INFO     Combining scores of all models with average score.
+2024-05-16 11:41:32 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:41:35 INFO     	 valid MR: 9742.20 | MRR: 0.198 | H@1: 0.142 | H@3: 0.228 | H@10: 0.299 | AMRI: 0.524158 | MR_deviation: 2.000
+2024-05-16 11:41:35 INFO     -\	Finished validating the ensemble in 15.59 seconds	/-
+2024-05-16 11:41:35 INFO     Saving models at epoch 6 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:41:35 INFO     -\	Training and optimization of epoch 6 finished in 2 minutes, 17.53 seconds	/-
+2024-05-16 11:41:35 INFO     Training subgraph sub_000 in epoch 7 with model ComplEx
+2024-05-16 11:42:04 INFO     Subgraph sub_000 Training Epoch 7 | average train loss: 7.3071
+2024-05-16 11:42:04 INFO     Training subgraph sub_001 in epoch 7 with model ComplEx
+2024-05-16 11:42:32 INFO     Subgraph sub_001 Training Epoch 7 | average train loss: 7.3199
+2024-05-16 11:42:32 INFO     Training subgraph sub_002 in epoch 7 with model ComplEx
+2024-05-16 11:43:00 INFO     Subgraph sub_002 Training Epoch 7 | average train loss: 7.3342
+2024-05-16 11:43:00 INFO     Training subgraph sub_003 in epoch 7 with model ComplEx
+2024-05-16 11:43:28 INFO     Subgraph sub_003 Training Epoch 7 | average train loss: 7.3453
+2024-05-16 11:43:28 INFO     Calculating self-attention...
+2024-05-16 11:43:32 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:43:32 INFO     Applying general embeddings to all models.
+2024-05-16 11:43:33 INFO     Validation Epoch 7 | average valid loss: 15.0231
+2024-05-16 11:43:33 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:43:42 INFO     Combining scores of all models with average score.
+2024-05-16 11:43:44 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:43:46 INFO     	 valid MR: 9702.41 | MRR: 0.232 | H@1: 0.173 | H@3: 0.269 | H@10: 0.343 | AMRI: 0.526102 | MR_deviation: 7.000
+2024-05-16 11:43:46 INFO     -\	Finished validating the ensemble in 13.72 seconds	/-
+2024-05-16 11:43:46 INFO     Saving models at epoch 7 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:43:47 INFO     -\	Training and optimization of epoch 7 finished in 2 minutes, 11.6 seconds	/-
+2024-05-16 11:43:47 INFO     Training subgraph sub_000 in epoch 8 with model ComplEx
+2024-05-16 11:44:15 INFO     Subgraph sub_000 Training Epoch 8 | average train loss: 6.8909
+2024-05-16 11:44:15 INFO     Training subgraph sub_001 in epoch 8 with model ComplEx
+2024-05-16 11:44:44 INFO     Subgraph sub_001 Training Epoch 8 | average train loss: 6.9000
+2024-05-16 11:44:44 INFO     Training subgraph sub_002 in epoch 8 with model ComplEx
+2024-05-16 11:45:12 INFO     Subgraph sub_002 Training Epoch 8 | average train loss: 6.9268
+2024-05-16 11:45:12 INFO     Training subgraph sub_003 in epoch 8 with model ComplEx
+2024-05-16 11:45:40 INFO     Subgraph sub_003 Training Epoch 8 | average train loss: 6.9196
+2024-05-16 11:45:40 INFO     Calculating self-attention...
+2024-05-16 11:45:44 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:45:44 INFO     Applying general embeddings to all models.
+2024-05-16 11:45:45 INFO     Validation Epoch 8 | average valid loss: 14.7240
+2024-05-16 11:45:45 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:45:55 INFO     Combining scores of all models with average score.
+2024-05-16 11:45:57 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:45:59 INFO     	 valid MR: 9667.53 | MRR: 0.253 | H@1: 0.190 | H@3: 0.295 | H@10: 0.370 | AMRI: 0.527806 | MR_deviation: 1.000
+2024-05-16 11:45:59 INFO     -\	Finished validating the ensemble in 14.84 seconds	/-
+2024-05-16 11:45:59 INFO     Saving models at epoch 8 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:46:00 INFO     -\	Training and optimization of epoch 8 finished in 2 minutes, 12.96 seconds	/-
+2024-05-16 11:46:00 INFO     Training subgraph sub_000 in epoch 9 with model ComplEx
+2024-05-16 11:46:28 INFO     Subgraph sub_000 Training Epoch 9 | average train loss: 6.5392
+2024-05-16 11:46:28 INFO     Training subgraph sub_001 in epoch 9 with model ComplEx
+2024-05-16 11:46:56 INFO     Subgraph sub_001 Training Epoch 9 | average train loss: 6.5365
+2024-05-16 11:46:56 INFO     Training subgraph sub_002 in epoch 9 with model ComplEx
+2024-05-16 11:47:24 INFO     Subgraph sub_002 Training Epoch 9 | average train loss: 6.5738
+2024-05-16 11:47:24 INFO     Training subgraph sub_003 in epoch 9 with model ComplEx
+2024-05-16 11:47:52 INFO     Subgraph sub_003 Training Epoch 9 | average train loss: 6.5587
+2024-05-16 11:47:52 INFO     Calculating self-attention...
+2024-05-16 11:47:56 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:47:56 INFO     Applying general embeddings to all models.
+2024-05-16 11:47:57 INFO     Validation Epoch 9 | average valid loss: 14.3648
+2024-05-16 11:47:57 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:48:06 INFO     Combining scores of all models with average score.
+2024-05-16 11:48:08 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:48:10 INFO     	 valid MR: 9652.65 | MRR: 0.268 | H@1: 0.201 | H@3: 0.316 | H@10: 0.387 | AMRI: 0.528532 | MR_deviation: 2.000
+2024-05-16 11:48:10 INFO     -\	Finished validating the ensemble in 13.83 seconds	/-
+2024-05-16 11:48:10 INFO     Saving models at epoch 9 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:48:11 INFO     -\	Training and optimization of epoch 9 finished in 2 minutes, 10.96 seconds	/-
+2024-05-16 11:48:11 INFO     Training subgraph sub_000 in epoch 10 with model ComplEx
+2024-05-16 11:48:39 INFO     Subgraph sub_000 Training Epoch 10 | average train loss: 6.2447
+2024-05-16 11:48:39 INFO     Training subgraph sub_001 in epoch 10 with model ComplEx
+2024-05-16 11:49:07 INFO     Subgraph sub_001 Training Epoch 10 | average train loss: 6.2294
+2024-05-16 11:49:07 INFO     Training subgraph sub_002 in epoch 10 with model ComplEx
+2024-05-16 11:49:46 INFO     Subgraph sub_002 Training Epoch 10 | average train loss: 6.2746
+2024-05-16 11:49:46 INFO     Training subgraph sub_003 in epoch 10 with model ComplEx
+2024-05-16 11:50:20 INFO     Subgraph sub_003 Training Epoch 10 | average train loss: 6.2591
+2024-05-16 11:50:20 INFO     Calculating self-attention...
+2024-05-16 11:50:25 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:50:26 INFO     Applying general embeddings to all models.
+2024-05-16 11:50:26 INFO     Validation Epoch 10 | average valid loss: 14.0213
+2024-05-16 11:50:26 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:50:35 INFO     Combining scores of all models with average score.
+2024-05-16 11:50:37 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:50:40 INFO     	 valid MR: 9632.98 | MRR: 0.279 | H@1: 0.212 | H@3: 0.326 | H@10: 0.394 | AMRI: 0.529493 | MR_deviation: 1.000
+2024-05-16 11:50:40 INFO     -\	Finished validating the ensemble in 13.37 seconds	/-
+2024-05-16 11:50:40 INFO     Saving models at epoch 10 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:50:40 INFO     -\	Training and optimization of epoch 10 finished in 2 minutes, 29.23 seconds	/-
+2024-05-16 11:50:40 INFO     Training subgraph sub_000 in epoch 11 with model ComplEx
+2024-05-16 11:51:09 INFO     Subgraph sub_000 Training Epoch 11 | average train loss: 5.9978
+2024-05-16 11:51:09 INFO     Training subgraph sub_001 in epoch 11 with model ComplEx
+2024-05-16 11:51:38 INFO     Subgraph sub_001 Training Epoch 11 | average train loss: 5.9725
+2024-05-16 11:51:38 INFO     Training subgraph sub_002 in epoch 11 with model ComplEx
+2024-05-16 11:52:07 INFO     Subgraph sub_002 Training Epoch 11 | average train loss: 6.0224
+2024-05-16 11:52:07 INFO     Training subgraph sub_003 in epoch 11 with model ComplEx
+2024-05-16 11:52:35 INFO     Subgraph sub_003 Training Epoch 11 | average train loss: 6.0110
+2024-05-16 11:52:35 INFO     Calculating self-attention...
+2024-05-16 11:52:42 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:52:42 INFO     Applying general embeddings to all models.
+2024-05-16 11:52:42 INFO     Validation Epoch 11 | average valid loss: 13.6738
+2024-05-16 11:52:42 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:52:56 INFO     Combining scores of all models with average score.
+2024-05-16 11:52:58 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:53:00 INFO     	 valid MR: 9612.61 | MRR: 0.284 | H@1: 0.216 | H@3: 0.334 | H@10: 0.402 | AMRI: 0.530488 | MR_deviation: 3.000
+2024-05-16 11:53:00 INFO     -\	Finished validating the ensemble in 17.99 seconds	/-
+2024-05-16 11:53:00 INFO     Saving models at epoch 11 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:53:01 INFO     -\	Training and optimization of epoch 11 finished in 2 minutes, 20.87 seconds	/-
+2024-05-16 11:53:01 INFO     Training subgraph sub_000 in epoch 12 with model ComplEx
+2024-05-16 11:53:29 INFO     Subgraph sub_000 Training Epoch 12 | average train loss: 5.7893
+2024-05-16 11:53:29 INFO     Training subgraph sub_001 in epoch 12 with model ComplEx
+2024-05-16 11:53:57 INFO     Subgraph sub_001 Training Epoch 12 | average train loss: 5.7581
+2024-05-16 11:53:57 INFO     Training subgraph sub_002 in epoch 12 with model ComplEx
+2024-05-16 11:54:25 INFO     Subgraph sub_002 Training Epoch 12 | average train loss: 5.8107
+2024-05-16 11:54:25 INFO     Training subgraph sub_003 in epoch 12 with model ComplEx
+2024-05-16 11:54:53 INFO     Subgraph sub_003 Training Epoch 12 | average train loss: 5.8057
+2024-05-16 11:54:53 INFO     Calculating self-attention...
+2024-05-16 11:54:56 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:54:56 INFO     Applying general embeddings to all models.
+2024-05-16 11:54:57 INFO     Validation Epoch 12 | average valid loss: 13.3500
+2024-05-16 11:54:57 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:55:07 INFO     Combining scores of all models with average score.
+2024-05-16 11:55:09 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:55:11 INFO     	 valid MR: 9636.30 | MRR: 0.286 | H@1: 0.216 | H@3: 0.339 | H@10: 0.403 | AMRI: 0.529331 | MR_deviation: 4.000
+2024-05-16 11:55:11 INFO     -\	Finished validating the ensemble in 14.09 seconds	/-
+2024-05-16 11:55:11 INFO     Saving models at epoch 12 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:55:12 INFO     -\	Training and optimization of epoch 12 finished in 2 minutes, 10.76 seconds	/-
+2024-05-16 11:55:12 INFO     Training subgraph sub_000 in epoch 13 with model ComplEx
+2024-05-16 11:55:40 INFO     Subgraph sub_000 Training Epoch 13 | average train loss: 5.6129
+2024-05-16 11:55:40 INFO     Training subgraph sub_001 in epoch 13 with model ComplEx
+2024-05-16 11:56:08 INFO     Subgraph sub_001 Training Epoch 13 | average train loss: 5.5787
+2024-05-16 11:56:08 INFO     Training subgraph sub_002 in epoch 13 with model ComplEx
+2024-05-16 11:56:36 INFO     Subgraph sub_002 Training Epoch 13 | average train loss: 5.6317
+2024-05-16 11:56:36 INFO     Training subgraph sub_003 in epoch 13 with model ComplEx
+2024-05-16 11:57:04 INFO     Subgraph sub_003 Training Epoch 13 | average train loss: 5.6331
+2024-05-16 11:57:04 INFO     Calculating self-attention...
+2024-05-16 11:57:08 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:57:08 INFO     Applying general embeddings to all models.
+2024-05-16 11:57:09 INFO     Validation Epoch 13 | average valid loss: 13.0596
+2024-05-16 11:57:09 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:57:20 INFO     Combining scores of all models with average score.
+2024-05-16 11:57:22 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:57:25 INFO     	 valid MR: 9638.05 | MRR: 0.290 | H@1: 0.222 | H@3: 0.340 | H@10: 0.405 | AMRI: 0.529245 | MR_deviation: 1.000
+2024-05-16 11:57:25 INFO     -\	Finished validating the ensemble in 15.96 seconds	/-
+2024-05-16 11:57:25 INFO     Saving models at epoch 13 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:57:25 INFO     -\	Training and optimization of epoch 13 finished in 2 minutes, 13.31 seconds	/-
+2024-05-16 11:57:25 INFO     Training subgraph sub_000 in epoch 14 with model ComplEx
+2024-05-16 11:57:53 INFO     Subgraph sub_000 Training Epoch 14 | average train loss: 5.4628
+2024-05-16 11:57:53 INFO     Training subgraph sub_001 in epoch 14 with model ComplEx
+2024-05-16 11:58:22 INFO     Subgraph sub_001 Training Epoch 14 | average train loss: 5.4275
+2024-05-16 11:58:22 INFO     Training subgraph sub_002 in epoch 14 with model ComplEx
+2024-05-16 11:58:50 INFO     Subgraph sub_002 Training Epoch 14 | average train loss: 5.4802
+2024-05-16 11:58:50 INFO     Training subgraph sub_003 in epoch 14 with model ComplEx
+2024-05-16 11:59:18 INFO     Subgraph sub_003 Training Epoch 14 | average train loss: 5.4877
+2024-05-16 11:59:18 INFO     Calculating self-attention...
+2024-05-16 11:59:21 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 11:59:21 INFO     Applying general embeddings to all models.
+2024-05-16 11:59:22 INFO     Validation Epoch 14 | average valid loss: 12.7889
+2024-05-16 11:59:22 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 11:59:32 INFO     Combining scores of all models with average score.
+2024-05-16 11:59:34 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 11:59:36 INFO     	 valid MR: 9636.05 | MRR: 0.293 | H@1: 0.223 | H@3: 0.344 | H@10: 0.408 | AMRI: 0.529343 | MR_deviation: 3.000
+2024-05-16 11:59:36 INFO     -\	Finished validating the ensemble in 13.96 seconds	/-
+2024-05-16 11:59:36 INFO     Saving models at epoch 14 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 11:59:36 INFO     -\	Training and optimization of epoch 14 finished in 2 minutes, 11.12 seconds	/-
+2024-05-16 11:59:36 INFO     Training subgraph sub_000 in epoch 15 with model ComplEx
+2024-05-16 12:00:04 INFO     Subgraph sub_000 Training Epoch 15 | average train loss: 5.3346
+2024-05-16 12:00:04 INFO     Training subgraph sub_001 in epoch 15 with model ComplEx
+2024-05-16 12:00:32 INFO     Subgraph sub_001 Training Epoch 15 | average train loss: 5.2998
+2024-05-16 12:00:32 INFO     Training subgraph sub_002 in epoch 15 with model ComplEx
+2024-05-16 12:01:00 INFO     Subgraph sub_002 Training Epoch 15 | average train loss: 5.3506
+2024-05-16 12:01:00 INFO     Training subgraph sub_003 in epoch 15 with model ComplEx
+2024-05-16 12:01:28 INFO     Subgraph sub_003 Training Epoch 15 | average train loss: 5.3636
+2024-05-16 12:01:28 INFO     Calculating self-attention...
+2024-05-16 12:01:32 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:01:32 INFO     Applying general embeddings to all models.
+2024-05-16 12:01:32 INFO     Validation Epoch 15 | average valid loss: 12.5485
+2024-05-16 12:01:32 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:01:42 INFO     Combining scores of all models with average score.
+2024-05-16 12:01:45 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:01:47 INFO     	 valid MR: 9635.90 | MRR: 0.293 | H@1: 0.223 | H@3: 0.345 | H@10: 0.409 | AMRI: 0.529351 | MR_deviation: 1.000
+2024-05-16 12:01:47 INFO     -\	Finished validating the ensemble in 15.06 seconds	/-
+2024-05-16 12:01:47 INFO     Saving models at epoch 15 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:01:48 INFO     -\	Training and optimization of epoch 15 finished in 2 minutes, 11.72 seconds	/-
+2024-05-16 12:01:48 INFO     Training subgraph sub_000 in epoch 16 with model ComplEx
+2024-05-16 12:02:16 INFO     Subgraph sub_000 Training Epoch 16 | average train loss: 5.2246
+2024-05-16 12:02:16 INFO     Training subgraph sub_001 in epoch 16 with model ComplEx
+2024-05-16 12:02:44 INFO     Subgraph sub_001 Training Epoch 16 | average train loss: 5.1911
+2024-05-16 12:02:44 INFO     Training subgraph sub_002 in epoch 16 with model ComplEx
+2024-05-16 12:03:12 INFO     Subgraph sub_002 Training Epoch 16 | average train loss: 5.2401
+2024-05-16 12:03:12 INFO     Training subgraph sub_003 in epoch 16 with model ComplEx
+2024-05-16 12:03:40 INFO     Subgraph sub_003 Training Epoch 16 | average train loss: 5.2575
+2024-05-16 12:03:40 INFO     Calculating self-attention...
+2024-05-16 12:03:43 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:03:43 INFO     Applying general embeddings to all models.
+2024-05-16 12:03:44 INFO     Validation Epoch 16 | average valid loss: 12.3326
+2024-05-16 12:03:44 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:03:54 INFO     Combining scores of all models with average score.
+2024-05-16 12:03:56 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:03:58 INFO     	 valid MR: 9638.44 | MRR: 0.296 | H@1: 0.226 | H@3: 0.347 | H@10: 0.413 | AMRI: 0.529227 | MR_deviation: 1.000
+2024-05-16 12:03:58 INFO     -\	Finished validating the ensemble in 13.59 seconds	/-
+2024-05-16 12:03:58 INFO     Saving models at epoch 16 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:03:58 INFO     -\	Training and optimization of epoch 16 finished in 2 minutes, 10.35 seconds	/-
+2024-05-16 12:03:58 INFO     Training subgraph sub_000 in epoch 17 with model ComplEx
+2024-05-16 12:04:26 INFO     Subgraph sub_000 Training Epoch 17 | average train loss: 5.1297
+2024-05-16 12:04:26 INFO     Training subgraph sub_001 in epoch 17 with model ComplEx
+2024-05-16 12:04:54 INFO     Subgraph sub_001 Training Epoch 17 | average train loss: 5.0978
+2024-05-16 12:04:54 INFO     Training subgraph sub_002 in epoch 17 with model ComplEx
+2024-05-16 12:05:23 INFO     Subgraph sub_002 Training Epoch 17 | average train loss: 5.1443
+2024-05-16 12:05:23 INFO     Training subgraph sub_003 in epoch 17 with model ComplEx
+2024-05-16 12:05:51 INFO     Subgraph sub_003 Training Epoch 17 | average train loss: 5.1654
+2024-05-16 12:05:51 INFO     Calculating self-attention...
+2024-05-16 12:05:54 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:05:54 INFO     Applying general embeddings to all models.
+2024-05-16 12:05:55 INFO     Validation Epoch 17 | average valid loss: 12.1380
+2024-05-16 12:05:55 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:06:06 INFO     Combining scores of all models with average score.
+2024-05-16 12:06:08 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:06:10 INFO     	 valid MR: 9641.00 | MRR: 0.296 | H@1: 0.226 | H@3: 0.348 | H@10: 0.415 | AMRI: 0.529102 | MR_deviation: 2.000
+2024-05-16 12:06:10 INFO     -\	Finished validating the ensemble in 14.69 seconds	/-
+2024-05-16 12:06:10 INFO     Saving models at epoch 17 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:06:10 INFO     -\	Training and optimization of epoch 17 finished in 2 minutes, 12.06 seconds	/-
+2024-05-16 12:06:10 INFO     Training subgraph sub_000 in epoch 18 with model ComplEx
+2024-05-16 12:06:38 INFO     Subgraph sub_000 Training Epoch 18 | average train loss: 5.0475
+2024-05-16 12:06:38 INFO     Training subgraph sub_001 in epoch 18 with model ComplEx
+2024-05-16 12:07:06 INFO     Subgraph sub_001 Training Epoch 18 | average train loss: 5.0174
+2024-05-16 12:07:06 INFO     Training subgraph sub_002 in epoch 18 with model ComplEx
+2024-05-16 12:07:34 INFO     Subgraph sub_002 Training Epoch 18 | average train loss: 5.0617
+2024-05-16 12:07:34 INFO     Training subgraph sub_003 in epoch 18 with model ComplEx
+2024-05-16 12:08:02 INFO     Subgraph sub_003 Training Epoch 18 | average train loss: 5.0854
+2024-05-16 12:08:02 INFO     Calculating self-attention...
+2024-05-16 12:08:06 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:08:06 INFO     Applying general embeddings to all models.
+2024-05-16 12:08:07 INFO     Validation Epoch 18 | average valid loss: 11.9642
+2024-05-16 12:08:07 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:08:16 INFO     Combining scores of all models with average score.
+2024-05-16 12:08:19 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:08:21 INFO     	 valid MR: 9655.80 | MRR: 0.298 | H@1: 0.227 | H@3: 0.351 | H@10: 0.417 | AMRI: 0.528378 | MR_deviation: 2.000
+2024-05-16 12:08:21 INFO     -\	Finished validating the ensemble in 14.49 seconds	/-
+2024-05-16 12:08:21 INFO     Saving models at epoch 18 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:08:21 INFO     -\	Training and optimization of epoch 18 finished in 2 minutes, 11.14 seconds	/-
+2024-05-16 12:08:21 INFO     Training subgraph sub_000 in epoch 19 with model ComplEx
+2024-05-16 12:08:50 INFO     Subgraph sub_000 Training Epoch 19 | average train loss: 4.9762
+2024-05-16 12:08:50 INFO     Training subgraph sub_001 in epoch 19 with model ComplEx
+2024-05-16 12:09:18 INFO     Subgraph sub_001 Training Epoch 19 | average train loss: 4.9477
+2024-05-16 12:09:18 INFO     Training subgraph sub_002 in epoch 19 with model ComplEx
+2024-05-16 12:09:47 INFO     Subgraph sub_002 Training Epoch 19 | average train loss: 4.9898
+2024-05-16 12:09:47 INFO     Training subgraph sub_003 in epoch 19 with model ComplEx
+2024-05-16 12:10:16 INFO     Subgraph sub_003 Training Epoch 19 | average train loss: 5.0150
+2024-05-16 12:10:16 INFO     Calculating self-attention...
+2024-05-16 12:10:19 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:10:19 INFO     Applying general embeddings to all models.
+2024-05-16 12:10:20 INFO     Validation Epoch 19 | average valid loss: 11.8100
+2024-05-16 12:10:20 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:10:31 INFO     Combining scores of all models with average score.
+2024-05-16 12:10:34 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:10:36 INFO     	 valid MR: 9665.68 | MRR: 0.297 | H@1: 0.226 | H@3: 0.349 | H@10: 0.417 | AMRI: 0.527896 | MR_deviation: 2.000
+2024-05-16 12:10:36 INFO     -\	Finished validating the ensemble in 15.98 seconds	/-
+2024-05-16 12:10:36 INFO     -\	Training and optimization of epoch 19 finished in 2 minutes, 14.64 seconds	/-
+2024-05-16 12:10:36 INFO     Training subgraph sub_000 in epoch 20 with model ComplEx
+2024-05-16 12:11:04 INFO     Subgraph sub_000 Training Epoch 20 | average train loss: 4.9135
+2024-05-16 12:11:04 INFO     Training subgraph sub_001 in epoch 20 with model ComplEx
+2024-05-16 12:11:32 INFO     Subgraph sub_001 Training Epoch 20 | average train loss: 4.8866
+2024-05-16 12:11:32 INFO     Training subgraph sub_002 in epoch 20 with model ComplEx
+2024-05-16 12:12:01 INFO     Subgraph sub_002 Training Epoch 20 | average train loss: 4.9265
+2024-05-16 12:12:01 INFO     Training subgraph sub_003 in epoch 20 with model ComplEx
+2024-05-16 12:12:29 INFO     Subgraph sub_003 Training Epoch 20 | average train loss: 4.9533
+2024-05-16 12:12:29 INFO     Calculating self-attention...
+2024-05-16 12:12:33 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:12:33 INFO     Applying general embeddings to all models.
+2024-05-16 12:12:34 INFO     Validation Epoch 20 | average valid loss: 11.6719
+2024-05-16 12:12:34 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:12:43 INFO     Combining scores of all models with average score.
+2024-05-16 12:12:46 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:12:48 INFO     	 valid MR: 9671.33 | MRR: 0.298 | H@1: 0.227 | H@3: 0.350 | H@10: 0.418 | AMRI: 0.527620 | MR_deviation: 1.000
+2024-05-16 12:12:48 INFO     -\	Finished validating the ensemble in 14.42 seconds	/-
+2024-05-16 12:12:48 INFO     Saving models at epoch 20 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:12:48 INFO     -\	Training and optimization of epoch 20 finished in 2 minutes, 12.36 seconds	/-
+2024-05-16 12:12:48 INFO     Training subgraph sub_000 in epoch 21 with model ComplEx
+2024-05-16 12:13:17 INFO     Subgraph sub_000 Training Epoch 21 | average train loss: 4.8584
+2024-05-16 12:13:17 INFO     Training subgraph sub_001 in epoch 21 with model ComplEx
+2024-05-16 12:13:45 INFO     Subgraph sub_001 Training Epoch 21 | average train loss: 4.8324
+2024-05-16 12:13:45 INFO     Training subgraph sub_002 in epoch 21 with model ComplEx
+2024-05-16 12:14:13 INFO     Subgraph sub_002 Training Epoch 21 | average train loss: 4.8711
+2024-05-16 12:14:13 INFO     Training subgraph sub_003 in epoch 21 with model ComplEx
+2024-05-16 12:14:41 INFO     Subgraph sub_003 Training Epoch 21 | average train loss: 4.8982
+2024-05-16 12:14:41 INFO     Calculating self-attention...
+2024-05-16 12:14:45 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:14:45 INFO     Applying general embeddings to all models.
+2024-05-16 12:14:46 INFO     Validation Epoch 21 | average valid loss: 11.5519
+2024-05-16 12:14:46 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:14:55 INFO     Combining scores of all models with average score.
+2024-05-16 12:14:57 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:15:00 INFO     	 valid MR: 9682.00 | MRR: 0.297 | H@1: 0.225 | H@3: 0.352 | H@10: 0.419 | AMRI: 0.527098 | MR_deviation: 2.000
+2024-05-16 12:15:00 INFO     -\	Finished validating the ensemble in 13.78 seconds	/-
+2024-05-16 12:15:00 INFO     -\	Training and optimization of epoch 21 finished in 2 minutes, 11.66 seconds	/-
+2024-05-16 12:15:00 INFO     Training subgraph sub_000 in epoch 22 with model ComplEx
+2024-05-16 12:15:29 INFO     Subgraph sub_000 Training Epoch 22 | average train loss: 4.8095
+2024-05-16 12:15:29 INFO     Training subgraph sub_001 in epoch 22 with model ComplEx
+2024-05-16 12:15:57 INFO     Subgraph sub_001 Training Epoch 22 | average train loss: 4.7851
+2024-05-16 12:15:57 INFO     Training subgraph sub_002 in epoch 22 with model ComplEx
+2024-05-16 12:16:26 INFO     Subgraph sub_002 Training Epoch 22 | average train loss: 4.8218
+2024-05-16 12:16:26 INFO     Training subgraph sub_003 in epoch 22 with model ComplEx
+2024-05-16 12:16:54 INFO     Subgraph sub_003 Training Epoch 22 | average train loss: 4.8489
+2024-05-16 12:16:54 INFO     Calculating self-attention...
+2024-05-16 12:16:58 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:16:59 INFO     Applying general embeddings to all models.
+2024-05-16 12:16:59 INFO     Validation Epoch 22 | average valid loss: 11.4410
+2024-05-16 12:16:59 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:17:10 INFO     Combining scores of all models with average score.
+2024-05-16 12:17:12 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:17:15 INFO     	 valid MR: 9683.98 | MRR: 0.298 | H@1: 0.225 | H@3: 0.354 | H@10: 0.419 | AMRI: 0.527002 | MR_deviation: 2.000
+2024-05-16 12:17:15 INFO     -\	Finished validating the ensemble in 15.9 seconds	/-
+2024-05-16 12:17:15 INFO     Saving models at epoch 22 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:17:16 INFO     -\	Training and optimization of epoch 22 finished in 2 minutes, 15.65 seconds	/-
+2024-05-16 12:17:16 INFO     Training subgraph sub_000 in epoch 23 with model ComplEx
+2024-05-16 12:17:42 INFO     Subgraph sub_000 Training Epoch 23 | average train loss: 4.7659
+2024-05-16 12:17:42 INFO     Training subgraph sub_001 in epoch 23 with model ComplEx
+2024-05-16 12:18:09 INFO     Subgraph sub_001 Training Epoch 23 | average train loss: 4.7426
+2024-05-16 12:18:09 INFO     Training subgraph sub_002 in epoch 23 with model ComplEx
+2024-05-16 12:18:35 INFO     Subgraph sub_002 Training Epoch 23 | average train loss: 4.7782
+2024-05-16 12:18:35 INFO     Training subgraph sub_003 in epoch 23 with model ComplEx
+2024-05-16 12:19:02 INFO     Subgraph sub_003 Training Epoch 23 | average train loss: 4.8050
+2024-05-16 12:19:02 INFO     Calculating self-attention...
+2024-05-16 12:19:05 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:19:05 INFO     Applying general embeddings to all models.
+2024-05-16 12:19:06 INFO     Validation Epoch 23 | average valid loss: 11.3463
+2024-05-16 12:19:06 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:19:14 INFO     Combining scores of all models with average score.
+2024-05-16 12:19:16 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:19:18 INFO     	 valid MR: 9689.76 | MRR: 0.299 | H@1: 0.228 | H@3: 0.353 | H@10: 0.420 | AMRI: 0.526720 | MR_deviation: 0.000
+2024-05-16 12:19:18 INFO     -\	Finished validating the ensemble in 12.32 seconds	/-
+2024-05-16 12:19:18 INFO     Saving models at epoch 23 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:19:18 INFO     -\	Training and optimization of epoch 23 finished in 2 minutes, 2.62 seconds	/-
+2024-05-16 12:19:18 INFO     Training subgraph sub_000 in epoch 24 with model ComplEx
+2024-05-16 12:19:45 INFO     Subgraph sub_000 Training Epoch 24 | average train loss: 4.7269
+2024-05-16 12:19:45 INFO     Training subgraph sub_001 in epoch 24 with model ComplEx
+2024-05-16 12:20:11 INFO     Subgraph sub_001 Training Epoch 24 | average train loss: 4.7045
+2024-05-16 12:20:11 INFO     Training subgraph sub_002 in epoch 24 with model ComplEx
+2024-05-16 12:20:39 INFO     Subgraph sub_002 Training Epoch 24 | average train loss: 4.7391
+2024-05-16 12:20:39 INFO     Training subgraph sub_003 in epoch 24 with model ComplEx
+2024-05-16 12:21:07 INFO     Subgraph sub_003 Training Epoch 24 | average train loss: 4.7654
+2024-05-16 12:21:07 INFO     Calculating self-attention...
+2024-05-16 12:21:11 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:21:11 INFO     Applying general embeddings to all models.
+2024-05-16 12:21:12 INFO     Validation Epoch 24 | average valid loss: 11.2608
+2024-05-16 12:21:12 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:21:22 INFO     Combining scores of all models with average score.
+2024-05-16 12:21:24 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:21:26 INFO     	 valid MR: 9690.50 | MRR: 0.299 | H@1: 0.227 | H@3: 0.353 | H@10: 0.419 | AMRI: 0.526683 | MR_deviation: 1.000
+2024-05-16 12:21:26 INFO     -\	Finished validating the ensemble in 14.25 seconds	/-
+2024-05-16 12:21:26 INFO     -\	Training and optimization of epoch 24 finished in 2 minutes, 7.72 seconds	/-
+2024-05-16 12:21:26 INFO     Training subgraph sub_000 in epoch 25 with model ComplEx
+2024-05-16 12:21:55 INFO     Subgraph sub_000 Training Epoch 25 | average train loss: 4.6922
+2024-05-16 12:21:55 INFO     Training subgraph sub_001 in epoch 25 with model ComplEx
+2024-05-16 12:22:24 INFO     Subgraph sub_001 Training Epoch 25 | average train loss: 4.6703
+2024-05-16 12:22:24 INFO     Training subgraph sub_002 in epoch 25 with model ComplEx
+2024-05-16 12:22:53 INFO     Subgraph sub_002 Training Epoch 25 | average train loss: 4.7041
+2024-05-16 12:22:53 INFO     Training subgraph sub_003 in epoch 25 with model ComplEx
+2024-05-16 12:23:22 INFO     Subgraph sub_003 Training Epoch 25 | average train loss: 4.7292
+2024-05-16 12:23:22 INFO     Calculating self-attention...
+2024-05-16 12:23:25 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:23:25 INFO     Applying general embeddings to all models.
+2024-05-16 12:23:26 INFO     Validation Epoch 25 | average valid loss: 11.1873
+2024-05-16 12:23:26 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:23:36 INFO     Combining scores of all models with average score.
+2024-05-16 12:23:38 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:23:41 INFO     	 valid MR: 9685.04 | MRR: 0.300 | H@1: 0.228 | H@3: 0.354 | H@10: 0.420 | AMRI: 0.526950 | MR_deviation: 1.000
+2024-05-16 12:23:41 INFO     -\	Finished validating the ensemble in 14.7 seconds	/-
+2024-05-16 12:23:41 INFO     Saving models at epoch 25 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:23:41 INFO     -\	Training and optimization of epoch 25 finished in 2 minutes, 14.9 seconds	/-
+2024-05-16 12:23:41 INFO     Training subgraph sub_000 in epoch 26 with model ComplEx
+2024-05-16 12:24:10 INFO     Subgraph sub_000 Training Epoch 26 | average train loss: 4.6602
+2024-05-16 12:24:10 INFO     Training subgraph sub_001 in epoch 26 with model ComplEx
+2024-05-16 12:24:39 INFO     Subgraph sub_001 Training Epoch 26 | average train loss: 4.6392
+2024-05-16 12:24:39 INFO     Training subgraph sub_002 in epoch 26 with model ComplEx
+2024-05-16 12:25:07 INFO     Subgraph sub_002 Training Epoch 26 | average train loss: 4.6720
+2024-05-16 12:25:07 INFO     Training subgraph sub_003 in epoch 26 with model ComplEx
+2024-05-16 12:25:37 INFO     Subgraph sub_003 Training Epoch 26 | average train loss: 4.6965
+2024-05-16 12:25:37 INFO     Calculating self-attention...
+2024-05-16 12:25:40 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:25:40 INFO     Applying general embeddings to all models.
+2024-05-16 12:25:41 INFO     Validation Epoch 26 | average valid loss: 11.1207
+2024-05-16 12:25:41 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:25:51 INFO     Combining scores of all models with average score.
+2024-05-16 12:25:53 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:25:55 INFO     	 valid MR: 9688.25 | MRR: 0.300 | H@1: 0.228 | H@3: 0.356 | H@10: 0.420 | AMRI: 0.526793 | MR_deviation: 2.000
+2024-05-16 12:25:55 INFO     -\	Finished validating the ensemble in 14.45 seconds	/-
+2024-05-16 12:25:55 INFO     -\	Training and optimization of epoch 26 finished in 2 minutes, 14.46 seconds	/-
+2024-05-16 12:25:55 INFO     Training subgraph sub_000 in epoch 27 with model ComplEx
+2024-05-16 12:26:24 INFO     Subgraph sub_000 Training Epoch 27 | average train loss: 4.6313
+2024-05-16 12:26:24 INFO     Training subgraph sub_001 in epoch 27 with model ComplEx
+2024-05-16 12:26:52 INFO     Subgraph sub_001 Training Epoch 27 | average train loss: 4.6109
+2024-05-16 12:26:52 INFO     Training subgraph sub_002 in epoch 27 with model ComplEx
+2024-05-16 12:27:20 INFO     Subgraph sub_002 Training Epoch 27 | average train loss: 4.6432
+2024-05-16 12:27:20 INFO     Training subgraph sub_003 in epoch 27 with model ComplEx
+2024-05-16 12:27:48 INFO     Subgraph sub_003 Training Epoch 27 | average train loss: 4.6664
+2024-05-16 12:27:48 INFO     Calculating self-attention...
+2024-05-16 12:27:51 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:27:52 INFO     Applying general embeddings to all models.
+2024-05-16 12:27:52 INFO     Validation Epoch 27 | average valid loss: 11.0622
+2024-05-16 12:27:52 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:28:03 INFO     Combining scores of all models with average score.
+2024-05-16 12:28:05 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:28:07 INFO     	 valid MR: 9693.45 | MRR: 0.299 | H@1: 0.226 | H@3: 0.355 | H@10: 0.420 | AMRI: 0.526539 | MR_deviation: 2.000
+2024-05-16 12:28:07 INFO     -\	Finished validating the ensemble in 14.93 seconds	/-
+2024-05-16 12:28:07 INFO     -\	Training and optimization of epoch 27 finished in 2 minutes, 11.97 seconds	/-
+2024-05-16 12:28:07 INFO     Training subgraph sub_000 in epoch 28 with model ComplEx
+2024-05-16 12:28:36 INFO     Subgraph sub_000 Training Epoch 28 | average train loss: 4.6052
+2024-05-16 12:28:36 INFO     Training subgraph sub_001 in epoch 28 with model ComplEx
+2024-05-16 12:29:05 INFO     Subgraph sub_001 Training Epoch 28 | average train loss: 4.5851
+2024-05-16 12:29:05 INFO     Training subgraph sub_002 in epoch 28 with model ComplEx
+2024-05-16 12:29:34 INFO     Subgraph sub_002 Training Epoch 28 | average train loss: 4.6170
+2024-05-16 12:29:34 INFO     Training subgraph sub_003 in epoch 28 with model ComplEx
+2024-05-16 12:30:03 INFO     Subgraph sub_003 Training Epoch 28 | average train loss: 4.6390
+2024-05-16 12:30:03 INFO     Calculating self-attention...
+2024-05-16 12:30:06 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:30:06 INFO     Applying general embeddings to all models.
+2024-05-16 12:30:07 INFO     Validation Epoch 28 | average valid loss: 11.0103
+2024-05-16 12:30:07 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:30:16 INFO     Combining scores of all models with average score.
+2024-05-16 12:30:19 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:30:21 INFO     	 valid MR: 9701.46 | MRR: 0.300 | H@1: 0.228 | H@3: 0.356 | H@10: 0.422 | AMRI: 0.526148 | MR_deviation: 3.000
+2024-05-16 12:30:21 INFO     -\	Finished validating the ensemble in 14.11 seconds	/-
+2024-05-16 12:30:21 INFO     Saving models at epoch 28 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.8\results\model_files
+2024-05-16 12:30:21 INFO     -\	Training and optimization of epoch 28 finished in 2 minutes, 13.81 seconds	/-
+2024-05-16 12:30:21 INFO     Training subgraph sub_000 in epoch 29 with model ComplEx
+2024-05-16 12:30:50 INFO     Subgraph sub_000 Training Epoch 29 | average train loss: 4.5811
+2024-05-16 12:30:50 INFO     Training subgraph sub_001 in epoch 29 with model ComplEx
+2024-05-16 12:31:18 INFO     Subgraph sub_001 Training Epoch 29 | average train loss: 4.5616
+2024-05-16 12:31:18 INFO     Training subgraph sub_002 in epoch 29 with model ComplEx
+2024-05-16 12:31:46 INFO     Subgraph sub_002 Training Epoch 29 | average train loss: 4.5927
+2024-05-16 12:31:47 INFO     Training subgraph sub_003 in epoch 29 with model ComplEx
+2024-05-16 12:32:16 INFO     Subgraph sub_003 Training Epoch 29 | average train loss: 4.6137
+2024-05-16 12:32:16 INFO     Calculating self-attention...
+2024-05-16 12:32:20 INFO     Calculating unified embedding for entities and relation names.
+2024-05-16 12:32:20 INFO     Applying general embeddings to all models.
+2024-05-16 12:32:21 INFO     Validation Epoch 29 | average valid loss: 10.9653
+2024-05-16 12:32:21 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-16 12:32:30 INFO     Combining scores of all models with average score.
+2024-05-16 12:32:32 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-16 12:32:35 INFO     	 valid MR: 9691.33 | MRR: 0.300 | H@1: 0.228 | H@3: 0.355 | H@10: 0.421 | AMRI: 0.526643 | MR_deviation: 1.000
+2024-05-16 12:32:35 INFO     -\	Finished validating the ensemble in 13.87 seconds	/-
+2024-05-16 12:32:35 INFO     -\	Training and optimization of epoch 29 finished in 2 minutes, 13.7 seconds	/-
+2024-05-16 12:32:35 INFO     Loading best models saved at epoch 28
+2024-05-16 12:32:35 INFO     -\	Successfully finished training and optimizing all subgraphs in 1 hour, 6 minutes, 47.76 seconds	/-
+2024-05-16 12:32:35 INFO     -/	Testing the ensemble with the score aggregation method "maximum score".	\-
+2024-05-16 12:32:46 INFO     Combining scores of all models with maximum score.
+2024-05-16 12:32:50 INFO     Successfully aggregated all scores with aggregation method maximum score.
+2024-05-16 12:32:53 INFO     	 test MR: 15565.12 | MRR: 0.132 | H@1: 0.038 | H@3: 0.203 | H@10: 0.311 | AMRI: 0.239718 | MR_deviation: 1385.000
+2024-05-16 12:32:53 INFO     -\	Finished testing the ensemble in 17.82 seconds	/-
+2024-05-16 12:32:53 INFO     Finished ensemble training and testing in 1 hour, 7 minutes, 8.12 seconds.
+2024-05-16 12:32:54 INFO     The entire process including sampling, training and testing took 1 hour, 8 minutes, 4.79 seconds.
