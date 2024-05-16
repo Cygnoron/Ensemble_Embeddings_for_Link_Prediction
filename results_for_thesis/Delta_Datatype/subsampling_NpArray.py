@@ -119,7 +119,6 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 for triple in sampled_data:
                     output_file_raw.write(f"{str(triple[0])}\t{str(triple[1])}\t{str(triple[2])}\n")
 
-                # TODO not necessarily needed, change when implementing training/testing process
                 # copy necessary files to the folder of the subgraph
                 files_to_copy = ["test.pickle", "valid.pickle", "to_skip.pickle"]
                 source_dir = f"data\\{dataset_in}"
