@@ -5,7 +5,7 @@ import traceback
 import torch
 from tqdm import tqdm
 
-from ensemble import Constants, util
+from ensemble import Constants, util, util_files
 from utils.train import avg_both, format_metrics
 
 
@@ -41,13 +41,7 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     logging.info(format_metrics(metrics, split=mode))
 
     if metrics_file_path != "":
-        with open(f"{metrics_file_path}", 'a') as metrics_file:
-            logging.debug(f"Printing metrics to {metrics_file_path}.")
-            metrics_file.write(f"{epoch};{mode};{metrics['MR']};{metrics['MRR']};{metrics['hits@[1,3,10]'][0]};"
-                               f"{metrics['hits@[1,3,10]'][1]};{metrics['hits@[1,3,10]'][2]};{metrics['AMRI']};"
-                               f"{metrics['MR_deviation']}")
-
-            metrics_file.write("\n")
+        util_files.print_metrics_to_file(metrics_file_path, metrics, epoch, mode)
 
     time_eval_stop = time.time()
 
@@ -74,10 +68,6 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
                - targets (dict): Dictionary containing target scores for both lhs and rhs directions.
     """
 
-    # Initialize progress bar for tracking progress
-    progress_bar_testing = tqdm(total=len(embedding_models), desc=f"Calculating {eval_mode} scores",
-                                unit=" embedding models")
-
     # Initialize variables to store target scores
     targets_lhs = None
     targets_rhs = None
@@ -99,10 +89,8 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         targets_lhs = torch.zeros((len(examples), candidate_answers))
 
         # Update progress bar
-        progress_bar_testing.n = args.subgraph_num
-        progress_bar_testing.refresh()
-        progress_bar_while = tqdm(total=len(examples) * 2, desc="Processing batches", unit=" queries", position=0,
-                                  leave=True)
+        progress_bar_testing = tqdm(total=len(examples) * 2, desc=f"Calculating valid scores for {args.subgraph}",
+                                    unit=" queries", position=0, leave=True)
 
         # calculate scores, adapted from base.compute_metrics() and base.get_rankings()
         # Iterate over each mode (rhs and lhs)
@@ -124,10 +112,10 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
                 while b_begin < len(queries):
                     # Update progress bar
                     if mode == 'lhs':
-                        progress_bar_while.n = b_begin + len(examples)
+                        progress_bar_testing.n = b_begin + len(examples)
                     else:
-                        progress_bar_while.n = b_begin
-                    progress_bar_while.refresh()
+                        progress_bar_testing.n = b_begin
+                    progress_bar_testing.refresh()
 
                     these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
@@ -151,8 +139,8 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
 
                     b_begin += batch_size
 
-        progress_bar_while.n = progress_bar_while.total
-        progress_bar_while.close()
+        progress_bar_testing.n = progress_bar_testing.total
+        progress_bar_testing.close()
         # Update embedding model dictionary with calculated scores
         embedding_model['scores_lhs'] = scores_lhs
         embedding_model['scores_rhs'] = scores_rhs
@@ -301,11 +289,11 @@ def compute_ranks(embedding_models, examples, filters, targets, aggregated_score
 
     # Initialize dictionary for ranks
     queries = examples.clone()
-    ranks_opt = {'rhs': torch.zeros(len(queries)),
-                 'lhs': torch.zeros(len(queries))}
+    ranks_opt = {'rhs': torch.ones(len(queries)),
+                 'lhs': torch.ones(len(queries))}
 
-    ranks_pes = {'rhs': torch.zeros(len(queries)),
-                 'lhs': torch.zeros(len(queries))}
+    ranks_pes = {'rhs': torch.ones(len(queries)),
+                 'lhs': torch.ones(len(queries))}
 
     # Initialize progress bar for tracking progress
     progress_bar_ranking = tqdm(total=len(queries) * 2, desc=f"Computing {eval_mode} ranking", unit=" queries")
@@ -415,16 +403,16 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
     # TODO check/correct calculation of AMRI
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
-        optimistic_rank = ranks_opt[mode][ranks_opt[mode] > 0]
-        pessimistic_rank = ranks_pes[mode][ranks_opt[mode] > 0]
+        optimistic_rank = ranks_opt[mode]
+        pessimistic_rank = ranks_pes[mode]
 
         # Compute mean rank
         mean_rank[mode] = torch.mean(optimistic_rank).item()
 
         # Compute mean reciprocal rank
-        with open("data\\WN18RR_Entity_sampling_N4_min0.3\\results\\MRR.csv", 'w') as MRR_file:
-            for rank in optimistic_rank:
-                MRR_file.write(f"{rank}\n")
+        # with open("data\\WN18RR_Entity_sampling_N4_min0.3\\results\\MRR.csv", 'w') as MRR_file:
+        #     for rank in optimistic_rank:
+        #         MRR_file.write(f"{rank}\n")
 
         mean_reciprocal_rank[mode] = torch.mean(1. / optimistic_rank).item()
 
@@ -466,12 +454,6 @@ def calculate_valid_loss(embedding_models, valid_loss_dir, epoch):
     # average valid loss over all "len(embedding_models)" models
     valid_loss /= len(embedding_models)
 
-    with open(valid_loss_dir, 'a') as valid_loss_file:
-        valid_loss_str = f"{epoch};{valid_loss}"
-        for valid_loss_sub in valid_loss_dict:
-            valid_loss_str += f";{valid_loss_dict[valid_loss_sub]}"
-
-        valid_loss_file.write(valid_loss_str)
-        valid_loss_file.write("\n")
+    util_files.print_loss_to_file(valid_loss_dir, valid_loss, epoch, "valid", valid_loss_dict)
 
     return valid_loss, valid_loss_dict

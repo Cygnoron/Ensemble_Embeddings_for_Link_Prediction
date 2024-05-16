@@ -263,3 +263,34 @@ def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, m
             # Load the best model
             embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args.subgraph}_"
                                                                 f"{args.model_name}.pt"))
+
+
+def print_loss_to_file(loss_file_path, loss, epoch, mode, *args):
+    with open(loss_file_path, 'a+') as loss_file:
+        if mode == "train":
+            # args[0] = current subgraph
+            # args[1] = max amount of subgraphs
+            if args[0] == 0:
+                loss_file.write(f"{epoch}")
+            loss_file.write(f";{loss}")
+            if args[0] == args[1] - 1:
+                loss_file.write("\n")
+
+        elif mode == "valid":
+            # args[0] = dict with all subgraphs as key and valid losses as values
+            valid_loss_str = f"{epoch};{loss}"
+            for valid_loss_sub in args[0]:
+                valid_loss_str += f";{args[0][valid_loss_sub]}"
+
+            loss_file.write(valid_loss_str)
+            loss_file.write("\n")
+
+
+def print_metrics_to_file(metrics_file_path, metrics, epoch, mode):
+    with open(f"{metrics_file_path}", 'a') as metrics_file:
+        logging.debug(f"Printing metrics to {metrics_file_path}.")
+        metrics_file.write(f"{epoch};{mode};{metrics['MR']};{metrics['MRR']};{metrics['hits@[1,3,10]'][0]};"
+                           f"{metrics['hits@[1,3,10]'][1]};{metrics['hits@[1,3,10]'][2]};{metrics['AMRI']};"
+                           f"{metrics['MR_deviation']}")
+
+        metrics_file.write("\n")

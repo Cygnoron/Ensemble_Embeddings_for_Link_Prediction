@@ -78,13 +78,16 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     e_s_mapping_dir = util_files.check_file(f"{info_directory}\\embedding_subgraph_mapping.json")
 
     valid_loss_file_path = util_files.check_file(f"{info_directory}\\valid_loss.csv")
+    train_loss_file_path = util_files.check_file(f"{info_directory}\\train_loss.csv")
     metrics_file_path = util_files.check_file(f"{info_directory}\\metrics_valid.csv")
 
-    with (open(valid_loss_file_path, "w") as valid_loss_file, open(metrics_file_path, "w") as metrics_file):
+    with (open(valid_loss_file_path, "w") as valid_loss_file, open(train_loss_file_path, "w") as train_loss_file,
+          open(metrics_file_path, "w") as metrics_file):
         subgraphs_str = ""
         for sub_num in range(subgraph_amount):
             subgraphs_str += f";sub_{sub_num:03d}"
         valid_loss_file.write(f"epoch;average valid loss{subgraphs_str}\n")
+        train_loss_file.write(f"epoch{subgraphs_str}\n")
         metrics_file.write(f"epoch;mode;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;MR_deviation\n")
 
     logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
@@ -256,7 +259,8 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
             logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
-            # TODO save train loss in file
+            util_files.print_loss_to_file(train_loss_file_path, train_loss, epoch, "train",
+                                          args.subgraph_num, subgraph_amount)
 
             # save embeddings of the model each epoch for later training processes
             if epoch % 1 == 0 or epoch == max_epochs - 1:
