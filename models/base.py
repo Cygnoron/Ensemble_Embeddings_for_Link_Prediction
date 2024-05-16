@@ -228,9 +228,6 @@ class KGModel(nn.Module, ABC):
 
             ranks_opt, ranks_pes = self.get_ranking(q, filters[m], batch_size=batch_size)
 
-            ranks_opt = ranks_opt[ranks_opt > 0]
-            ranks_pes = ranks_pes[ranks_pes > 0]
-
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
             hits_at[m] = torch.FloatTensor((list(map(

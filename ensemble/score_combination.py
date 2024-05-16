@@ -89,7 +89,7 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         targets_lhs = torch.zeros((len(examples), candidate_answers))
 
         # Update progress bar
-        progress_bar_testing = tqdm(total=len(examples) * 2, desc=f"Calculating valid scores for {args.subgraph}",
+        progress_bar_testing = tqdm(total=len(examples) * 2, desc=f"Calculating {eval_mode} scores for {args.subgraph}",
                                     unit=" queries", position=0, leave=True)
 
         # calculate scores, adapted from base.compute_metrics() and base.get_rankings()
@@ -400,7 +400,6 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
     amri = {}
     mr_deviation = {}
 
-    # TODO check/correct calculation of AMRI
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:
         optimistic_rank = ranks_opt[mode]
