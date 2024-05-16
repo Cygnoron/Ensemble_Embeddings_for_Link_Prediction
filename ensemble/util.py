@@ -169,8 +169,6 @@ def assign_model_to_subgraph(kge_models, args):
             Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
             -> All subgraphs are embedded by ROTAT_E
         """
-    # TODO include possibility for ration of embedding methods?
-    #   e.g. Constants.TransE: [0.2] -> 20% of subgraphs with TransE, remaining subgraphs random
 
     # Initial setup
     subgraph_embedding_mapping = {}
