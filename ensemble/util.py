@@ -141,43 +141,6 @@ def inverse_dict(dictionary):
     return dict(inverse_dictionary)
 
 
-def format_dict(dictionary):
-    """
-        Formats a dictionary into a string representation.
-
-        Args:
-            dictionary (dict): A dictionary to be formatted.
-
-        Returns:
-            str: A string representation of the dictionary, where each key-value pair is formatted as follows:
-                - Key is enclosed in single quotes.
-                - Values are separated by commas.
-                - If a value is a string, it is enclosed in single quotes.
-                - Each key-value pair is separated by a tab ('\t').
-                - Each key-value pair is terminated by a newline character ('\n').
-    """
-    out_str = ""
-    # iterate through all keys
-    for key_index, key in enumerate(dictionary):
-        # add key to string
-        out_str += f"'{key}':\t"
-
-        # iterate through values
-        for value_index, value in enumerate(dictionary[key]):
-            # add single quotes to value, if value is string
-            if type(value) is str:
-                value = f"'{value}'"
-            # add value to string and end with newline if it is the last value
-            if value_index == len(dictionary[key]) - 1:
-                if key_index == len(dictionary) - 1:
-                    out_str += f"{value}"
-                else:
-                    out_str += f"{value}\n"
-            else:
-                out_str += f"{value}, "
-    return out_str
-
-
 def assign_model_to_subgraph(kge_models, args):
     """
     Assign embedding models to subgraphs based on the given dictionary of kge_models.
@@ -205,25 +168,24 @@ def assign_model_to_subgraph(kge_models, args):
             Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
             -> All subgraphs are embedded by ROTAT_E
         """
-
+    # TODO fix non-correct settings of subgraphs
     # Initial setup
     subgraph_embedding_mapping = {}
     kge_models_adjusted = list(kge_models.keys()).copy()
 
-    logging.debug(f"kge_models before checking for illegal assignments:\n{kge_models}")
+    logging.debug(f"kge_models before checking for illegal assignments:\n{format_dict(kge_models)}")
     # check for illegal subgraph assignment and remove if any were found
     for embedding_model in list(kge_models.keys()):
-        buffer_assignments = kge_models[embedding_model].copy()
-        for assignment in buffer_assignments:
+        for assignment in kge_models[embedding_model].copy():
             if type(assignment) is int:
-                if assignment > args.subgraph_amount:
+                if assignment >= args.subgraph_amount:
                     logging.debug(f"Removed illegal assignment \"{assignment}\"")
                     kge_models[embedding_model].remove(assignment)
             elif type(assignment) is str:
                 if assignment != "all" and assignment != "rest":
                     logging.debug(f"Removed illegal assignment \"{assignment}\"")
                     kge_models[embedding_model].remove(assignment)
-    logging.debug(f"kge_models after checking for illegal assignments:\n{kge_models}")
+    logging.debug(f"kge_models after checking for illegal assignments:\n{format_dict(kge_models)}")
 
     logging.debug("Checking if 'all' or 'rest' was specified")
     for embedding_model in list(kge_models.keys()):
@@ -247,7 +209,8 @@ def assign_model_to_subgraph(kge_models, args):
 
                 logging.info(f"Setting {args.model} as embedding method for subgraph {args.subgraph}.")
 
-            logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
+            logging.info(f"Mapping from embedding methods to subgraphs:\n"
+                         f"{format_dict(inverse_dict(subgraph_embedding_mapping))}")
             return subgraph_embedding_mapping
 
         # Handle case "rest" if specified in kge_models
@@ -566,3 +529,40 @@ def format_time(time_total_start, time_total_end, divisor=1, multiplier=1, preci
             output_time_str += f"{total_time_seconds} seconds"
 
     return output_time_str
+
+
+def format_dict(dictionary):
+    """
+        Formats a dictionary into a string representation.
+
+        Args:
+            dictionary (dict): A dictionary to be formatted.
+
+        Returns:
+            str: A string representation of the dictionary, where each key-value pair is formatted as follows:
+                - Key is enclosed in single quotes.
+                - Values are separated by commas.
+                - If a value is a string, it is enclosed in single quotes.
+                - Each key-value pair is separated by a tab ('\t').
+                - Each key-value pair is terminated by a newline character ('\n').
+    """
+    out_str = ""
+    # iterate through all keys
+    for key_index, key in enumerate(dictionary):
+        # add key to string
+        out_str += f"'{key}':\t"
+
+        # iterate through values
+        for value_index, value in enumerate(dictionary[key]):
+            # add single quotes to value, if value is string
+            if type(value) is str:
+                value = f"'{value}'"
+            # add value to string and end with newline if it is the last value
+            if value_index == len(dictionary[key]) - 1:
+                if key_index == len(dictionary) - 1:
+                    out_str += f"{value}"
+                else:
+                    out_str += f"{value}\n"
+            else:
+                out_str += f"{value}, "
+    return out_str

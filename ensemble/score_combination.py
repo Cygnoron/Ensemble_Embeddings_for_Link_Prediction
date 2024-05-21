@@ -43,6 +43,13 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     if metrics_file_path != "":
         util_files.print_metrics_to_file(metrics_file_path, metrics, epoch, mode)
 
+    for embedding_model in embedding_models:
+        logging.debug(f"printing file test_{embedding_model['args'].subgraph}.txt")
+        for i in range(50):
+            logging.log(Constants.DATA_LEVEL_LOGGING, embedding_model['model'].entity.weight.data[i])
+
+        logging.log(Constants.DATA_LEVEL_LOGGING, embedding_model['model'].rel.weight.data)
+
     time_eval_stop = time.time()
 
     logging.info(f"-\\\tFinished {mode_str.lower()}ing the ensemble in "

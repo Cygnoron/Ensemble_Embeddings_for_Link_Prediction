@@ -98,10 +98,10 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 # -- Special case: subgraph_num ==  --
                 # check if all entity and relation name ids are used
                 # -> force them to be present if missing
-                buffer_var = calculate_delta(subgraph_size_range, data, subgraph_num, subgraph_amount, entity_set,
-                                             relation_name_set, entity_ids_unused, relation_name_ids_unused,
-                                             sampling_method, relation_name_amount, entities_per_step)
-                delta_triples, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = buffer_var
+                delta_triples, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = calculate_delta(
+                    subgraph_size_range, data, subgraph_num, subgraph_amount, entity_set,
+                    relation_name_set, entity_ids_unused, relation_name_ids_unused,
+                    sampling_method, relation_name_amount, entities_per_step)
 
                 # Initialize a mask with False values
                 mask = np.zeros(len(data), dtype=bool)

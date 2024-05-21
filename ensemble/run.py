@@ -152,17 +152,29 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         model = getattr(models, args_subgraph.model)(args_subgraph)
         total = count_params(model)
 
+        entity_set, relation_name_set = dataset.get_entities_relation_names(args_subgraph.sizes, double_relations=True)
+
         # set embeddings
         model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim)
-        model.entity.weight.data = torch.rand(embedding_general_ent.weight.data.size())
+        # initialize with zeros and set present entities to one
+        model.entity.weight.data = torch.zeros(embedding_general_ent.weight.data.size())
+        model.entity.weight.data[entity_set] = torch.rand((len(entity_set), rank))
+
         model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
-        model.rel.weight.data = torch.rand(embedding_general_rel.weight.data.size())
+        # initialize with zeros and set present relation names to one
+        model.rel.weight.data = torch.zeros(embedding_general_rel.weight.data.size())
+        model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank))
 
         # set context vectors
         model.theta_ent = nn.Embedding(theta_general_ent.num_embeddings, theta_general_ent.embedding_dim)
-        model.theta_ent.weight.data = torch.rand(theta_general_ent.weight.data.size())
+        # initialize with zeros and set present entities to one
+        model.theta_ent.weight.data = torch.zeros(theta_general_ent.weight.data.size())
+        model.theta_ent.weight.data[entity_set] = torch.rand((len(entity_set), rank))
+
         model.theta_rel = nn.Embedding(theta_general_rel.num_embeddings, theta_general_rel.embedding_dim)
-        model.theta_rel.weight.data = torch.rand(theta_general_rel.weight.data.size())
+        # initialize with zeros and set present relation names to one
+        model.theta_rel.weight.data = torch.zeros(theta_general_rel.weight.data.size())
+        model.theta_rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank))
 
         logging.debug(f"Entity size: {model.entity.weight.data.size()}")
         logging.debug(f"Relation size: {model.rel.weight.data.size()}")
@@ -259,6 +271,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
             logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
+            # TODO fix train loss file
             util_files.print_loss_to_file(train_loss_file_path, train_loss, epoch, "train",
                                           args.subgraph_num, subgraph_amount)
 
@@ -342,7 +355,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
     # --- Testing with aggregated scores ---
 
-    evaluate_ensemble(embedding_models, metrics_file_path=metrics_file_path)
+    evaluate_ensemble(embedding_models, aggregation_method=aggregation_method, metrics_file_path=metrics_file_path)
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
@@ -431,4 +444,3 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     # Test metrics
     # test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
     # logging.info(format_metrics(test_metrics, split="test"))
-

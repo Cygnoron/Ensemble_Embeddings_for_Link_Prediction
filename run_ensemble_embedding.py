@@ -15,11 +15,13 @@ if __name__ == "__main__":
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.3, 0.8)
+    subgraph_size_range = (0.3, 0.7)
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
     relation_name_amount = 0.5
     time_dependent_file_path = False
+    do_sampling = False
+    do_training = True
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -37,7 +39,7 @@ if __name__ == "__main__":
                            f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
 
         if time_dependent_file_path:
-            dataset_out += datetime.now().strftime('_mm%m_dd%d__HH%H_MM%M')
+            dataset_out += datetime.now().strftime('_%m.%d_%H_%M')
 
         dataset_out_dir = f"data\\{dataset_out}"
         info_directory = os.path.abspath(f"{dataset_out_dir}")
@@ -46,7 +48,7 @@ if __name__ == "__main__":
         util_files.check_directory(info_directory)
 
         util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
-                           logging_level="info")
+                           logging_level="debug")
 
         # --- if a new debugging dataset was created ---
 
@@ -69,10 +71,10 @@ if __name__ == "__main__":
         #     util.create_entity_and_relation_name_set_file(dataset.name)
 
         # --- sampling process ---
-
-        # subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
-        #                          subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
-        #                          relation_name_amount=relation_name_amount)
+        if do_sampling:
+            subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
+                                     subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
+                                     relation_name_amount=relation_name_amount)
 
         # sampling_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
         #                   150, 200, 300, 400, 500]
@@ -99,10 +101,8 @@ if __name__ == "__main__":
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0], Constants.DIST_MULT: [1, "rest"], Constants.ROTAT_E: [2],
-                               Constants.COMPL_EX: [3, 12, "all"], Constants.ATT_E: [4, 50]}]
-
-        print(util.format_dict(allowed_kge_models[0]))
+        allowed_kge_models = [{Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [13, "rest"], Constants.ROTAT_E: [21],
+                               Constants.COMPL_EX: [2, 3], Constants.ATT_E: [4, 50]}]
 
         # --- training process ---
 
@@ -115,29 +115,35 @@ if __name__ == "__main__":
         #                       # {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
         #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}]
         # #
-        # error = False
-        # for models in allowed_kge_models:
-        #     try:
-        #         run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        #                   learning_rate=0.1, kge_models=models, max_epochs=30, batch_size=800,
-        #                   rank=32, aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION, debug=True,
-        #                   reg=0.05,
-        #                   patience=15,
-        #                   valid=1,
-        #                   neg_sample_size=-1,
-        #                   init_size=0.001,
-        #                   bias="none",
-        #                   dtype="double"
-        #                   )
-        #     except Exception:
-        #         logging.error(traceback.format_exc())
-        #         error = True
-        #
-        # time_process_end = time.time()
-        #
-        # if not error:
-        #     logging.info(f"The entire process including sampling, training and testing took "
-        #                  f"{util.format_time(time_process_start, time_process_end)}.")
-        # else:
-        #     logging.info(f"The process ended with an error after "
-        #                  f"{util.format_time(time_process_start, time_process_end)}")
+        error = False
+        for models in allowed_kge_models:
+            try:
+                if do_training:
+                    pass
+                run.train(info_directory, subgraph_amount, dataset=dataset_out, dataset_directory=dataset_out_dir,
+                          kge_models=models, aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
+                          max_epochs=10,
+                          batch_size=750,
+                          rank=32,
+                          learning_rate=0.1,
+                          reg=0.05,
+                          patience=15,
+                          valid=5,
+                          neg_sample_size=-1,
+                          init_size=0.001,
+                          bias="none",
+                          dtype="double",
+                          debug=False
+                          )
+            except Exception:
+                logging.error(traceback.format_exc())
+                error = True
+
+        time_process_end = time.time()
+
+        if not error:
+            logging.info(f"The entire process including sampling, training and testing took "
+                         f"{util.format_time(time_process_start, time_process_end)}.")
+        else:
+            logging.info(f"The process ended with an error after "
+                         f"{util.format_time(time_process_start, time_process_end)}")
