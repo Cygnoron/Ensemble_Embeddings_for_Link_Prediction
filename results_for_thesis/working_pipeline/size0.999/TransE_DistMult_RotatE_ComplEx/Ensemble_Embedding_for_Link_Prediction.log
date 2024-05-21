@@ -1,0 +1,525 @@
+2024-05-21 12:28:26 INFO     ### Saving logs in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results ###
+2024-05-21 12:28:26 DEBUG    ### Debug messages are enabled ###
+2024-05-21 12:28:26 DEBUG    Deleting unwanted files and directories
+2024-05-21 12:28:26 INFO     Sampling 4 subgraphs with a relative size (0.3, 0.7) from WN18RR with Entity sampling
+2024-05-21 12:28:26 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:26 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:26 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7\sub_000 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-21 12:28:38 INFO     Current subgraph size 0.7000287902343525 reached or exceeded target size 0.7.
+2024-05-21 12:28:38 INFO     Created subgraph 0 with 6505 entities and 0 relation names left unused and a relative subgraph size 0.7000287902343525.
+2024-05-21 12:28:38 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:38 INFO     Length of delta: 60787		Deviation from target size: 2
+2024-05-21 12:28:38 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\subgraph_config.csv" for subgraph 000, sampling took 12.03 seconds	/-
+
+2024-05-21 12:28:38 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:39 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7\sub_001 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-21 12:28:50 INFO     Current subgraph size 0.7000287902343525 reached or exceeded target size 0.7.
+2024-05-21 12:28:50 INFO     Created subgraph 1 with 1083 entities and 0 relation names left unused and a relative subgraph size 0.7000287902343525.
+2024-05-21 12:28:50 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:50 INFO     Length of delta: 60787		Deviation from target size: 2
+2024-05-21 12:28:50 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\subgraph_config.csv" for subgraph 001, sampling took 11.88 seconds	/-
+
+2024-05-21 12:28:50 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:28:51 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7\sub_002 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-21 12:28:51 INFO     Enforcing 1083 entities to be present in the subgraph
+2024-05-21 12:29:02 INFO     Current subgraph size 0.7000287902343525 reached or exceeded target size 0.7.
+2024-05-21 12:29:02 INFO     Created subgraph 2 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000287902343525.
+2024-05-21 12:29:02 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:29:02 INFO     Length of delta: 60787		Deviation from target size: 2
+2024-05-21 12:29:02 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\subgraph_config.csv" for subgraph 002, sampling took 11.42 seconds	/-
+
+2024-05-21 12:29:02 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:29:02 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7\sub_003 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-21 12:29:13 INFO     Current subgraph size 0.7000172741406115 reached or exceeded target size 0.7.
+2024-05-21 12:29:13 INFO     Created subgraph 3 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000172741406115.
+2024-05-21 12:29:14 DEBUG    Calculating sets of unique ids for entities and relation names
+2024-05-21 12:29:14 INFO     Length of delta: 60786		Deviation from target size: 1
+2024-05-21 12:29:14 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\subgraph_config.csv" for subgraph 003, sampling took 11.56 seconds	/-
+
+2024-05-21 12:29:14 INFO     ### Successfully created 4 subgraphs of the relative size (0.3, 0.7) from the original KG "WN18RR" in a total of 47.75 seconds (avg: 11.94 seconds) ###
+2024-05-21 12:29:14 INFO     ### Saving .json config files of models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\model_setup_configs ###
+2024-05-21 12:29:14 INFO     ### Saving .pt files of stored models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\model_files ###
+2024-05-21 12:29:14 DEBUG    Given dataset was sampled by Entity sampling, returning original name WN18RR
+2024-05-21 12:29:14 DEBUG    Creating general embeddings and context vectors.
+2024-05-21 12:29:14 INFO     -/	Setting up embedding models	\-
+2024-05-21 12:29:14 DEBUG    kge_models before checking for illegal assignments:
+'TransE':	0
+'DistMult':	3, 'rest'
+'RotatE':	2
+'ComplEx':	1, 12
+'AttE':	4, 50
+2024-05-21 12:29:14 DEBUG    Removed illegal assignment "12"
+2024-05-21 12:29:14 DEBUG    Removed illegal assignment "4"
+2024-05-21 12:29:14 DEBUG    Removed illegal assignment "50"
+2024-05-21 12:29:14 DEBUG    kge_models after checking for illegal assignments:
+'TransE':	0
+'DistMult':	3, 'rest'
+'RotatE':	2
+'ComplEx':	1
+'AttE':	
+2024-05-21 12:29:14 DEBUG    Checking if 'all' or 'rest' was specified
+2024-05-21 12:29:14 DEBUG    'rest' was found for embedding model DistMult
+2024-05-21 12:29:14 DEBUG    Checking for direct mappings
+2024-05-21 12:29:14 INFO     Subgraphs with fixed embedding: '0':	'T', 'r', 'a', 'n', 's', 'E'
+'3':	'D', 'i', 's', 't', 'M', 'u', 'l', 't'
+'2':	'R', 'o', 't', 'a', 't', 'E'
+'1':	'C', 'o', 'm', 'p', 'l', 'E', 'x'
+		Remaining subgraphs will be embedded by random embedding methods ['DistMult']
+2024-05-21 12:29:14 INFO     Found mapping, using embedding method TransE for subgraph sub_000
+2024-05-21 12:29:14 INFO     Found mapping, using embedding method ComplEx for subgraph sub_001
+2024-05-21 12:29:14 INFO     Found mapping, using embedding method RotatE for subgraph sub_002
+2024-05-21 12:29:14 INFO     Found mapping, using embedding method DistMult for subgraph sub_003
+2024-05-21 12:29:14 INFO     Mapping from embedding methods to subgraphs: {'TransE': [0], 'DistMult': [3], 'RotatE': [2], 'ComplEx': [1]}
+2024-05-21 12:29:14 INFO     No already trained models found.
+2024-05-21 12:29:14 INFO     -/	Creating new model from embedding method TransE for subgraph sub_000	\-
+2024-05-21 12:29:14 INFO     Loading data for subgraph sub_000.
+2024-05-21 12:29:15 DEBUG    Sizes: old (40943, 22, 40943)	new (40943, 22, 40943)
+2024-05-21 12:29:15 DEBUG    Calculating new entity and relation name from the dataset.
+2024-05-21 12:29:15 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-21 12:29:15 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-21 12:29:15 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-21 12:29:15 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-21 12:29:15 INFO     -\	Total number of parameters: 2703646	/-
+2024-05-21 12:29:15 INFO     -/	Creating new model from embedding method DistMult for subgraph sub_003	\-
+2024-05-21 12:29:15 INFO     Loading data for subgraph sub_003.
+2024-05-21 12:29:16 DEBUG    Sizes: old (40943, 22, 40943)	new (40943, 22, 40943)
+2024-05-21 12:29:16 DEBUG    Calculating new entity and relation name from the dataset.
+2024-05-21 12:29:16 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-21 12:29:16 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-21 12:29:16 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-21 12:29:16 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-21 12:29:16 INFO     -\	Total number of parameters: 2703646	/-
+2024-05-21 12:29:16 INFO     -/	Creating new model from embedding method RotatE for subgraph sub_002	\-
+2024-05-21 12:29:16 INFO     Loading data for subgraph sub_002.
+2024-05-21 12:29:17 DEBUG    Sizes: old (40943, 22, 40943)	new (40943, 22, 40943)
+2024-05-21 12:29:17 DEBUG    Calculating new entity and relation name from the dataset.
+2024-05-21 12:29:17 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-21 12:29:17 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-21 12:29:17 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-21 12:29:17 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-21 12:29:17 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-21 12:29:17 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_001	\-
+2024-05-21 12:29:17 INFO     Loading data for subgraph sub_001.
+2024-05-21 12:29:17 DEBUG    Sizes: old (40943, 22, 40943)	new (40943, 22, 40943)
+2024-05-21 12:29:17 DEBUG    Calculating new entity and relation name from the dataset.
+2024-05-21 12:29:17 DEBUG    Entity size: torch.Size([40943, 32])
+2024-05-21 12:29:17 DEBUG    Relation size: torch.Size([22, 32])
+2024-05-21 12:29:17 DEBUG    Theta_ent size: torch.Size([40943, 32])
+2024-05-21 12:29:17 DEBUG    Theta_rel size: torch.Size([22, 32])
+2024-05-21 12:29:17 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-21 12:29:17 INFO     -\	Successfully created all models in 3.21 seconds	/-
+2024-05-21 12:29:17 INFO     -/	Starting training	\-
+2024-05-21 12:29:17 INFO     -/	Start training sub_000 with TransE	\-
+2024-05-21 12:29:18 INFO     -/	Start training sub_003 with DistMult	\-
+2024-05-21 12:29:18 INFO     -/	Start training sub_002 with RotatE	\-
+2024-05-21 12:29:18 INFO     -/	Start training sub_001 with ComplEx	\-
+2024-05-21 12:29:18 INFO     Training subgraph sub_000 in epoch 0 with model TransE
+2024-05-21 12:29:24 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 12.7447
+2024-05-21 12:29:24 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:24 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:24 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:24 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:24 INFO     Training subgraph sub_003 in epoch 0 with model DistMult
+2024-05-21 12:29:29 INFO     Subgraph sub_003 Training Epoch 0 | average train loss: 13.6876
+2024-05-21 12:29:29 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:29 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:29 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:29 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:29 INFO     Training subgraph sub_002 in epoch 0 with model RotatE
+2024-05-21 12:29:53 INFO     Subgraph sub_002 Training Epoch 0 | average train loss: 10.1697
+2024-05-21 12:29:53 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:53 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:53 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:29:53 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-21 12:29:53 INFO     Training subgraph sub_001 in epoch 0 with model ComplEx
+2024-05-21 12:30:17 INFO     Subgraph sub_001 Training Epoch 0 | average train loss: 11.5034
+2024-05-21 12:30:17 DEBUG    Entity size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:30:17 DEBUG    Relation size epoch 0: torch.Size([22, 32])
+2024-05-21 12:30:17 DEBUG    Theta_ent size epoch 0: torch.Size([40943, 32])
+2024-05-21 12:30:17 DEBUG    Theta_rel size epoch 0: torch.Size([22, 32])
+2024-05-21 12:30:17 INFO     Calculating self-attention...
+2024-05-21 12:30:17 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:30:17 DEBUG    (40943, 22, 40943)
+2024-05-21 12:30:17 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:30:17 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:30:20 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:30:20 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:30:20 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:30:20 INFO     Applying general embeddings to all models.
+2024-05-21 12:30:20 DEBUG    Validation Epoch 0 per subgraph | average valid losses: {'sub_000': 18.801923751831055, 'sub_003': 12.86528491973877, 'sub_002': 10.958042618085015, 'sub_001': 14.32478287742448}
+2024-05-21 12:30:20 INFO     Validation Epoch 0 | average valid loss: 14.2375
+2024-05-21 12:30:20 INFO     -\	Training and optimization of epoch 0 finished in 1 minute, 2.28 seconds	/-
+2024-05-21 12:30:20 INFO     Training subgraph sub_000 in epoch 1 with model TransE
+2024-05-21 12:30:26 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 10.1829
+2024-05-21 12:30:26 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:26 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:26 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:26 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:26 INFO     Training subgraph sub_003 in epoch 1 with model DistMult
+2024-05-21 12:30:31 INFO     Subgraph sub_003 Training Epoch 1 | average train loss: 10.3745
+2024-05-21 12:30:31 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:31 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:31 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:31 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:31 INFO     Training subgraph sub_002 in epoch 1 with model RotatE
+2024-05-21 12:30:55 INFO     Subgraph sub_002 Training Epoch 1 | average train loss: 8.4765
+2024-05-21 12:30:55 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:55 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:55 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:30:55 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-21 12:30:55 INFO     Training subgraph sub_001 in epoch 1 with model ComplEx
+2024-05-21 12:31:18 INFO     Subgraph sub_001 Training Epoch 1 | average train loss: 10.3902
+2024-05-21 12:31:18 DEBUG    Entity size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:31:18 DEBUG    Relation size epoch 1: torch.Size([22, 32])
+2024-05-21 12:31:18 DEBUG    Theta_ent size epoch 1: torch.Size([40943, 32])
+2024-05-21 12:31:18 DEBUG    Theta_rel size epoch 1: torch.Size([22, 32])
+2024-05-21 12:31:18 INFO     Calculating self-attention...
+2024-05-21 12:31:18 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:31:18 DEBUG    (40943, 22, 40943)
+2024-05-21 12:31:19 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:31:19 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:31:21 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:31:21 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:31:21 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:31:21 INFO     Applying general embeddings to all models.
+2024-05-21 12:31:22 DEBUG    Validation Epoch 1 per subgraph | average valid losses: {'sub_000': 17.856952667236328, 'sub_003': 12.932026863098145, 'sub_002': 11.284662341412474, 'sub_001': 15.70396017438069}
+2024-05-21 12:31:22 INFO     Validation Epoch 1 | average valid loss: 14.4444
+2024-05-21 12:31:22 INFO     -\	Training and optimization of epoch 1 finished in 1 minute, 1.49 seconds	/-
+2024-05-21 12:31:22 INFO     Training subgraph sub_000 in epoch 2 with model TransE
+2024-05-21 12:31:27 INFO     Subgraph sub_000 Training Epoch 2 | average train loss: 10.3486
+2024-05-21 12:31:27 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:27 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:27 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:27 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:27 INFO     Training subgraph sub_003 in epoch 2 with model DistMult
+2024-05-21 12:31:33 INFO     Subgraph sub_003 Training Epoch 2 | average train loss: 10.3962
+2024-05-21 12:31:33 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:33 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:33 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:33 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:33 INFO     Training subgraph sub_002 in epoch 2 with model RotatE
+2024-05-21 12:31:56 INFO     Subgraph sub_002 Training Epoch 2 | average train loss: 7.2860
+2024-05-21 12:31:56 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:56 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:56 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:31:56 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-21 12:31:56 INFO     Training subgraph sub_001 in epoch 2 with model ComplEx
+2024-05-21 12:32:20 INFO     Subgraph sub_001 Training Epoch 2 | average train loss: 9.7866
+2024-05-21 12:32:20 DEBUG    Entity size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:32:20 DEBUG    Relation size epoch 2: torch.Size([22, 32])
+2024-05-21 12:32:20 DEBUG    Theta_ent size epoch 2: torch.Size([40943, 32])
+2024-05-21 12:32:20 DEBUG    Theta_rel size epoch 2: torch.Size([22, 32])
+2024-05-21 12:32:20 INFO     Calculating self-attention...
+2024-05-21 12:32:20 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:32:20 DEBUG    (40943, 22, 40943)
+2024-05-21 12:32:20 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:32:20 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:32:23 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:32:23 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:32:23 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:32:23 INFO     Applying general embeddings to all models.
+2024-05-21 12:32:24 DEBUG    Validation Epoch 2 per subgraph | average valid losses: {'sub_000': 17.7976131439209, 'sub_003': 12.964570999145508, 'sub_002': 11.493893878660385, 'sub_001': 16.62087308337898}
+2024-05-21 12:32:24 INFO     Validation Epoch 2 | average valid loss: 14.7192
+2024-05-21 12:32:24 INFO     -\	Training and optimization of epoch 2 finished in 1 minute, 2.0 seconds	/-
+2024-05-21 12:32:24 INFO     Training subgraph sub_000 in epoch 3 with model TransE
+2024-05-21 12:32:29 INFO     Subgraph sub_000 Training Epoch 3 | average train loss: 10.6003
+2024-05-21 12:32:29 DEBUG    Entity size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:32:29 DEBUG    Relation size epoch 3: torch.Size([22, 32])
+2024-05-21 12:32:29 DEBUG    Theta_ent size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:32:29 DEBUG    Theta_rel size epoch 3: torch.Size([22, 32])
+2024-05-21 12:32:29 INFO     Training subgraph sub_003 in epoch 3 with model DistMult
+2024-05-21 12:32:36 INFO     Subgraph sub_003 Training Epoch 3 | average train loss: 10.6077
+2024-05-21 12:32:36 DEBUG    Entity size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:32:36 DEBUG    Relation size epoch 3: torch.Size([22, 32])
+2024-05-21 12:32:36 DEBUG    Theta_ent size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:32:36 DEBUG    Theta_rel size epoch 3: torch.Size([22, 32])
+2024-05-21 12:32:36 INFO     Training subgraph sub_002 in epoch 3 with model RotatE
+2024-05-21 12:33:02 INFO     Subgraph sub_002 Training Epoch 3 | average train loss: 6.4221
+2024-05-21 12:33:02 DEBUG    Entity size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:33:02 DEBUG    Relation size epoch 3: torch.Size([22, 32])
+2024-05-21 12:33:02 DEBUG    Theta_ent size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:33:02 DEBUG    Theta_rel size epoch 3: torch.Size([22, 32])
+2024-05-21 12:33:02 INFO     Training subgraph sub_001 in epoch 3 with model ComplEx
+2024-05-21 12:33:26 INFO     Subgraph sub_001 Training Epoch 3 | average train loss: 9.2776
+2024-05-21 12:33:26 DEBUG    Entity size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:33:26 DEBUG    Relation size epoch 3: torch.Size([22, 32])
+2024-05-21 12:33:26 DEBUG    Theta_ent size epoch 3: torch.Size([40943, 32])
+2024-05-21 12:33:26 DEBUG    Theta_rel size epoch 3: torch.Size([22, 32])
+2024-05-21 12:33:26 INFO     Calculating self-attention...
+2024-05-21 12:33:26 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:33:26 DEBUG    (40943, 22, 40943)
+2024-05-21 12:33:26 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:33:26 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:33:28 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:33:28 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:33:28 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:33:28 INFO     Applying general embeddings to all models.
+2024-05-21 12:33:29 DEBUG    Validation Epoch 3 per subgraph | average valid losses: {'sub_000': 19.614660263061523, 'sub_003': 14.148241996765137, 'sub_002': 11.521601001387712, 'sub_001': 17.364533266237807}
+2024-05-21 12:33:29 INFO     Validation Epoch 3 | average valid loss: 15.6623
+2024-05-21 12:33:29 INFO     -\	Training and optimization of epoch 3 finished in 1 minute, 5.11 seconds	/-
+2024-05-21 12:33:29 INFO     Training subgraph sub_000 in epoch 4 with model TransE
+2024-05-21 12:33:35 INFO     Subgraph sub_000 Training Epoch 4 | average train loss: 18.8765
+2024-05-21 12:33:35 DEBUG    Entity size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:33:35 DEBUG    Relation size epoch 4: torch.Size([22, 32])
+2024-05-21 12:33:35 DEBUG    Theta_ent size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:33:35 DEBUG    Theta_rel size epoch 4: torch.Size([22, 32])
+2024-05-21 12:33:35 INFO     Training subgraph sub_003 in epoch 4 with model DistMult
+2024-05-21 12:33:40 INFO     Subgraph sub_003 Training Epoch 4 | average train loss: 19.9166
+2024-05-21 12:33:40 DEBUG    Entity size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:33:40 DEBUG    Relation size epoch 4: torch.Size([22, 32])
+2024-05-21 12:33:40 DEBUG    Theta_ent size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:33:40 DEBUG    Theta_rel size epoch 4: torch.Size([22, 32])
+2024-05-21 12:33:40 INFO     Training subgraph sub_002 in epoch 4 with model RotatE
+2024-05-21 12:34:04 INFO     Subgraph sub_002 Training Epoch 4 | average train loss: 5.7887
+2024-05-21 12:34:04 DEBUG    Entity size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:34:04 DEBUG    Relation size epoch 4: torch.Size([22, 32])
+2024-05-21 12:34:04 DEBUG    Theta_ent size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:34:04 DEBUG    Theta_rel size epoch 4: torch.Size([22, 32])
+2024-05-21 12:34:04 INFO     Training subgraph sub_001 in epoch 4 with model ComplEx
+2024-05-21 12:34:27 INFO     Subgraph sub_001 Training Epoch 4 | average train loss: 8.7617
+2024-05-21 12:34:27 DEBUG    Entity size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:34:27 DEBUG    Relation size epoch 4: torch.Size([22, 32])
+2024-05-21 12:34:27 DEBUG    Theta_ent size epoch 4: torch.Size([40943, 32])
+2024-05-21 12:34:27 DEBUG    Theta_rel size epoch 4: torch.Size([22, 32])
+2024-05-21 12:34:27 INFO     Calculating self-attention...
+2024-05-21 12:34:27 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:34:27 DEBUG    (40943, 22, 40943)
+2024-05-21 12:34:27 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:34:27 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:34:30 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:34:30 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:34:30 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:34:30 INFO     Applying general embeddings to all models.
+2024-05-21 12:34:31 DEBUG    Validation Epoch 4 per subgraph | average valid losses: {'sub_000': 101.53233337402344, 'sub_003': 85.77550506591797, 'sub_002': 11.437497051689098, 'sub_001': 18.125803994889594}
+2024-05-21 12:34:31 INFO     Validation Epoch 4 | average valid loss: 54.2178
+2024-05-21 12:34:31 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-21 12:34:37 INFO     Combining scores of all models with average score.
+2024-05-21 12:34:37 DEBUG    Aggregating rhs, with a size torch.Size([3034, 40943])
+2024-05-21 12:34:38 DEBUG    Aggregating lhs, with a size torch.Size([3034, 40943])
+2024-05-21 12:34:39 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-21 12:34:40 INFO     	 valid MR: 10932.03 | MRR: 0.314 | H@1: 0.285 | H@3: 0.326 | H@10: 0.371 | AMRI: 0.466037 | MR_deviation: 2.000
+2024-05-21 12:34:40 DEBUG    Printing metrics to C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\metrics_valid.csv.
+2024-05-21 12:34:40 DEBUG    printing file test_sub_000.txt
+2024-05-21 12:34:40 DEBUG    printing file test_sub_003.txt
+2024-05-21 12:34:40 DEBUG    printing file test_sub_002.txt
+2024-05-21 12:34:40 DEBUG    printing file test_sub_001.txt
+2024-05-21 12:34:40 INFO     -\	Finished validating the ensemble in 9.43 seconds	/-
+2024-05-21 12:34:40 INFO     Saving models at epoch 4 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\model_files
+2024-05-21 12:34:41 INFO     -\	Training and optimization of epoch 4 finished in 1 minute, 11.56 seconds	/-
+2024-05-21 12:34:41 INFO     Training subgraph sub_000 in epoch 5 with model TransE
+2024-05-21 12:34:46 INFO     Subgraph sub_000 Training Epoch 5 | average train loss: 437.1838
+2024-05-21 12:34:46 DEBUG    Entity size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:34:46 DEBUG    Relation size epoch 5: torch.Size([22, 32])
+2024-05-21 12:34:46 DEBUG    Theta_ent size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:34:46 DEBUG    Theta_rel size epoch 5: torch.Size([22, 32])
+2024-05-21 12:34:46 INFO     Training subgraph sub_003 in epoch 5 with model DistMult
+2024-05-21 12:34:52 INFO     Subgraph sub_003 Training Epoch 5 | average train loss: 549.4039
+2024-05-21 12:34:52 DEBUG    Entity size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:34:52 DEBUG    Relation size epoch 5: torch.Size([22, 32])
+2024-05-21 12:34:52 DEBUG    Theta_ent size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:34:52 DEBUG    Theta_rel size epoch 5: torch.Size([22, 32])
+2024-05-21 12:34:52 INFO     Training subgraph sub_002 in epoch 5 with model RotatE
+2024-05-21 12:35:15 INFO     Subgraph sub_002 Training Epoch 5 | average train loss: 5.3124
+2024-05-21 12:35:15 DEBUG    Entity size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:35:15 DEBUG    Relation size epoch 5: torch.Size([22, 32])
+2024-05-21 12:35:15 DEBUG    Theta_ent size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:35:15 DEBUG    Theta_rel size epoch 5: torch.Size([22, 32])
+2024-05-21 12:35:15 INFO     Training subgraph sub_001 in epoch 5 with model ComplEx
+2024-05-21 12:35:39 INFO     Subgraph sub_001 Training Epoch 5 | average train loss: 8.2408
+2024-05-21 12:35:39 DEBUG    Entity size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:35:39 DEBUG    Relation size epoch 5: torch.Size([22, 32])
+2024-05-21 12:35:39 DEBUG    Theta_ent size epoch 5: torch.Size([40943, 32])
+2024-05-21 12:35:39 DEBUG    Theta_rel size epoch 5: torch.Size([22, 32])
+2024-05-21 12:35:39 INFO     Calculating self-attention...
+2024-05-21 12:35:39 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:35:39 DEBUG    (40943, 22, 40943)
+2024-05-21 12:35:39 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:35:39 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:35:42 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:35:42 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:35:42 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:35:42 INFO     Applying general embeddings to all models.
+2024-05-21 12:35:43 DEBUG    Validation Epoch 5 per subgraph | average valid losses: {'sub_000': 4787.47412109375, 'sub_003': 4607.4765625, 'sub_002': 11.349126479560281, 'sub_001': 18.545970591802057}
+2024-05-21 12:35:43 INFO     Validation Epoch 5 | average valid loss: 2356.2117
+2024-05-21 12:35:43 INFO     -\	Training and optimization of epoch 5 finished in 1 minute, 2.17 seconds	/-
+2024-05-21 12:35:43 INFO     Training subgraph sub_000 in epoch 6 with model TransE
+2024-05-21 12:35:48 INFO     Subgraph sub_000 Training Epoch 6 | average train loss: 25484.5586
+2024-05-21 12:35:48 DEBUG    Entity size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:35:48 DEBUG    Relation size epoch 6: torch.Size([22, 32])
+2024-05-21 12:35:48 DEBUG    Theta_ent size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:35:48 DEBUG    Theta_rel size epoch 6: torch.Size([22, 32])
+2024-05-21 12:35:48 INFO     Training subgraph sub_003 in epoch 6 with model DistMult
+2024-05-21 12:35:54 INFO     Subgraph sub_003 Training Epoch 6 | average train loss: 33377.2070
+2024-05-21 12:35:54 DEBUG    Entity size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:35:54 DEBUG    Relation size epoch 6: torch.Size([22, 32])
+2024-05-21 12:35:54 DEBUG    Theta_ent size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:35:54 DEBUG    Theta_rel size epoch 6: torch.Size([22, 32])
+2024-05-21 12:35:54 INFO     Training subgraph sub_002 in epoch 6 with model RotatE
+2024-05-21 12:36:17 INFO     Subgraph sub_002 Training Epoch 6 | average train loss: 4.9603
+2024-05-21 12:36:17 DEBUG    Entity size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:36:17 DEBUG    Relation size epoch 6: torch.Size([22, 32])
+2024-05-21 12:36:17 DEBUG    Theta_ent size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:36:17 DEBUG    Theta_rel size epoch 6: torch.Size([22, 32])
+2024-05-21 12:36:17 INFO     Training subgraph sub_001 in epoch 6 with model ComplEx
+2024-05-21 12:36:41 INFO     Subgraph sub_001 Training Epoch 6 | average train loss: 7.7397
+2024-05-21 12:36:41 DEBUG    Entity size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:36:41 DEBUG    Relation size epoch 6: torch.Size([22, 32])
+2024-05-21 12:36:41 DEBUG    Theta_ent size epoch 6: torch.Size([40943, 32])
+2024-05-21 12:36:41 DEBUG    Theta_rel size epoch 6: torch.Size([22, 32])
+2024-05-21 12:36:41 INFO     Calculating self-attention...
+2024-05-21 12:36:41 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:36:41 DEBUG    (40943, 22, 40943)
+2024-05-21 12:36:41 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:36:41 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:36:44 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:36:44 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:36:44 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:36:44 INFO     Applying general embeddings to all models.
+2024-05-21 12:36:45 DEBUG    Validation Epoch 6 per subgraph | average valid losses: {'sub_000': 295809.34375, 'sub_003': 293003.0625, 'sub_002': 11.19445597176695, 'sub_001': 18.72872601470923}
+2024-05-21 12:36:45 INFO     Validation Epoch 6 | average valid loss: 147210.5781
+2024-05-21 12:36:45 INFO     -\	Training and optimization of epoch 6 finished in 1 minute, 1.8 seconds	/-
+2024-05-21 12:36:45 INFO     Training subgraph sub_000 in epoch 7 with model TransE
+2024-05-21 12:36:50 INFO     Subgraph sub_000 Training Epoch 7 | average train loss: 1600829.0000
+2024-05-21 12:36:50 DEBUG    Entity size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:36:50 DEBUG    Relation size epoch 7: torch.Size([22, 32])
+2024-05-21 12:36:50 DEBUG    Theta_ent size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:36:50 DEBUG    Theta_rel size epoch 7: torch.Size([22, 32])
+2024-05-21 12:36:50 INFO     Training subgraph sub_003 in epoch 7 with model DistMult
+2024-05-21 12:36:55 INFO     Subgraph sub_003 Training Epoch 7 | average train loss: 2117400.2500
+2024-05-21 12:36:55 DEBUG    Entity size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:36:55 DEBUG    Relation size epoch 7: torch.Size([22, 32])
+2024-05-21 12:36:55 DEBUG    Theta_ent size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:36:55 DEBUG    Theta_rel size epoch 7: torch.Size([22, 32])
+2024-05-21 12:36:55 INFO     Training subgraph sub_002 in epoch 7 with model RotatE
+2024-05-21 12:37:19 INFO     Subgraph sub_002 Training Epoch 7 | average train loss: 4.6940
+2024-05-21 12:37:19 DEBUG    Entity size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:37:19 DEBUG    Relation size epoch 7: torch.Size([22, 32])
+2024-05-21 12:37:19 DEBUG    Theta_ent size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:37:19 DEBUG    Theta_rel size epoch 7: torch.Size([22, 32])
+2024-05-21 12:37:19 INFO     Training subgraph sub_001 in epoch 7 with model ComplEx
+2024-05-21 12:37:43 INFO     Subgraph sub_001 Training Epoch 7 | average train loss: 7.2896
+2024-05-21 12:37:43 DEBUG    Entity size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:37:43 DEBUG    Relation size epoch 7: torch.Size([22, 32])
+2024-05-21 12:37:43 DEBUG    Theta_ent size epoch 7: torch.Size([40943, 32])
+2024-05-21 12:37:43 DEBUG    Theta_rel size epoch 7: torch.Size([22, 32])
+2024-05-21 12:37:43 INFO     Calculating self-attention...
+2024-05-21 12:37:43 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:37:43 DEBUG    (40943, 22, 40943)
+2024-05-21 12:37:43 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:37:43 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:37:46 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:37:46 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:37:46 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:37:46 INFO     Applying general embeddings to all models.
+2024-05-21 12:37:47 DEBUG    Validation Epoch 7 per subgraph | average valid losses: {'sub_000': 18779278.0, 'sub_003': 18734458.0, 'sub_002': 11.102303803210296, 'sub_001': 18.597888925252104}
+2024-05-21 12:37:47 INFO     Validation Epoch 7 | average valid loss: 9378442.0000
+2024-05-21 12:37:47 INFO     -\	Training and optimization of epoch 7 finished in 1 minute, 1.99 seconds	/-
+2024-05-21 12:37:47 INFO     Training subgraph sub_000 in epoch 8 with model TransE
+2024-05-21 12:37:52 INFO     Subgraph sub_000 Training Epoch 8 | average train loss: 102269432.0000
+2024-05-21 12:37:52 DEBUG    Entity size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:37:52 DEBUG    Relation size epoch 8: torch.Size([22, 32])
+2024-05-21 12:37:52 DEBUG    Theta_ent size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:37:52 DEBUG    Theta_rel size epoch 8: torch.Size([22, 32])
+2024-05-21 12:37:52 INFO     Training subgraph sub_003 in epoch 8 with model DistMult
+2024-05-21 12:37:57 INFO     Subgraph sub_003 Training Epoch 8 | average train loss: 135223760.0000
+2024-05-21 12:37:57 DEBUG    Entity size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:37:57 DEBUG    Relation size epoch 8: torch.Size([22, 32])
+2024-05-21 12:37:57 DEBUG    Theta_ent size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:37:57 DEBUG    Theta_rel size epoch 8: torch.Size([22, 32])
+2024-05-21 12:37:57 INFO     Training subgraph sub_002 in epoch 8 with model RotatE
+2024-05-21 12:38:21 INFO     Subgraph sub_002 Training Epoch 8 | average train loss: 4.4889
+2024-05-21 12:38:21 DEBUG    Entity size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:38:21 DEBUG    Relation size epoch 8: torch.Size([22, 32])
+2024-05-21 12:38:21 DEBUG    Theta_ent size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:38:21 DEBUG    Theta_rel size epoch 8: torch.Size([22, 32])
+2024-05-21 12:38:21 INFO     Training subgraph sub_001 in epoch 8 with model ComplEx
+2024-05-21 12:38:45 INFO     Subgraph sub_001 Training Epoch 8 | average train loss: 6.8926
+2024-05-21 12:38:45 DEBUG    Entity size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:38:45 DEBUG    Relation size epoch 8: torch.Size([22, 32])
+2024-05-21 12:38:45 DEBUG    Theta_ent size epoch 8: torch.Size([40943, 32])
+2024-05-21 12:38:45 DEBUG    Theta_rel size epoch 8: torch.Size([22, 32])
+2024-05-21 12:38:45 INFO     Calculating self-attention...
+2024-05-21 12:38:45 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:38:45 DEBUG    (40943, 22, 40943)
+2024-05-21 12:38:45 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:38:45 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:38:49 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:38:49 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:38:49 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:38:49 INFO     Applying general embeddings to all models.
+2024-05-21 12:38:50 DEBUG    Validation Epoch 8 per subgraph | average valid losses: {'sub_000': 1199450752.0, 'sub_003': 1198733696.0, 'sub_002': 10.956062763074424, 'sub_001': 18.342010509878122}
+2024-05-21 12:38:50 INFO     Validation Epoch 8 | average valid loss: 599546112.0000
+2024-05-21 12:38:50 INFO     -\	Training and optimization of epoch 8 finished in 1 minute, 3.04 seconds	/-
+2024-05-21 12:38:50 INFO     Training subgraph sub_000 in epoch 9 with model TransE
+2024-05-21 12:38:55 INFO     Subgraph sub_000 Training Epoch 9 | average train loss: 6519154176.0000
+2024-05-21 12:38:55 DEBUG    Saved final model for sub_000 (TransE).
+2024-05-21 12:38:55 DEBUG    Entity size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:38:55 DEBUG    Relation size epoch 9: torch.Size([22, 32])
+2024-05-21 12:38:55 DEBUG    Theta_ent size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:38:55 DEBUG    Theta_rel size epoch 9: torch.Size([22, 32])
+2024-05-21 12:38:55 INFO     Training subgraph sub_003 in epoch 9 with model DistMult
+2024-05-21 12:39:00 INFO     Subgraph sub_003 Training Epoch 9 | average train loss: 8649689088.0000
+2024-05-21 12:39:00 DEBUG    Saved final model for sub_003 (DistMult).
+2024-05-21 12:39:00 DEBUG    Entity size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:00 DEBUG    Relation size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:00 DEBUG    Theta_ent size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:00 DEBUG    Theta_rel size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:00 INFO     Training subgraph sub_002 in epoch 9 with model RotatE
+2024-05-21 12:39:24 INFO     Subgraph sub_002 Training Epoch 9 | average train loss: 4.3298
+2024-05-21 12:39:24 DEBUG    Saved final model for sub_002 (RotatE).
+2024-05-21 12:39:24 DEBUG    Entity size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:24 DEBUG    Relation size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:24 DEBUG    Theta_ent size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:24 DEBUG    Theta_rel size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:24 INFO     Training subgraph sub_001 in epoch 9 with model ComplEx
+2024-05-21 12:39:48 INFO     Subgraph sub_001 Training Epoch 9 | average train loss: 6.5561
+2024-05-21 12:39:48 DEBUG    Saved final model for sub_001 (ComplEx).
+2024-05-21 12:39:48 DEBUG    Entity size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:48 DEBUG    Relation size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:48 DEBUG    Theta_ent size epoch 9: torch.Size([40943, 32])
+2024-05-21 12:39:48 DEBUG    Theta_rel size epoch 9: torch.Size([22, 32])
+2024-05-21 12:39:48 INFO     Calculating self-attention...
+2024-05-21 12:39:48 DEBUG    b_begin: 0	Steps: 40943
+2024-05-21 12:39:48 DEBUG    (40943, 22, 40943)
+2024-05-21 12:39:48 DEBUG    Entity sizes:	-Cands: torch.Size([40943, 32, 4])	-Theta: torch.Size([40943, 32, 4])
+2024-05-21 12:39:48 DEBUG    Relation name sizes:	-Cands: torch.Size([22, 32, 4])	-Theta: torch.Size([22, 32, 4])
+2024-05-21 12:39:51 INFO     Calculating unified embedding for entities and relation names.
+2024-05-21 12:39:51 DEBUG    Size of general entity embedding, before applying attention:	torch.Size([40943, 32])
+2024-05-21 12:39:51 DEBUG    Size of general relation name embedding, before applying attention:	torch.Size([22, 32])
+2024-05-21 12:39:51 INFO     Applying general embeddings to all models.
+2024-05-21 12:39:51 DEBUG    Validation Epoch 9 per subgraph | average valid losses: {'sub_000': 76726116352.0, 'sub_003': 76714639360.0, 'sub_002': 10.834170606618246, 'sub_001': 17.94946377081684}
+2024-05-21 12:39:51 INFO     Validation Epoch 9 | average valid loss: 38360186880.0000
+2024-05-21 12:39:51 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-21 12:39:57 INFO     Combining scores of all models with average score.
+2024-05-21 12:39:57 DEBUG    Aggregating rhs, with a size torch.Size([3034, 40943])
+2024-05-21 12:39:58 DEBUG    Aggregating lhs, with a size torch.Size([3034, 40943])
+2024-05-21 12:39:59 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-21 12:40:01 INFO     	 valid MR: 10534.97 | MRR: 0.450 | H@1: 0.435 | H@3: 0.457 | H@10: 0.479 | AMRI: 0.485432 | MR_deviation: 1.000
+2024-05-21 12:40:01 DEBUG    Printing metrics to C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\metrics_valid.csv.
+2024-05-21 12:40:01 DEBUG    printing file test_sub_000.txt
+2024-05-21 12:40:01 DEBUG    printing file test_sub_003.txt
+2024-05-21 12:40:01 DEBUG    printing file test_sub_002.txt
+2024-05-21 12:40:01 DEBUG    printing file test_sub_001.txt
+2024-05-21 12:40:01 INFO     -\	Finished validating the ensemble in 9.66 seconds	/-
+2024-05-21 12:40:01 INFO     Saving models at epoch 9 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\model_files
+2024-05-21 12:40:01 INFO     -\	Training and optimization of epoch 9 finished in 1 minute, 11.78 seconds	/-
+2024-05-21 12:40:01 INFO     Loading best models saved at epoch 9
+2024-05-21 12:40:01 INFO     -\	Successfully finished training and optimizing all subgraphs in 10 minutes, 44.03 seconds	/-
+2024-05-21 12:40:01 INFO     -/	Testing the ensemble with the score aggregation method "maximum score".	\-
+2024-05-21 12:40:08 INFO     Combining scores of all models with maximum score.
+2024-05-21 12:40:08 DEBUG    Aggregating rhs, with a size torch.Size([3134, 40943])
+2024-05-21 12:40:11 DEBUG    Aggregating lhs, with a size torch.Size([3134, 40943])
+2024-05-21 12:40:12 INFO     Successfully aggregated all scores with aggregation method maximum score.
+2024-05-21 12:40:14 INFO     	 test MR: 18674.20 | MRR: 0.047 | H@1: 0.008 | H@3: 0.060 | H@10: 0.127 | AMRI: 0.087844 | MR_deviation: 1937.000
+2024-05-21 12:40:14 DEBUG    Printing metrics to C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7\results\metrics_valid.csv.
+2024-05-21 12:40:14 DEBUG    printing file test_sub_000.txt
+2024-05-21 12:40:14 DEBUG    printing file test_sub_003.txt
+2024-05-21 12:40:14 DEBUG    printing file test_sub_002.txt
+2024-05-21 12:40:14 DEBUG    printing file test_sub_001.txt
+2024-05-21 12:40:14 INFO     -\	Finished testing the ensemble in 12.61 seconds	/-
+2024-05-21 12:40:14 INFO     Finished ensemble training and testing in 11 minutes, 0.26 seconds.
+2024-05-21 12:40:15 INFO     The entire process including sampling, training and testing took 11 minutes, 48.72 seconds.

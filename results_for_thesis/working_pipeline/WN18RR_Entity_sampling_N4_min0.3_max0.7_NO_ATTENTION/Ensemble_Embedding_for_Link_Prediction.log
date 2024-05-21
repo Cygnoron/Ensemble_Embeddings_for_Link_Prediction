@@ -1,0 +1,405 @@
+2024-05-20 14:42:03 INFO     ### Saving logs in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results ###
+2024-05-20 14:42:03 INFO     Sampling 4 subgraphs with a relative size (0.3, 0.7) from WN18RR with Entity sampling
+2024-05-20 14:42:03 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_000 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-20 14:42:14 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-05-20 14:42:14 INFO     Created subgraph 0 with 6620 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705.
+2024-05-20 14:42:14 INFO     Length of delta: 60785		Deviation from target size: 0
+2024-05-20 14:42:14 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\subgraph_config.csv" for subgraph 000, sampling took 10.95 seconds	/-
+
+2024-05-20 14:42:14 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_001 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-20 14:42:25 INFO     Current subgraph size 0.7000172741406115 reached or exceeded target size 0.7.
+2024-05-20 14:42:25 INFO     Created subgraph 1 with 1090 entities and 0 relation names left unused and a relative subgraph size 0.7000172741406115.
+2024-05-20 14:42:26 INFO     Length of delta: 60786		Deviation from target size: 1
+2024-05-20 14:42:26 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\subgraph_config.csv" for subgraph 001, sampling took 11.35 seconds	/-
+
+2024-05-20 14:42:26 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_002 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-20 14:42:26 INFO     Enforcing 1090 entities to be present in the subgraph
+2024-05-20 14:42:36 INFO     Current subgraph size 0.7000403063280936 reached or exceeded target size 0.7.
+2024-05-20 14:42:36 INFO     Created subgraph 2 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000403063280936.
+2024-05-20 14:42:37 INFO     Length of delta: 60788		Deviation from target size: 3
+2024-05-20 14:42:37 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\subgraph_config.csv" for subgraph 002, sampling took 10.75 seconds	/-
+
+2024-05-20 14:42:37 INFO     -/	Sampling subgraph data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_003 from WN18RR with params:
+							 Entity sampling and (0.3, 0.7) relative subgraph size.	\-
+2024-05-20 14:42:48 INFO     Current subgraph size 0.7000057580468705 reached or exceeded target size 0.7.
+2024-05-20 14:42:48 INFO     Created subgraph 3 with 0 entities and 0 relation names left unused and a relative subgraph size 0.7000057580468705.
+2024-05-20 14:42:48 INFO     Length of delta: 60785		Deviation from target size: 0
+2024-05-20 14:42:48 INFO     -\	Updated config file "C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\subgraph_config.csv" for subgraph 003, sampling took 11.43 seconds	/-
+
+2024-05-20 14:42:48 INFO     ### Successfully created 4 subgraphs of the relative size (0.3, 0.7) from the original KG "WN18RR" in a total of 45.3 seconds (avg: 11.33 seconds) ###
+2024-05-20 14:42:48 INFO     ### Saving .json config files of models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_setup_configs ###
+2024-05-20 14:42:48 INFO     ### Saving .pt files of stored models in: C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files ###
+2024-05-20 14:42:49 INFO     -/	Setting up embedding models	\-
+2024-05-20 14:42:49 INFO     All subgraphs will be embedded by ComplEx
+2024-05-20 14:42:49 INFO     Setting ComplEx as embedding method for subgraph sub_000.
+2024-05-20 14:42:49 INFO     Setting ComplEx as embedding method for subgraph sub_001.
+2024-05-20 14:42:49 INFO     Setting ComplEx as embedding method for subgraph sub_002.
+2024-05-20 14:42:49 INFO     Setting ComplEx as embedding method for subgraph sub_003.
+2024-05-20 14:42:49 INFO     Mapping from embedding methods to subgraphs:
+'ComplEx':	0, 1, 2, 3
+2024-05-20 14:42:49 INFO     No already trained models found.
+2024-05-20 14:42:49 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_000	\-
+2024-05-20 14:42:49 INFO     Loading data for subgraph sub_000.
+2024-05-20 14:42:49 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-20 14:42:49 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_001	\-
+2024-05-20 14:42:49 INFO     Loading data for subgraph sub_001.
+2024-05-20 14:42:50 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-20 14:42:50 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_002	\-
+2024-05-20 14:42:50 INFO     Loading data for subgraph sub_002.
+2024-05-20 14:42:50 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-20 14:42:50 INFO     -/	Creating new model from embedding method ComplEx for subgraph sub_003	\-
+2024-05-20 14:42:50 INFO     Loading data for subgraph sub_003.
+2024-05-20 14:42:51 INFO     -\	Total number of parameters: 4014526	/-
+2024-05-20 14:42:51 INFO     -\	Successfully created all models in 2.26 seconds	/-
+2024-05-20 14:42:51 INFO     -/	Starting training	\-
+2024-05-20 14:42:51 INFO     -/	Start training sub_000 with ComplEx	\-
+2024-05-20 14:42:52 INFO     -/	Start training sub_001 with ComplEx	\-
+2024-05-20 14:42:52 INFO     -/	Start training sub_002 with ComplEx	\-
+2024-05-20 14:42:52 INFO     -/	Start training sub_003 with ComplEx	\-
+2024-05-20 14:42:52 INFO     Training subgraph sub_000 in epoch 0 with model ComplEx
+2024-05-20 14:43:15 INFO     Subgraph sub_000 Training Epoch 0 | average train loss: 11.3195
+2024-05-20 14:43:15 INFO     Training subgraph sub_001 in epoch 0 with model ComplEx
+2024-05-20 14:43:39 INFO     Subgraph sub_001 Training Epoch 0 | average train loss: 11.2682
+2024-05-20 14:43:39 INFO     Training subgraph sub_002 in epoch 0 with model ComplEx
+2024-05-20 14:44:03 INFO     Subgraph sub_002 Training Epoch 0 | average train loss: 11.3283
+2024-05-20 14:44:03 INFO     Training subgraph sub_003 in epoch 0 with model ComplEx
+2024-05-20 14:44:27 INFO     Subgraph sub_003 Training Epoch 0 | average train loss: 11.3563
+2024-05-20 14:44:28 INFO     Validation Epoch 0 | average valid loss: 13.8643
+2024-05-20 14:44:28 INFO     -\	Training and optimization of epoch 0 finished in 1 minute, 36.01 seconds	/-
+2024-05-20 14:44:28 INFO     Training subgraph sub_000 in epoch 1 with model ComplEx
+2024-05-20 14:44:51 INFO     Subgraph sub_000 Training Epoch 1 | average train loss: 10.2844
+2024-05-20 14:44:51 INFO     Training subgraph sub_001 in epoch 1 with model ComplEx
+2024-05-20 14:45:14 INFO     Subgraph sub_001 Training Epoch 1 | average train loss: 10.2389
+2024-05-20 14:45:14 INFO     Training subgraph sub_002 in epoch 1 with model ComplEx
+2024-05-20 14:45:38 INFO     Subgraph sub_002 Training Epoch 1 | average train loss: 10.2373
+2024-05-20 14:45:38 INFO     Training subgraph sub_003 in epoch 1 with model ComplEx
+2024-05-20 14:46:01 INFO     Subgraph sub_003 Training Epoch 1 | average train loss: 10.3046
+2024-05-20 14:46:02 INFO     Validation Epoch 1 | average valid loss: 15.1387
+2024-05-20 14:46:02 INFO     -\	Training and optimization of epoch 1 finished in 1 minute, 33.99 seconds	/-
+2024-05-20 14:46:02 INFO     Training subgraph sub_000 in epoch 2 with model ComplEx
+2024-05-20 14:46:25 INFO     Subgraph sub_000 Training Epoch 2 | average train loss: 9.7272
+2024-05-20 14:46:25 INFO     Training subgraph sub_001 in epoch 2 with model ComplEx
+2024-05-20 14:46:49 INFO     Subgraph sub_001 Training Epoch 2 | average train loss: 9.6691
+2024-05-20 14:46:49 INFO     Training subgraph sub_002 in epoch 2 with model ComplEx
+2024-05-20 14:47:12 INFO     Subgraph sub_002 Training Epoch 2 | average train loss: 9.6240
+2024-05-20 14:47:12 INFO     Training subgraph sub_003 in epoch 2 with model ComplEx
+2024-05-20 14:47:35 INFO     Subgraph sub_003 Training Epoch 2 | average train loss: 9.7440
+2024-05-20 14:47:36 INFO     Validation Epoch 2 | average valid loss: 16.0562
+2024-05-20 14:47:36 INFO     -\	Training and optimization of epoch 2 finished in 1 minute, 34.23 seconds	/-
+2024-05-20 14:47:36 INFO     Training subgraph sub_000 in epoch 3 with model ComplEx
+2024-05-20 14:47:59 INFO     Subgraph sub_000 Training Epoch 3 | average train loss: 9.2442
+2024-05-20 14:47:59 INFO     Training subgraph sub_001 in epoch 3 with model ComplEx
+2024-05-20 14:48:24 INFO     Subgraph sub_001 Training Epoch 3 | average train loss: 9.1815
+2024-05-20 14:48:24 INFO     Training subgraph sub_002 in epoch 3 with model ComplEx
+2024-05-20 14:48:48 INFO     Subgraph sub_002 Training Epoch 3 | average train loss: 9.1009
+2024-05-20 14:48:48 INFO     Training subgraph sub_003 in epoch 3 with model ComplEx
+2024-05-20 14:49:11 INFO     Subgraph sub_003 Training Epoch 3 | average train loss: 9.2708
+2024-05-20 14:49:12 INFO     Validation Epoch 3 | average valid loss: 16.8416
+2024-05-20 14:49:12 INFO     -\	Training and optimization of epoch 3 finished in 1 minute, 36.25 seconds	/-
+2024-05-20 14:49:12 INFO     Training subgraph sub_000 in epoch 4 with model ComplEx
+2024-05-20 14:49:36 INFO     Subgraph sub_000 Training Epoch 4 | average train loss: 8.7551
+2024-05-20 14:49:36 INFO     Training subgraph sub_001 in epoch 4 with model ComplEx
+2024-05-20 14:50:01 INFO     Subgraph sub_001 Training Epoch 4 | average train loss: 8.7026
+2024-05-20 14:50:01 INFO     Training subgraph sub_002 in epoch 4 with model ComplEx
+2024-05-20 14:50:26 INFO     Subgraph sub_002 Training Epoch 4 | average train loss: 8.5750
+2024-05-20 14:50:26 INFO     Training subgraph sub_003 in epoch 4 with model ComplEx
+2024-05-20 14:50:49 INFO     Subgraph sub_003 Training Epoch 4 | average train loss: 8.7936
+2024-05-20 14:50:50 INFO     Validation Epoch 4 | average valid loss: 17.4704
+2024-05-20 14:50:50 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 14:50:59 INFO     Combining scores of all models with average score.
+2024-05-20 14:51:02 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 14:51:04 INFO     	 valid MR: 11064.69 | MRR: 0.152 | H@1: 0.115 | H@3: 0.165 | H@10: 0.221 | AMRI: 0.459556 | MR_deviation: 2.000
+2024-05-20 14:51:04 INFO     -\	Finished validating the ensemble in 13.8 seconds	/-
+2024-05-20 14:51:04 INFO     Saving models at epoch 4 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files
+2024-05-20 14:51:04 INFO     -\	Training and optimization of epoch 4 finished in 1 minute, 51.9 seconds	/-
+2024-05-20 14:51:04 INFO     Training subgraph sub_000 in epoch 5 with model ComplEx
+2024-05-20 14:51:28 INFO     Subgraph sub_000 Training Epoch 5 | average train loss: 8.2478
+2024-05-20 14:51:28 INFO     Training subgraph sub_001 in epoch 5 with model ComplEx
+2024-05-20 14:51:52 INFO     Subgraph sub_001 Training Epoch 5 | average train loss: 8.2150
+2024-05-20 14:51:52 INFO     Training subgraph sub_002 in epoch 5 with model ComplEx
+2024-05-20 14:52:16 INFO     Subgraph sub_002 Training Epoch 5 | average train loss: 8.0322
+2024-05-20 14:52:16 INFO     Training subgraph sub_003 in epoch 5 with model ComplEx
+2024-05-20 14:52:39 INFO     Subgraph sub_003 Training Epoch 5 | average train loss: 8.2965
+2024-05-20 14:52:40 INFO     Validation Epoch 5 | average valid loss: 17.9220
+2024-05-20 14:52:40 INFO     -\	Training and optimization of epoch 5 finished in 1 minute, 35.94 seconds	/-
+2024-05-20 14:52:40 INFO     Training subgraph sub_000 in epoch 6 with model ComplEx
+2024-05-20 14:53:03 INFO     Subgraph sub_000 Training Epoch 6 | average train loss: 7.7444
+2024-05-20 14:53:03 INFO     Training subgraph sub_001 in epoch 6 with model ComplEx
+2024-05-20 14:53:27 INFO     Subgraph sub_001 Training Epoch 6 | average train loss: 7.7318
+2024-05-20 14:53:27 INFO     Training subgraph sub_002 in epoch 6 with model ComplEx
+2024-05-20 14:53:51 INFO     Subgraph sub_002 Training Epoch 6 | average train loss: 7.5004
+2024-05-20 14:53:51 INFO     Training subgraph sub_003 in epoch 6 with model ComplEx
+2024-05-20 14:54:14 INFO     Subgraph sub_003 Training Epoch 6 | average train loss: 7.7947
+2024-05-20 14:54:15 INFO     Validation Epoch 6 | average valid loss: 18.1748
+2024-05-20 14:54:15 INFO     -\	Training and optimization of epoch 6 finished in 1 minute, 34.8 seconds	/-
+2024-05-20 14:54:15 INFO     Training subgraph sub_000 in epoch 7 with model ComplEx
+2024-05-20 14:54:40 INFO     Subgraph sub_000 Training Epoch 7 | average train loss: 7.2760
+2024-05-20 14:54:40 INFO     Training subgraph sub_001 in epoch 7 with model ComplEx
+2024-05-20 14:55:03 INFO     Subgraph sub_001 Training Epoch 7 | average train loss: 7.2778
+2024-05-20 14:55:03 INFO     Training subgraph sub_002 in epoch 7 with model ComplEx
+2024-05-20 14:55:27 INFO     Subgraph sub_002 Training Epoch 7 | average train loss: 7.0175
+2024-05-20 14:55:27 INFO     Training subgraph sub_003 in epoch 7 with model ComplEx
+2024-05-20 14:55:50 INFO     Subgraph sub_003 Training Epoch 7 | average train loss: 7.3204
+2024-05-20 14:55:51 INFO     Validation Epoch 7 | average valid loss: 18.2263
+2024-05-20 14:55:51 INFO     -\	Training and optimization of epoch 7 finished in 1 minute, 36.19 seconds	/-
+2024-05-20 14:55:51 INFO     Training subgraph sub_000 in epoch 8 with model ComplEx
+2024-05-20 14:56:14 INFO     Subgraph sub_000 Training Epoch 8 | average train loss: 6.8619
+2024-05-20 14:56:14 INFO     Training subgraph sub_001 in epoch 8 with model ComplEx
+2024-05-20 14:56:38 INFO     Subgraph sub_001 Training Epoch 8 | average train loss: 6.8696
+2024-05-20 14:56:38 INFO     Training subgraph sub_002 in epoch 8 with model ComplEx
+2024-05-20 14:57:01 INFO     Subgraph sub_002 Training Epoch 8 | average train loss: 6.6045
+2024-05-20 14:57:01 INFO     Training subgraph sub_003 in epoch 8 with model ComplEx
+2024-05-20 14:57:25 INFO     Subgraph sub_003 Training Epoch 8 | average train loss: 6.8971
+2024-05-20 14:57:25 INFO     Validation Epoch 8 | average valid loss: 18.1497
+2024-05-20 14:57:25 INFO     -\	Training and optimization of epoch 8 finished in 1 minute, 34.34 seconds	/-
+2024-05-20 14:57:25 INFO     Training subgraph sub_000 in epoch 9 with model ComplEx
+2024-05-20 14:57:48 INFO     Subgraph sub_000 Training Epoch 9 | average train loss: 6.5064
+2024-05-20 14:57:48 INFO     Training subgraph sub_001 in epoch 9 with model ComplEx
+2024-05-20 14:58:12 INFO     Subgraph sub_001 Training Epoch 9 | average train loss: 6.5145
+2024-05-20 14:58:12 INFO     Training subgraph sub_002 in epoch 9 with model ComplEx
+2024-05-20 14:58:35 INFO     Subgraph sub_002 Training Epoch 9 | average train loss: 6.2626
+2024-05-20 14:58:35 INFO     Training subgraph sub_003 in epoch 9 with model ComplEx
+2024-05-20 14:58:58 INFO     Subgraph sub_003 Training Epoch 9 | average train loss: 6.5330
+2024-05-20 14:58:59 INFO     Validation Epoch 9 | average valid loss: 17.9441
+2024-05-20 14:58:59 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 14:59:07 INFO     Combining scores of all models with average score.
+2024-05-20 14:59:09 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 14:59:11 INFO     	 valid MR: 10917.14 | MRR: 0.276 | H@1: 0.224 | H@3: 0.309 | H@10: 0.366 | AMRI: 0.466764 | MR_deviation: 3.000
+2024-05-20 14:59:11 INFO     -\	Finished validating the ensemble in 12.33 seconds	/-
+2024-05-20 14:59:11 INFO     Saving models at epoch 9 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files
+2024-05-20 14:59:11 INFO     -\	Training and optimization of epoch 9 finished in 1 minute, 46.27 seconds	/-
+2024-05-20 14:59:11 INFO     Training subgraph sub_000 in epoch 10 with model ComplEx
+2024-05-20 14:59:35 INFO     Subgraph sub_000 Training Epoch 10 | average train loss: 6.2053
+2024-05-20 14:59:35 INFO     Training subgraph sub_001 in epoch 10 with model ComplEx
+2024-05-20 14:59:58 INFO     Subgraph sub_001 Training Epoch 10 | average train loss: 6.2109
+2024-05-20 14:59:58 INFO     Training subgraph sub_002 in epoch 10 with model ComplEx
+2024-05-20 15:00:21 INFO     Subgraph sub_002 Training Epoch 10 | average train loss: 5.9823
+2024-05-20 15:00:21 INFO     Training subgraph sub_003 in epoch 10 with model ComplEx
+2024-05-20 15:00:44 INFO     Subgraph sub_003 Training Epoch 10 | average train loss: 6.2242
+2024-05-20 15:00:45 INFO     Validation Epoch 10 | average valid loss: 17.6645
+2024-05-20 15:00:45 INFO     -\	Training and optimization of epoch 10 finished in 1 minute, 33.5 seconds	/-
+2024-05-20 15:00:45 INFO     Training subgraph sub_000 in epoch 11 with model ComplEx
+2024-05-20 15:01:08 INFO     Subgraph sub_000 Training Epoch 11 | average train loss: 5.9506
+2024-05-20 15:01:08 INFO     Training subgraph sub_001 in epoch 11 with model ComplEx
+2024-05-20 15:01:32 INFO     Subgraph sub_001 Training Epoch 11 | average train loss: 5.9540
+2024-05-20 15:01:32 INFO     Training subgraph sub_002 in epoch 11 with model ComplEx
+2024-05-20 15:01:55 INFO     Subgraph sub_002 Training Epoch 11 | average train loss: 5.7524
+2024-05-20 15:01:55 INFO     Training subgraph sub_003 in epoch 11 with model ComplEx
+2024-05-20 15:02:18 INFO     Subgraph sub_003 Training Epoch 11 | average train loss: 5.9641
+2024-05-20 15:02:19 INFO     Validation Epoch 11 | average valid loss: 17.3385
+2024-05-20 15:02:19 INFO     -\	Training and optimization of epoch 11 finished in 1 minute, 33.65 seconds	/-
+2024-05-20 15:02:19 INFO     Training subgraph sub_000 in epoch 12 with model ComplEx
+2024-05-20 15:02:42 INFO     Subgraph sub_000 Training Epoch 12 | average train loss: 5.7352
+2024-05-20 15:02:42 INFO     Training subgraph sub_001 in epoch 12 with model ComplEx
+2024-05-20 15:03:05 INFO     Subgraph sub_001 Training Epoch 12 | average train loss: 5.7373
+2024-05-20 15:03:05 INFO     Training subgraph sub_002 in epoch 12 with model ComplEx
+2024-05-20 15:03:28 INFO     Subgraph sub_002 Training Epoch 12 | average train loss: 5.5623
+2024-05-20 15:03:28 INFO     Training subgraph sub_003 in epoch 12 with model ComplEx
+2024-05-20 15:03:52 INFO     Subgraph sub_003 Training Epoch 12 | average train loss: 5.7452
+2024-05-20 15:03:52 INFO     Validation Epoch 12 | average valid loss: 16.9939
+2024-05-20 15:03:52 INFO     -\	Training and optimization of epoch 12 finished in 1 minute, 33.65 seconds	/-
+2024-05-20 15:03:52 INFO     Training subgraph sub_000 in epoch 13 with model ComplEx
+2024-05-20 15:04:16 INFO     Subgraph sub_000 Training Epoch 13 | average train loss: 5.5527
+2024-05-20 15:04:16 INFO     Training subgraph sub_001 in epoch 13 with model ComplEx
+2024-05-20 15:04:39 INFO     Subgraph sub_001 Training Epoch 13 | average train loss: 5.5542
+2024-05-20 15:04:39 INFO     Training subgraph sub_002 in epoch 13 with model ComplEx
+2024-05-20 15:05:02 INFO     Subgraph sub_002 Training Epoch 13 | average train loss: 5.4040
+2024-05-20 15:05:02 INFO     Training subgraph sub_003 in epoch 13 with model ComplEx
+2024-05-20 15:05:25 INFO     Subgraph sub_003 Training Epoch 13 | average train loss: 5.5603
+2024-05-20 15:05:26 INFO     Validation Epoch 13 | average valid loss: 16.6375
+2024-05-20 15:05:26 INFO     -\	Training and optimization of epoch 13 finished in 1 minute, 33.59 seconds	/-
+2024-05-20 15:05:26 INFO     Training subgraph sub_000 in epoch 14 with model ComplEx
+2024-05-20 15:05:49 INFO     Subgraph sub_000 Training Epoch 14 | average train loss: 5.3979
+2024-05-20 15:05:49 INFO     Training subgraph sub_001 in epoch 14 with model ComplEx
+2024-05-20 15:06:12 INFO     Subgraph sub_001 Training Epoch 14 | average train loss: 5.3994
+2024-05-20 15:06:12 INFO     Training subgraph sub_002 in epoch 14 with model ComplEx
+2024-05-20 15:06:36 INFO     Subgraph sub_002 Training Epoch 14 | average train loss: 5.2711
+2024-05-20 15:06:36 INFO     Training subgraph sub_003 in epoch 14 with model ComplEx
+2024-05-20 15:06:59 INFO     Subgraph sub_003 Training Epoch 14 | average train loss: 5.4041
+2024-05-20 15:07:00 INFO     Validation Epoch 14 | average valid loss: 16.2756
+2024-05-20 15:07:00 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 15:07:08 INFO     Combining scores of all models with average score.
+2024-05-20 15:07:10 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 15:07:12 INFO     	 valid MR: 10849.70 | MRR: 0.294 | H@1: 0.241 | H@3: 0.334 | H@10: 0.381 | AMRI: 0.470058 | MR_deviation: 9.000
+2024-05-20 15:07:12 INFO     -\	Finished validating the ensemble in 12.83 seconds	/-
+2024-05-20 15:07:12 INFO     Saving models at epoch 14 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files
+2024-05-20 15:07:13 INFO     -\	Training and optimization of epoch 14 finished in 1 minute, 47.16 seconds	/-
+2024-05-20 15:07:13 INFO     Training subgraph sub_000 in epoch 15 with model ComplEx
+2024-05-20 15:07:37 INFO     Subgraph sub_000 Training Epoch 15 | average train loss: 5.2654
+2024-05-20 15:07:37 INFO     Training subgraph sub_001 in epoch 15 with model ComplEx
+2024-05-20 15:08:00 INFO     Subgraph sub_001 Training Epoch 15 | average train loss: 5.2677
+2024-05-20 15:08:00 INFO     Training subgraph sub_002 in epoch 15 with model ComplEx
+2024-05-20 15:08:23 INFO     Subgraph sub_002 Training Epoch 15 | average train loss: 5.1586
+2024-05-20 15:08:23 INFO     Training subgraph sub_003 in epoch 15 with model ComplEx
+2024-05-20 15:08:46 INFO     Subgraph sub_003 Training Epoch 15 | average train loss: 5.2715
+2024-05-20 15:08:47 INFO     Validation Epoch 15 | average valid loss: 15.9266
+2024-05-20 15:08:47 INFO     -\	Training and optimization of epoch 15 finished in 1 minute, 33.84 seconds	/-
+2024-05-20 15:08:47 INFO     Training subgraph sub_000 in epoch 16 with model ComplEx
+2024-05-20 15:09:10 INFO     Subgraph sub_000 Training Epoch 16 | average train loss: 5.1521
+2024-05-20 15:09:10 INFO     Training subgraph sub_001 in epoch 16 with model ComplEx
+2024-05-20 15:09:34 INFO     Subgraph sub_001 Training Epoch 16 | average train loss: 5.1552
+2024-05-20 15:09:34 INFO     Training subgraph sub_002 in epoch 16 with model ComplEx
+2024-05-20 15:09:57 INFO     Subgraph sub_002 Training Epoch 16 | average train loss: 5.0628
+2024-05-20 15:09:57 INFO     Training subgraph sub_003 in epoch 16 with model ComplEx
+2024-05-20 15:10:20 INFO     Subgraph sub_003 Training Epoch 16 | average train loss: 5.1584
+2024-05-20 15:10:21 INFO     Validation Epoch 16 | average valid loss: 15.5848
+2024-05-20 15:10:21 INFO     -\	Training and optimization of epoch 16 finished in 1 minute, 33.99 seconds	/-
+2024-05-20 15:10:21 INFO     Training subgraph sub_000 in epoch 17 with model ComplEx
+2024-05-20 15:10:44 INFO     Subgraph sub_000 Training Epoch 17 | average train loss: 5.0545
+2024-05-20 15:10:44 INFO     Training subgraph sub_001 in epoch 17 with model ComplEx
+2024-05-20 15:11:07 INFO     Subgraph sub_001 Training Epoch 17 | average train loss: 5.0588
+2024-05-20 15:11:07 INFO     Training subgraph sub_002 in epoch 17 with model ComplEx
+2024-05-20 15:11:31 INFO     Subgraph sub_002 Training Epoch 17 | average train loss: 4.9803
+2024-05-20 15:11:31 INFO     Training subgraph sub_003 in epoch 17 with model ComplEx
+2024-05-20 15:11:54 INFO     Subgraph sub_003 Training Epoch 17 | average train loss: 5.0615
+2024-05-20 15:11:54 INFO     Validation Epoch 17 | average valid loss: 15.2629
+2024-05-20 15:11:54 INFO     -\	Training and optimization of epoch 17 finished in 1 minute, 33.57 seconds	/-
+2024-05-20 15:11:54 INFO     Training subgraph sub_000 in epoch 18 with model ComplEx
+2024-05-20 15:12:18 INFO     Subgraph sub_000 Training Epoch 18 | average train loss: 4.9700
+2024-05-20 15:12:18 INFO     Training subgraph sub_001 in epoch 18 with model ComplEx
+2024-05-20 15:12:41 INFO     Subgraph sub_001 Training Epoch 18 | average train loss: 4.9756
+2024-05-20 15:12:41 INFO     Training subgraph sub_002 in epoch 18 with model ComplEx
+2024-05-20 15:13:04 INFO     Subgraph sub_002 Training Epoch 18 | average train loss: 4.9087
+2024-05-20 15:13:04 INFO     Training subgraph sub_003 in epoch 18 with model ComplEx
+2024-05-20 15:13:27 INFO     Subgraph sub_003 Training Epoch 18 | average train loss: 4.9779
+2024-05-20 15:13:28 INFO     Validation Epoch 18 | average valid loss: 14.9586
+2024-05-20 15:13:28 INFO     -\	Training and optimization of epoch 18 finished in 1 minute, 33.59 seconds	/-
+2024-05-20 15:13:28 INFO     Training subgraph sub_000 in epoch 19 with model ComplEx
+2024-05-20 15:13:51 INFO     Subgraph sub_000 Training Epoch 19 | average train loss: 4.8965
+2024-05-20 15:13:51 INFO     Training subgraph sub_001 in epoch 19 with model ComplEx
+2024-05-20 15:14:15 INFO     Subgraph sub_001 Training Epoch 19 | average train loss: 4.9031
+2024-05-20 15:14:15 INFO     Training subgraph sub_002 in epoch 19 with model ComplEx
+2024-05-20 15:14:39 INFO     Subgraph sub_002 Training Epoch 19 | average train loss: 4.8465
+2024-05-20 15:14:39 INFO     Training subgraph sub_003 in epoch 19 with model ComplEx
+2024-05-20 15:15:02 INFO     Subgraph sub_003 Training Epoch 19 | average train loss: 4.9054
+2024-05-20 15:15:03 INFO     Validation Epoch 19 | average valid loss: 14.6835
+2024-05-20 15:15:03 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 15:15:11 INFO     Combining scores of all models with average score.
+2024-05-20 15:15:12 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 15:15:14 INFO     	 valid MR: 10908.30 | MRR: 0.300 | H@1: 0.249 | H@3: 0.340 | H@10: 0.381 | AMRI: 0.467196 | MR_deviation: 2.000
+2024-05-20 15:15:14 INFO     -\	Finished validating the ensemble in 11.81 seconds	/-
+2024-05-20 15:15:14 INFO     Saving models at epoch 19 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files
+2024-05-20 15:15:15 INFO     -\	Training and optimization of epoch 19 finished in 1 minute, 46.62 seconds	/-
+2024-05-20 15:15:15 INFO     Training subgraph sub_000 in epoch 20 with model ComplEx
+2024-05-20 15:15:38 INFO     Subgraph sub_000 Training Epoch 20 | average train loss: 4.8322
+2024-05-20 15:15:38 INFO     Training subgraph sub_001 in epoch 20 with model ComplEx
+2024-05-20 15:16:02 INFO     Subgraph sub_001 Training Epoch 20 | average train loss: 4.8401
+2024-05-20 15:16:02 INFO     Training subgraph sub_002 in epoch 20 with model ComplEx
+2024-05-20 15:16:26 INFO     Subgraph sub_002 Training Epoch 20 | average train loss: 4.7917
+2024-05-20 15:16:26 INFO     Training subgraph sub_003 in epoch 20 with model ComplEx
+2024-05-20 15:16:49 INFO     Subgraph sub_003 Training Epoch 20 | average train loss: 4.8422
+2024-05-20 15:16:50 INFO     Validation Epoch 20 | average valid loss: 14.4192
+2024-05-20 15:16:50 INFO     -\	Training and optimization of epoch 20 finished in 1 minute, 34.88 seconds	/-
+2024-05-20 15:16:50 INFO     Training subgraph sub_000 in epoch 21 with model ComplEx
+2024-05-20 15:17:13 INFO     Subgraph sub_000 Training Epoch 21 | average train loss: 4.7756
+2024-05-20 15:17:13 INFO     Training subgraph sub_001 in epoch 21 with model ComplEx
+2024-05-20 15:17:37 INFO     Subgraph sub_001 Training Epoch 21 | average train loss: 4.7845
+2024-05-20 15:17:37 INFO     Training subgraph sub_002 in epoch 21 with model ComplEx
+2024-05-20 15:18:00 INFO     Subgraph sub_002 Training Epoch 21 | average train loss: 4.7432
+2024-05-20 15:18:00 INFO     Training subgraph sub_003 in epoch 21 with model ComplEx
+2024-05-20 15:18:24 INFO     Subgraph sub_003 Training Epoch 21 | average train loss: 4.7864
+2024-05-20 15:18:24 INFO     Validation Epoch 21 | average valid loss: 14.1765
+2024-05-20 15:18:24 INFO     -\	Training and optimization of epoch 21 finished in 1 minute, 34.8 seconds	/-
+2024-05-20 15:18:24 INFO     Training subgraph sub_000 in epoch 22 with model ComplEx
+2024-05-20 15:18:48 INFO     Subgraph sub_000 Training Epoch 22 | average train loss: 4.7253
+2024-05-20 15:18:48 INFO     Training subgraph sub_001 in epoch 22 with model ComplEx
+2024-05-20 15:19:11 INFO     Subgraph sub_001 Training Epoch 22 | average train loss: 4.7354
+2024-05-20 15:19:11 INFO     Training subgraph sub_002 in epoch 22 with model ComplEx
+2024-05-20 15:19:35 INFO     Subgraph sub_002 Training Epoch 22 | average train loss: 4.6999
+2024-05-20 15:19:35 INFO     Training subgraph sub_003 in epoch 22 with model ComplEx
+2024-05-20 15:19:59 INFO     Subgraph sub_003 Training Epoch 22 | average train loss: 4.7371
+2024-05-20 15:19:59 INFO     Validation Epoch 22 | average valid loss: 13.9485
+2024-05-20 15:19:59 INFO     -\	Training and optimization of epoch 22 finished in 1 minute, 34.76 seconds	/-
+2024-05-20 15:19:59 INFO     Training subgraph sub_000 in epoch 23 with model ComplEx
+2024-05-20 15:20:23 INFO     Subgraph sub_000 Training Epoch 23 | average train loss: 4.6807
+2024-05-20 15:20:23 INFO     Training subgraph sub_001 in epoch 23 with model ComplEx
+2024-05-20 15:20:46 INFO     Subgraph sub_001 Training Epoch 23 | average train loss: 4.6916
+2024-05-20 15:20:46 INFO     Training subgraph sub_002 in epoch 23 with model ComplEx
+2024-05-20 15:21:10 INFO     Subgraph sub_002 Training Epoch 23 | average train loss: 4.6610
+2024-05-20 15:21:10 INFO     Training subgraph sub_003 in epoch 23 with model ComplEx
+2024-05-20 15:21:34 INFO     Subgraph sub_003 Training Epoch 23 | average train loss: 4.6933
+2024-05-20 15:21:34 INFO     Validation Epoch 23 | average valid loss: 13.7430
+2024-05-20 15:21:34 INFO     -\	Training and optimization of epoch 23 finished in 1 minute, 35.1 seconds	/-
+2024-05-20 15:21:34 INFO     Training subgraph sub_000 in epoch 24 with model ComplEx
+2024-05-20 15:21:58 INFO     Subgraph sub_000 Training Epoch 24 | average train loss: 4.6404
+2024-05-20 15:21:58 INFO     Training subgraph sub_001 in epoch 24 with model ComplEx
+2024-05-20 15:22:21 INFO     Subgraph sub_001 Training Epoch 24 | average train loss: 4.6527
+2024-05-20 15:22:21 INFO     Training subgraph sub_002 in epoch 24 with model ComplEx
+2024-05-20 15:22:45 INFO     Subgraph sub_002 Training Epoch 24 | average train loss: 4.6259
+2024-05-20 15:22:45 INFO     Training subgraph sub_003 in epoch 24 with model ComplEx
+2024-05-20 15:23:09 INFO     Subgraph sub_003 Training Epoch 24 | average train loss: 4.6539
+2024-05-20 15:23:09 INFO     Validation Epoch 24 | average valid loss: 13.5508
+2024-05-20 15:23:09 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 15:23:18 INFO     Combining scores of all models with average score.
+2024-05-20 15:23:20 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 15:23:22 INFO     	 valid MR: 10970.01 | MRR: 0.301 | H@1: 0.249 | H@3: 0.341 | H@10: 0.381 | AMRI: 0.464181 | MR_deviation: 4.000
+2024-05-20 15:23:22 INFO     -\	Finished validating the ensemble in 13.0 seconds	/-
+2024-05-20 15:23:22 INFO     Saving models at epoch 24 in C:\Users\Tim\Documents\Masterarbeit\Software\Ensemble_Embedding_for_Link_Prediction\data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\results\model_files
+2024-05-20 15:23:22 INFO     -\	Training and optimization of epoch 24 finished in 1 minute, 48.09 seconds	/-
+2024-05-20 15:23:22 INFO     Training subgraph sub_000 in epoch 25 with model ComplEx
+2024-05-20 15:23:46 INFO     Subgraph sub_000 Training Epoch 25 | average train loss: 4.6043
+2024-05-20 15:23:46 INFO     Training subgraph sub_001 in epoch 25 with model ComplEx
+2024-05-20 15:24:09 INFO     Subgraph sub_001 Training Epoch 25 | average train loss: 4.6174
+2024-05-20 15:24:09 INFO     Training subgraph sub_002 in epoch 25 with model ComplEx
+2024-05-20 15:24:33 INFO     Subgraph sub_002 Training Epoch 25 | average train loss: 4.5942
+2024-05-20 15:24:33 INFO     Training subgraph sub_003 in epoch 25 with model ComplEx
+2024-05-20 15:24:57 INFO     Subgraph sub_003 Training Epoch 25 | average train loss: 4.6184
+2024-05-20 15:24:57 INFO     Validation Epoch 25 | average valid loss: 13.3712
+2024-05-20 15:24:57 INFO     -\	Training and optimization of epoch 25 finished in 1 minute, 35.19 seconds	/-
+2024-05-20 15:24:57 INFO     Training subgraph sub_000 in epoch 26 with model ComplEx
+2024-05-20 15:25:22 INFO     Subgraph sub_000 Training Epoch 26 | average train loss: 4.5717
+2024-05-20 15:25:22 INFO     Training subgraph sub_001 in epoch 26 with model ComplEx
+2024-05-20 15:25:47 INFO     Subgraph sub_001 Training Epoch 26 | average train loss: 4.5855
+2024-05-20 15:25:47 INFO     Training subgraph sub_002 in epoch 26 with model ComplEx
+2024-05-20 15:26:11 INFO     Subgraph sub_002 Training Epoch 26 | average train loss: 4.5651
+2024-05-20 15:26:11 INFO     Training subgraph sub_003 in epoch 26 with model ComplEx
+2024-05-20 15:26:34 INFO     Subgraph sub_003 Training Epoch 26 | average train loss: 4.5863
+2024-05-20 15:26:35 INFO     Validation Epoch 26 | average valid loss: 13.2016
+2024-05-20 15:26:35 INFO     -\	Training and optimization of epoch 26 finished in 1 minute, 37.49 seconds	/-
+2024-05-20 15:26:35 INFO     Training subgraph sub_000 in epoch 27 with model ComplEx
+2024-05-20 15:27:00 INFO     Subgraph sub_000 Training Epoch 27 | average train loss: 4.5418
+2024-05-20 15:27:00 INFO     Training subgraph sub_001 in epoch 27 with model ComplEx
+2024-05-20 15:27:24 INFO     Subgraph sub_001 Training Epoch 27 | average train loss: 4.5566
+2024-05-20 15:27:24 INFO     Training subgraph sub_002 in epoch 27 with model ComplEx
+2024-05-20 15:27:48 INFO     Subgraph sub_002 Training Epoch 27 | average train loss: 4.5385
+2024-05-20 15:27:48 INFO     Training subgraph sub_003 in epoch 27 with model ComplEx
+2024-05-20 15:28:13 INFO     Subgraph sub_003 Training Epoch 27 | average train loss: 4.5570
+2024-05-20 15:28:13 INFO     Validation Epoch 27 | average valid loss: 13.0537
+2024-05-20 15:28:13 INFO     -\	Training and optimization of epoch 27 finished in 1 minute, 38.17 seconds	/-
+2024-05-20 15:28:13 INFO     Training subgraph sub_000 in epoch 28 with model ComplEx
+2024-05-20 15:28:38 INFO     Subgraph sub_000 Training Epoch 28 | average train loss: 4.5147
+2024-05-20 15:28:38 INFO     Training subgraph sub_001 in epoch 28 with model ComplEx
+2024-05-20 15:29:02 INFO     Subgraph sub_001 Training Epoch 28 | average train loss: 4.5301
+2024-05-20 15:29:02 INFO     Training subgraph sub_002 in epoch 28 with model ComplEx
+2024-05-20 15:29:27 INFO     Subgraph sub_002 Training Epoch 28 | average train loss: 4.5139
+2024-05-20 15:29:27 INFO     Training subgraph sub_003 in epoch 28 with model ComplEx
+2024-05-20 15:29:51 INFO     Subgraph sub_003 Training Epoch 28 | average train loss: 4.5302
+2024-05-20 15:29:51 INFO     Validation Epoch 28 | average valid loss: 12.9096
+2024-05-20 15:29:51 INFO     -\	Training and optimization of epoch 28 finished in 1 minute, 38.37 seconds	/-
+2024-05-20 15:29:51 INFO     Training subgraph sub_000 in epoch 29 with model ComplEx
+2024-05-20 15:30:16 INFO     Subgraph sub_000 Training Epoch 29 | average train loss: 4.4897
+2024-05-20 15:30:16 INFO     Training subgraph sub_001 in epoch 29 with model ComplEx
+2024-05-20 15:30:40 INFO     Subgraph sub_001 Training Epoch 29 | average train loss: 4.5059
+2024-05-20 15:30:40 INFO     Training subgraph sub_002 in epoch 29 with model ComplEx
+2024-05-20 15:31:04 INFO     Subgraph sub_002 Training Epoch 29 | average train loss: 4.4913
+2024-05-20 15:31:04 INFO     Training subgraph sub_003 in epoch 29 with model ComplEx
+2024-05-20 15:31:28 INFO     Subgraph sub_003 Training Epoch 29 | average train loss: 4.5055
+2024-05-20 15:31:29 INFO     Validation Epoch 29 | average valid loss: 12.7779
+2024-05-20 15:31:29 INFO     -/	Validating the ensemble with the score aggregation method "average score".	\-
+2024-05-20 15:31:38 INFO     Combining scores of all models with average score.
+2024-05-20 15:31:40 INFO     Successfully aggregated all scores with aggregation method average score.
+2024-05-20 15:31:42 INFO     	 valid MR: 11004.39 | MRR: 0.300 | H@1: 0.248 | H@3: 0.341 | H@10: 0.381 | AMRI: 0.462502 | MR_deviation: 6.000
+2024-05-20 15:31:42 INFO     -\	Finished validating the ensemble in 12.75 seconds	/-
+2024-05-20 15:31:42 INFO     -\	Training and optimization of epoch 29 finished in 1 minute, 50.42 seconds	/-
+2024-05-20 15:31:42 INFO     Loading best models saved at epoch 24
+2024-05-20 15:31:42 INFO     -\	Successfully finished training and optimizing all subgraphs in 48 minutes, 51.33 seconds	/-
+2024-05-20 15:31:42 INFO     -/	Testing the ensemble with the score aggregation method "maximum score".	\-
+2024-05-20 15:31:51 INFO     Combining scores of all models with maximum score.
+2024-05-20 15:31:55 INFO     Successfully aggregated all scores with aggregation method maximum score.
+2024-05-20 15:31:57 INFO     	 test MR: 18160.64 | MRR: 0.112 | H@1: 0.036 | H@3: 0.168 | H@10: 0.263 | AMRI: 0.112930 | MR_deviation: 1751.000
+2024-05-20 15:31:57 INFO     -\	Finished testing the ensemble in 14.71 seconds	/-
+2024-05-20 15:31:57 INFO     Finished ensemble training and testing in 49 minutes, 8.73 seconds.
+2024-05-20 15:31:58 INFO     The entire process including sampling, training and testing took 49 minutes, 55.02 seconds.
