@@ -265,25 +265,24 @@ def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, m
                                                                 f"{args.model_name}.pt"))
 
 
-def print_loss_to_file(loss_file_path, loss, epoch, mode, *args):
+def print_loss_to_file(loss_file_path, epoch, loss_dict):
     with open(loss_file_path, 'a+') as loss_file:
-        if mode == "train":
-            # args[0] = current subgraph
-            # args[1] = max amount of subgraphs
-            if args[0] == 0:
-                loss_file.write(f"{epoch}")
-            loss_file.write(f";{loss}")
-            if args[0] == args[1] - 1:
-                loss_file.write("\n")
+        keys_sorted = list(loss_dict.keys())
+        logging.debug(f"Output keys unsorted: {keys_sorted}")
+        keys_sorted.sort()
+        logging.debug(f"Output keys sorted: {keys_sorted}")
 
-        elif mode == "valid":
-            # args[0] = dict with all subgraphs as key and valid losses as values
-            valid_loss_str = f"{epoch};{loss}"
-            for valid_loss_sub in args[0]:
-                valid_loss_str += f";{args[0][valid_loss_sub]}"
+        average_loss = 0.
+        for subgraph in loss_dict:
+            average_loss += loss_dict[subgraph]
+        average_loss /= len(keys_sorted)
 
-            loss_file.write(valid_loss_str)
-            loss_file.write("\n")
+        out_str = f"{epoch};{average_loss}"
+        for subgraph in keys_sorted:
+            out_str += f";{loss_dict[subgraph]}"
+
+        loss_file.write(out_str)
+        loss_file.write("\n")
 
 
 def print_metrics_to_file(metrics_file_path, metrics, epoch, mode):

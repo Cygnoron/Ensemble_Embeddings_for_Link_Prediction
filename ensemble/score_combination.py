@@ -44,7 +44,6 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
         util_files.print_metrics_to_file(metrics_file_path, metrics, epoch, mode)
 
     for embedding_model in embedding_models:
-        logging.debug(f"printing file test_{embedding_model['args'].subgraph}.txt")
         for i in range(50):
             logging.log(Constants.DATA_LEVEL_LOGGING, embedding_model['model'].entity.weight.data[i])
 
@@ -78,6 +77,7 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
     # Initialize variables to store target scores
     targets_lhs = None
     targets_rhs = None
+    progress_bar_testing = None
 
     # Iterate over each embedding model
     for embedding_model in embedding_models:
@@ -438,7 +438,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
     return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
 
 
-def calculate_valid_loss(embedding_models, valid_loss_dir, epoch):
+def calculate_valid_loss(embedding_models):
     valid_loss_dict = {}
     valid_loss = 0.0
     # Iterate over all embedding models
@@ -459,7 +459,5 @@ def calculate_valid_loss(embedding_models, valid_loss_dir, epoch):
 
     # average valid loss over all "len(embedding_models)" models
     valid_loss /= len(embedding_models)
-
-    util_files.print_loss_to_file(valid_loss_dir, valid_loss, epoch, "valid", valid_loss_dict)
 
     return valid_loss, valid_loss_dict

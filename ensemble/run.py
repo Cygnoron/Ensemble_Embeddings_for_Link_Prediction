@@ -87,7 +87,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         for sub_num in range(subgraph_amount):
             subgraphs_str += f";sub_{sub_num:03d}"
         valid_loss_file.write(f"epoch;average valid loss{subgraphs_str}\n")
-        train_loss_file.write(f"epoch{subgraphs_str}\n")
+        train_loss_file.write(f"epoch;average train loss{subgraphs_str}\n")
         metrics_file.write(f"epoch;mode;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;MR_deviation\n")
 
     logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
@@ -247,10 +247,14 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
         embedding_model['optimizer'] = KGOptimizer(model, regularizer, optim_method, args.batch_size,
                                                    args.neg_sample_size, bool(args.double_neg))
 
+    train_losses = {}
+    valid_losses = {}
     # Iterate over epochs
     for epoch in range(max_epochs):
         time_start_training_sub = time.time()
 
+        # initialize dict for train losses
+        train_losses[epoch] = {}
         # Iterate over models
         for embedding_model in embedding_models:
             args = embedding_model['args']
@@ -271,9 +275,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             train_loss = embedding_model['optimizer'].epoch(embedding_model['train_examples'])
             logging.info(f"Subgraph {embedding_model['subgraph']} Training Epoch {epoch} | "
                          f"average train loss: {train_loss:.4f}")
-            # TODO fix train loss file
-            util_files.print_loss_to_file(train_loss_file_path, train_loss, epoch, "train",
-                                          args.subgraph_num, subgraph_amount)
+            train_losses[epoch][embedding_model['args'].subgraph] = train_loss
 
             # save embeddings of the model each epoch for later training processes
             if epoch % 1 == 0 or epoch == max_epochs - 1:
@@ -305,12 +307,15 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
                                                                   embedding_general_rel,
                                                                   embedding_models,
                                                                   cands_att_dict)
+        # print training losses to file
+        util_files.print_loss_to_file(train_loss_file_path, epoch, train_losses[epoch])
 
         # Valid step
-        valid_loss, valid_loss_dict = score_combination.calculate_valid_loss(embedding_models, valid_loss_file_path,
-                                                                             epoch)
+        valid_loss, valid_losses[epoch] = score_combination.calculate_valid_loss(embedding_models)
 
-        logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses: {valid_loss_dict}")
+        # print validation losses
+        util_files.print_loss_to_file(valid_loss_file_path, epoch, valid_losses[epoch])
+        logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses: {valid_losses[epoch]}")
         logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
 
         if (epoch + 1) % valid_args.valid == 0:

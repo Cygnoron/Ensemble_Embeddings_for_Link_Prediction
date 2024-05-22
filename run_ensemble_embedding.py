@@ -14,7 +14,7 @@ if __name__ == "__main__":
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 4
+    subgraph_amount = 10
     subgraph_size_range = (0.3, 0.7)
     sampling_method = Constants.ENTITY_SAMPLING
     # sampling_method = Constants.FEATURE_SAMPLING
@@ -101,8 +101,8 @@ if __name__ == "__main__":
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: ["all"]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [13, "rest"], Constants.ROTAT_E: [21],
-                               Constants.COMPL_EX: [2, 3], Constants.ATT_E: [4, 50]}]
+        allowed_kge_models = [{Constants.TRANS_E: [1, 0, "rest"], Constants.DIST_MULT: [13], Constants.ROTAT_E: [21],
+                               Constants.COMPL_EX: [2, 3, "rest"], Constants.ATT_E: [50]}]
 
         # --- training process ---
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
                           init_size=0.001,
                           bias="none",
                           dtype="double",
-                          debug=False
+                          debug=True
                           )
             except Exception:
                 logging.error(traceback.format_exc())
