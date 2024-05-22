@@ -132,11 +132,19 @@ def inverse_dict(dictionary):
             >>> dict_a = {0: 'TransE', 1: 'TransE', 2: 'RotatE', 3: 'AttE', 4: 'RotatE', 5: 'ComplEx'}
             >>> inverse_dict(dict_a)
             {'TransE': [0, 1], 'RotatE': [2, 4], 'AttE':[3], 'ComplEx': [5]}
+
+            >>> dict_b = {'TransE': [0, 1], 'RotatE': [2, 4], 'AttE':[3], 'ComplEx': [5]}
+            >>> inverse_dict(dict_b)
+            {0: 'TransE', 1: 'TransE', 2: 'RotatE', 3: 'AttE', 4: 'RotatE', 5: 'ComplEx'}
         """
     inverse_dictionary = defaultdict(list)
 
     for key, value in dictionary.items():
-        inverse_dictionary[value].append(key)
+        if isinstance(value, list):
+            for item in value:
+                inverse_dictionary[item].append(key)
+        else:
+            inverse_dictionary[value].append(key)
 
     return dict(inverse_dictionary)
 
@@ -552,17 +560,25 @@ def format_dict(dictionary):
         # add key to string
         out_str += f"'{key}':\t"
 
-        # iterate through values
-        for value_index, value in enumerate(dictionary[key]):
-            # add single quotes to value, if value is string
-            if type(value) is str:
-                value = f"'{value}'"
-            # add value to string and end with newline if it is the last value
-            if value_index == len(dictionary[key]) - 1:
-                if key_index == len(dictionary) - 1:
-                    out_str += f"{value}"
+        if type(dictionary[key]) is list:
+            # iterate through values
+            for value_index, value in enumerate(dictionary[key]):
+                # add single quotes to value, if value is string
+                if type(value) is str:
+                    value = f"'{value}'"
+                # add value to string and end with newline if it is the last value
+                if value_index == len(dictionary[key]) - 1:
+                    if key_index == len(dictionary) - 1:
+                        out_str += f"{value}"
+                    else:
+                        out_str += f"{value}\n"
                 else:
-                    out_str += f"{value}\n"
+                    out_str += f"{value}, "
+        else:
+            value = dictionary[key]
+            if type(value) is str:
+                out_str += f"'{value}'\n"
             else:
-                out_str += f"{value}, "
-    return out_str
+                out_str += f"{value}\n"
+
+    return out_str.rstrip("\n")
