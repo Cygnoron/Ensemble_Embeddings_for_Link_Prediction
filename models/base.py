@@ -1,29 +1,32 @@
 """Base Knowledge Graph embedding model."""
+import logging
 from abc import ABC, abstractmethod
 
 import numpy as np
 import torch
 from torch import nn
 
+from ensemble import Constants
+
 
 class KGModel(nn.Module, ABC):
     """Base Knowledge Graph Embedding model class.
 
-    Attributes:
-        sizes: Tuple[int, int, int] with (n_entities, n_relations, n_entities)
-        rank: integer for embedding dimension
-        dropout: float for dropout rate
-        gamma: torch.nn.Parameter for margin in ranking-based loss
-        data_type: torch.dtype for machine precision (single or double)
-        bias: string for whether to learn or fix bias (none for no bias)
-        init_size: float for embeddings' initialization scale
-        entity: torch.nn.Embedding with entity embeddings
-        rel: torch.nn.Embedding with relation embeddings
-        bh: torch.nn.Embedding with head entity bias embeddings
-        bt: torch.nn.Embedding with tail entity bias embeddings
-    """
+        Attributes:
+            sizes: Tuple[int, int, int] with (n_entities, n_relations, n_entities)
+            rank: integer for embedding dimension
+            dropout: float for dropout rate
+            gamma: torch.nn.Parameter for margin in ranking-based loss
+            data_type: torch.dtype for machine precision (single or double)
+            bias: string for whether to learn or fix bias (none for no bias)
+            init_size: float for embeddings' initialization scale
+            entity: torch.nn.Embedding with entity embeddings
+            rel: torch.nn.Embedding with relation embeddings
+            bh: torch.nn.Embedding with head entity bias embeddings
+            bt: torch.nn.Embedding with tail entity bias embeddings
+        """
 
-    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size):
+    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size, theta_calculation):
         """Initialize KGModel."""
         super(KGModel, self).__init__()
         if data_type == 'double':
@@ -43,12 +46,13 @@ class KGModel(nn.Module, ABC):
         self.bt = nn.Embedding(sizes[0], 1)
         self.bt.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
 
-        # attention
-        self.theta_ent = nn.Embedding(sizes[0], rank)
-        self.theta_rel = nn.Embedding(sizes[1], rank)
+        # ensemble attention
+        self.theta_calculation = theta_calculation
+        self.theta_ent = None
+        self.theta_rel = None
+        self.init_theta(theta_calculation, sizes, rank)
         self.act = nn.Softmax(dim=1)
         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
-        self.att = []
 
     @abstractmethod
     def get_queries(self, queries):
@@ -244,3 +248,43 @@ class KGModel(nn.Module, ABC):
             mr_deviation[m] = torch.sum(ranks_opt - ranks_pes)
 
         return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
+
+    def init_theta(self, theta_calculation, sizes, rank):
+        logging.debug(f"{theta_calculation[1]} was set for calculating theta.")
+        if theta_calculation[0] == Constants.NO_THETA[0]:
+            return
+        elif theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+            self.theta_ent = nn.Embedding(sizes[0], rank)
+            self.theta_rel = nn.Embedding(sizes[1], rank)
+        elif theta_calculation[0] == Constants.REVERSED_THETA[0]:
+            self.theta_ent = nn.Embedding(sizes[1], rank)
+            self.theta_rel = nn.Embedding(sizes[0], rank)
+        elif theta_calculation[0] == Constants.RELATION_THETA[0]:
+            self.theta_ent = nn.Embedding(sizes[1], rank)
+            self.theta_rel = nn.Embedding(sizes[1], rank)
+        elif theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
+            self.theta_ent = nn.Embedding(sizes[0], rank)
+            self.theta_rel = nn.Embedding(sizes[1], rank)
+        else:
+            logging.error(f"The given '{theta_calculation}' is not implemented as a way to calculate theta!")
+            assert ValueError
+        logging.debug(f"Theta init sizes:\tEnt: {self.theta_ent.weight.data.size()}\t"
+                      f"Rel: {self.theta_rel.weight.data.size()}")
+
+    def update_theta(self, queries):
+        logging.debug(f"Theta working sizes:\tEnt: {self.theta_ent.weight.data.size()}\t"
+                      f"Rel: {self.theta_rel.weight.data.size()}")
+        if self.theta_calculation[0] == Constants.NO_THETA[0]:
+            return
+        elif self.theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+            self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
+            self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
+            self.theta_ent(queries[:, 1]).view((-1, 1, self.rank))
+            self.theta_rel(queries[:, 0]).view((-1, 1, self.rank))
+        elif self.theta_calculation[0] == Constants.RELATION_THETA[0]:
+            self.theta_ent(queries[:, 1]).view((-1, 1, self.rank))
+            self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        elif self.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
+            self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
+            self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
