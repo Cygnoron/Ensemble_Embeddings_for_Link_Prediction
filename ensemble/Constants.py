@@ -16,3 +16,10 @@ ROT_H, REF_H, ATT_H = "RotH", "RefH", "AttH"
 
 # logging levels
 DATA_LEVEL_LOGGING = 5
+
+# theta calculation methods
+NO_THETA = [20, "no theta", "no_theta"]
+UNCHANGED_THETA = [21, "unchanged theta", "unchanged_theta"]
+REVERSED_THETA = [22, "reversed theta", "reversed_theta"]
+RELATION_THETA = [23, "relation theta", "relation_theta"]
+MULTIPLIED_THETA = [24, "multiplied theta", "multiplied_theta"]
