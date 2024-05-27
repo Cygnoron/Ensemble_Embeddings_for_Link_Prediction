@@ -1,4 +1,6 @@
 """Hyperbolic Knowledge Graph embedding models where all parameters are defined in tangent spaces."""
+import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -16,7 +18,7 @@ class BaseH(KGModel):
 
     def __init__(self, args):
         super(BaseH, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size)
+                                    args.init_size, args.theta_calculation)
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], 2 * self.rank), dtype=self.data_type)
         self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
@@ -59,8 +61,7 @@ class RotH(BaseH):
         res2 = mobius_add(res1, rel2, c)
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return (res2, c), self.bh(queries[:, 0])
 
@@ -78,8 +79,7 @@ class RefH(BaseH):
         res = project(mobius_add(lhs, rel, c), c)
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return (res, c), self.bh(queries[:, 0])
 
@@ -117,7 +117,6 @@ class AttH(BaseH):
         res = project(mobius_add(lhs, rel, c), c)
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return (res, c), self.bh(queries[:, 0])

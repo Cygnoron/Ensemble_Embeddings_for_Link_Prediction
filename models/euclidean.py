@@ -20,7 +20,7 @@ class BaseE(KGModel):
 
     def __init__(self, args):
         super(BaseE, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size)
+                                    args.init_size, args.theta_calculation)
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
         # self.att = []
@@ -58,8 +58,7 @@ class TransE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -77,8 +76,7 @@ class DistMult(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -92,8 +90,7 @@ class CP(BaseE):
 
     def get_queries(self, queries: torch.Tensor):
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return self.entity(queries[:, 0]) * self.rel(queries[:, 1]), self.bh(queries[:, 0])
 
@@ -113,8 +110,7 @@ class MurE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -134,8 +130,7 @@ class RotE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -156,8 +151,7 @@ class RefE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs + rel, lhs_biases
 
@@ -207,7 +201,6 @@ class AttE(BaseE):
         lhs_e = torch.sum(att_weights * cands, dim=1) + self.rel(queries[:, 1])
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])

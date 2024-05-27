@@ -17,7 +17,7 @@ class BaseC(KGModel):
     def __init__(self, args):
         """Initialize a Complex KGModel."""
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size)
+                                    args.init_size, args.theta_calculation)
         assert self.rank % 2 == 0, "Complex models require even embedding dimension"
         self.rank = self.rank // 2
         self.embeddings = nn.ModuleList([
@@ -77,8 +77,7 @@ class ComplEx(BaseC):
         ], 1)
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])
 
@@ -98,7 +97,6 @@ class RotatE(BaseC):
         ], 1)
 
         # update context vector
-        self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-        self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])
