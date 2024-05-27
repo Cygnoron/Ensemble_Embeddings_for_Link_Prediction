@@ -9,6 +9,7 @@ import numpy as np
 import torch
 
 from ensemble import Constants
+from ensemble.util import get_unique_triple_ids
 
 
 def check_directory(directory):
@@ -293,3 +294,48 @@ def print_metrics_to_file(metrics_file_path, metrics, epoch, mode):
                            f"{metrics['MR_deviation']}")
 
         metrics_file.write("\n")
+
+
+def create_entity_and_relation_name_set_file(dataset):
+    """
+    Calculates and writes entity and relation name sets for dataset to csv files
+
+    :param dataset: Name of the input dataset
+    """
+    logging.debug(f"Creating csv files containing the entity and relation name sets for dataset {dataset}")
+
+    with (open(os.path.abspath(f"{dataset}\\train.pickle"), 'rb') as pickle_file,
+          open(f"{dataset}\\entity_set.csv", 'w') as entity_set_file,
+          open(f"{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
+
+        logging.debug("Loading data from .pickle file")
+        # load data from train.pickle file
+        data = pickle.load(pickle_file)
+        total_triples = len(data)
+
+        logging.debug("Creating entity and relation name sets")
+        # calculate entity and relation name sets
+        entity_set, relation_name_set = get_unique_triple_ids(data, h=True, r=True, t=True)
+
+        # sort entities by total amount of triples
+        sorted_entities = sorted(entity_set.items(), key=lambda x: len(x[1]), reverse=True)
+
+        logging.debug("Writing entity set to csv file")
+        # write header for entity set file
+        entity_set_file.write(f"entity_id;total_amount_of_triples;relative_amount_of_triples\n")
+        # write entity id and amount of triples for each entity
+        for entity, triples in sorted_entities:
+            entity_set_file.write(f"{entity};{len(triples)};{round(len(triples) / total_triples * 100, 3)}%\n")
+        entity_set_file.write(f"total_triples;{total_triples};100%")
+
+        # sort relation names by total amount of triples
+        sorted_relation_names = sorted(relation_name_set.items(), key=lambda x: len(x[1]), reverse=True)
+
+        logging.debug("Writing relation name set to csv file")
+        # write header for relation name file
+        relation_name_set_file.write(f"relation_name_id;total_amount_of_triples;relative_amount_of_triples\n")
+        # write relation name id and amount of triples for each relation name
+        for relation_name, triples in sorted_relation_names:
+            relation_name_set_file.write(
+                f"{relation_name};{len(triples)};{round(len(triples) / total_triples * 100, 3)}%\n")
+        relation_name_set_file.write(f"total_triples;{total_triples};100%")

@@ -1,6 +1,5 @@
 import logging
 import os
-import pickle
 import random
 from collections import defaultdict
 
@@ -9,51 +8,6 @@ from torch import nn
 
 from datasets.kg_dataset import KGDataset
 from ensemble import Constants
-
-
-def create_entity_and_relation_name_set_file(dataset):
-    """
-    Calculates and writes entity and relation name sets for dataset to csv files
-
-    :param dataset: Name of the input dataset
-    """
-    logging.debug(f"Creating csv files containing the entity and relation name sets for dataset {dataset}")
-
-    with (open(os.path.abspath(f"{dataset}\\train.pickle"), 'rb') as pickle_file,
-          open(f"{dataset}\\entity_set.csv", 'w') as entity_set_file,
-          open(f"{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
-
-        logging.debug("Loading data from .pickle file")
-        # load data from train.pickle file
-        data = pickle.load(pickle_file)
-        total_triples = len(data)
-
-        logging.debug("Creating entity and relation name sets")
-        # calculate entity and relation name sets
-        entity_set, relation_name_set = get_unique_triple_ids(data, h=True, r=True, t=True)
-
-        # sort entities by total amount of triples
-        sorted_entities = sorted(entity_set.items(), key=lambda x: len(x[1]), reverse=True)
-
-        logging.debug("Writing entity set to csv file")
-        # write header for entity set file
-        entity_set_file.write(f"entity_id;total_amount_of_triples;relative_amount_of_triples\n")
-        # write entity id and amount of triples for each entity
-        for entity, triples in sorted_entities:
-            entity_set_file.write(f"{entity};{len(triples)};{round(len(triples) / total_triples * 100, 3)}%\n")
-        entity_set_file.write(f"total_triples;{total_triples};100%")
-
-        # sort relation names by total amount of triples
-        sorted_relation_names = sorted(relation_name_set.items(), key=lambda x: len(x[1]), reverse=True)
-
-        logging.debug("Writing relation name set to csv file")
-        # write header for relation name file
-        relation_name_set_file.write(f"relation_name_id;total_amount_of_triples;relative_amount_of_triples\n")
-        # write relation name id and amount of triples for each relation name
-        for relation_name, triples in sorted_relation_names:
-            relation_name_set_file.write(
-                f"{relation_name};{len(triples)};{round(len(triples) / total_triples * 100, 3)}%\n")
-        relation_name_set_file.write(f"total_triples;{total_triples};100%")
 
 
 def get_unique_triple_ids(dataset, h=False, r=False, t=False):
@@ -176,7 +130,6 @@ def assign_model_to_subgraph(kge_models, args):
             Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
             -> All subgraphs are embedded by ROTAT_E
         """
-    # TODO fix non-correct settings of subgraphs
     # Initial setup
     subgraph_embedding_mapping = {}
     kge_models_adjusted = list(kge_models.keys()).copy()
@@ -353,21 +306,41 @@ def generate_general_embeddings(general_dataset: str, args):
 
     # load data
     dataset = KGDataset(os.path.abspath(f"data\\{general_dataset}"), args.debug)
-    sizes_entity, sizes_rel, _ = dataset.get_shape()
+    sizes_ent, sizes_rel, _ = dataset.get_shape()
+
+    if args.dtype == "double":
+        dtype = torch.double
+    else:
+        dtype = torch.float
 
     # embeddings
-    embedding_general_ent = nn.Embedding(sizes_entity, args.rank, dtype=torch.double)
-    embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=torch.double)
+    embedding_general_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
+    embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
 
     # context vectors
-    theta_ent = nn.Embedding(sizes_entity, args.rank, dtype=torch.double)
-    theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=torch.double)
+    theta_ent = None
+    theta_rel = None
+    if args.theta_calculation[0] == Constants.NO_THETA[0]:
+        pass
+    elif args.theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+        theta_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
+        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
+    elif args.theta_calculation[0] == Constants.REVERSED_THETA[0]:
+        theta_ent = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
+        theta_rel = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
+    elif args.theta_calculation[0] == Constants.RELATION_THETA[0]:
+        theta_ent = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
+        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
+    elif args.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
+        theta_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
+        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
 
-    # set device as "cuda"
+    # set to "cuda"
     embedding_general_ent.to("cuda")
     embedding_general_rel.to("cuda")
-    theta_ent.to("cuda")
-    theta_rel.to("cuda")
+    if args.theta_calculation[0] != Constants.NO_THETA[0]:
+        theta_ent.to("cuda")
+        theta_rel.to("cuda")
 
     return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel, dataset.get_shape()
 
@@ -561,6 +534,10 @@ def format_dict(dictionary):
         out_str += f"'{key}':\t"
 
         if type(dictionary[key]) is list:
+
+            if len(dictionary[key]) == 0:
+                out_str += "\n"
+                continue
             # iterate through values
             for value_index, value in enumerate(dictionary[key]):
                 # add single quotes to value, if value is string
