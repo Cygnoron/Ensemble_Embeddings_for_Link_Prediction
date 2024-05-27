@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import random
@@ -8,6 +9,7 @@ from torch import nn
 
 from datasets.kg_dataset import KGDataset
 from ensemble import Constants
+from ensemble.Constants import EMBEDDING_METHODS
 
 
 def get_unique_triple_ids(dataset, h=False, r=False, t=False):
@@ -198,7 +200,7 @@ def assign_model_to_subgraph(kge_models, args):
     logging.info(f"Subgraphs with fixed embedding: {format_dict(subgraph_embedding_mapping)}\n\t\t"
                  f"Remaining subgraphs will be embedded by random embedding methods {kge_models_adjusted}")
 
-    for subgraph in os.listdir(os.path.abspath(args.dataset_directory)):
+    for subgraph in os.listdir(os.path.abspath(args.dataset_dir)):
         # Ignore folders which don't contain a subgraph
         if "sub_" not in subgraph:
             continue
@@ -322,7 +324,7 @@ def generate_general_embeddings(general_dataset: str, args):
     theta_rel = None
     if args.theta_calculation[0] == Constants.NO_THETA[0]:
         pass
-    elif args.theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+    elif args.theta_calculation[0] == Constants.REGULAR_THETA[0]:
         theta_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
         theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
     elif args.theta_calculation[0] == Constants.REVERSED_THETA[0]:
@@ -559,3 +561,29 @@ def format_dict(dictionary):
                 out_str += f"{value}\n"
 
     return out_str.rstrip("\n")
+
+
+def get_embedding_methods(mapping_json_str):
+    kge_mapping = json.loads(mapping_json_str)
+    for embedding_model in list(kge_mapping.keys()):
+        if embedding_model not in EMBEDDING_METHODS:
+            raise ValueError(f"The given embedding method \'{embedding_model}\' does not exist!\n"
+                             f"Please check if your spelling was correct, if the method should exist.")
+
+    return kge_mapping
+
+
+def handle_methods(method_str, mode):
+    method_list = None
+    if mode == "sampling":
+        method_list = Constants.SAMPLING_METHODS
+    elif mode == "aggregation":
+        method_list = Constants.AGGREGATION_METHODS
+    elif mode == "theta":
+        method_list = Constants.THETA_METHODS
+
+    for candidate_method in method_list:
+        if method_str.lower() in candidate_method[1].lower():
+            return candidate_method
+    raise ValueError(f"The given sampling method \'{method_str}\' does not exist!\n"
+                     f"Please check if your spelling was correct, if the method should exist.")

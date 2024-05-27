@@ -25,11 +25,12 @@ except FileNotFoundError:
     DATA_PATH = "C:\\Users\\timbr\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data"
 
 
-def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="data\\WN18RR", kge_models=None,
-          regularizer="N3", reg=0, optimizer="Adagrad", max_epochs=50, patience=10, valid=3, rank=1000,
-          batch_size=1000, neg_sample_size=50, dropout=0, init_size=1e-3, learning_rate=1e-1, gamma=0,
-          bias="constant", dtype="double", double_neg=False, debug=False, multi_c=True,
-          aggregation_method=Constants.MAX_SCORE_AGGREGATION, theta_calculation=Constants.UNCHANGED_THETA):
+def train(info_directory, args):
+    #   subgraph_amount, args, dataset="WN18RR", dataset_directory="data\\WN18RR", kge_models=None,
+    #   regularizer="N3", reg=0, optimizer="Adagrad", max_epochs=50, patience=10, valid=3, rank=1000,
+    #   batch_size=1000, neg_sample_size=50, dropout=0, init_size=1e-3, learning_rate=1e-1, gamma=0,
+    #   bias="constant", dtype="double", double_neg=False, debug=False, multi_c=True,
+    #   aggregation_method=Constants.MAX_SCORE_AGGREGATION, theta_calculation=Constants.REGULAR_THETA):
     """
     The train function is a wrapper for the general train function in the general run.py file.
     It allows us to run multiple models at once, and save them all in one folder with
@@ -62,16 +63,6 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     """
     time_total_start = time.time()
 
-    if kge_models is None:
-        kge_models = {Constants.ROTAT_E: []}
-
-    args = argparse.Namespace(dataset=dataset, dataset_directory=dataset_directory, theta_calculation=theta_calculation,
-                              subgraph_amount=subgraph_amount, regularizer=regularizer, reg=reg, optimizer=optimizer,
-                              max_epochs=max_epochs, patience=patience, valid=valid, rank=rank, batch_size=batch_size,
-                              neg_sample_size=neg_sample_size, dropout=dropout, init_size=init_size,
-                              learning_rate=learning_rate, gamma=gamma, bias=bias, dtype=dtype, double_neg=double_neg,
-                              debug=debug, multi_c=multi_c)
-
     # set directories and ensure that they exist
     model_setup_config_dir = util_files.check_directory(f"{info_directory}\\model_setup_configs")
     model_file_dir = util_files.check_directory(f"{info_directory}\\model_files")
@@ -84,7 +75,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     with (open(valid_loss_file_path, "w") as valid_loss_file, open(train_loss_file_path, "w") as train_loss_file,
           open(metrics_file_path, "w") as metrics_file):
         subgraphs_str = ""
-        for sub_num in range(subgraph_amount):
+        for sub_num in range(args.subgraph_amount):
             subgraphs_str += f";sub_{sub_num:03d}"
         valid_loss_file.write(f"epoch;average valid loss{subgraphs_str}\n")
         train_loss_file.write(f"epoch;average train loss{subgraphs_str}\n")
@@ -97,12 +88,12 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     dataset_path = os.path.join(DATA_PATH, args.dataset)
 
     # get original dataset name
-    dataset_general = util.get_dataset_name(dataset)
+    dataset_general = util.get_dataset_name(args.dataset)
     # create model using original dataset and sizes, use returned embeddings in new models as initialization
     embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape \
         = util.generate_general_embeddings(dataset_general, args)
 
-    subgraph_embedding_mapping = util.assign_model_to_subgraph(kge_models, args)
+    subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
     embedding_models = setup_models(subgraph_embedding_mapping, args, info_directory, embedding_general_ent,
                                     embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape,
@@ -112,7 +103,8 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     logging.info(f"-/\tStarting training\t\\-")
     time_start_training_total = time.time()
 
-    valid_args = argparse.Namespace(counter=0, best_mrr=None, best_epoch=None, epoch=0, valid=valid, patience=patience)
+    valid_args = argparse.Namespace(counter=0, best_mrr=None, best_epoch=None, epoch=0, valid=args.valid,
+                                    patience=args.patience)
 
     for embedding_model in embedding_models:
         # --- Setting up training ---
@@ -131,7 +123,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
     train_losses = {}
     valid_losses = {}
     # Iterate over epochs
-    for epoch in range(max_epochs):
+    for epoch in range(args.max_epochs):
         time_start_training_sub = time.time()
 
         # initialize dict for train losses
@@ -163,12 +155,12 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
             model.eval()
 
         # Calculate unified embedding
-        cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models, theta_calculation)
+        cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models, args.theta_calculation)
         Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
                                                                   embedding_general_rel,
                                                                   embedding_models,
                                                                   cands_att_dict,
-                                                                  theta_calculation)
+                                                                  args.theta_calculation)
         # print training losses to file
         util_files.print_loss_to_file(train_loss_file_path, epoch, train_losses[epoch])
 
@@ -182,7 +174,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
         if (epoch + 1) % valid_args.valid == 0:
 
-            valid_metrics = evaluate_ensemble(embedding_models, aggregation_method, mode="valid",
+            valid_metrics = evaluate_ensemble(embedding_models, args.aggregation_method, mode="valid",
                                               metrics_file_path=metrics_file_path, epoch=epoch)
 
             valid_mrr = valid_metrics["MRR"]
@@ -222,7 +214,7 @@ def train(info_directory, subgraph_amount, dataset="WN18RR", dataset_directory="
 
     # --- Testing with aggregated scores ---
 
-    evaluate_ensemble(embedding_models, aggregation_method=aggregation_method, metrics_file_path=metrics_file_path)
+    evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, metrics_file_path=metrics_file_path)
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
@@ -278,7 +270,7 @@ def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_gen
         logging.debug(f"Entity size: {model.entity.weight.data.size()}")
 
         if args_subgraph.model_name in hyperbolic.HYP_MODELS:
-            model.rel = nn.Embedding(embedding_general_rel.num_embeddings , embedding_general_rel.embedding_dim)
+            model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
             # initialize with zeros and set present relation names to one
             model.rel.weight.data = torch.rand(args_subgraph.sizes[0], args_subgraph.rank * 2)
             # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
@@ -323,7 +315,7 @@ def set_context_vectors(model, rank, theta_calculation, theta_general_ent, theta
     theta_ent_set = None
     theta_rel_set = None
 
-    if theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+    if theta_calculation[0] == Constants.REGULAR_THETA[0]:
         theta_ent_set = entity_set
         theta_rel_set = relation_name_set
 

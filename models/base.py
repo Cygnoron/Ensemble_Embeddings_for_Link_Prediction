@@ -253,7 +253,7 @@ class KGModel(nn.Module, ABC):
         logging.debug(f"{theta_calculation[1]} was set for calculating theta.")
         if theta_calculation[0] == Constants.NO_THETA[0]:
             return
-        elif theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+        elif theta_calculation[0] == Constants.REGULAR_THETA[0]:
             self.theta_ent = nn.Embedding(sizes[0], rank)
             self.theta_rel = nn.Embedding(sizes[1], rank)
         elif theta_calculation[0] == Constants.REVERSED_THETA[0]:
@@ -276,7 +276,7 @@ class KGModel(nn.Module, ABC):
                       f"Rel: {self.theta_rel.weight.data.size()}")
         if self.theta_calculation[0] == Constants.NO_THETA[0]:
             return
-        elif self.theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+        elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
             self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
             self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
         elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:

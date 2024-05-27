@@ -4,6 +4,7 @@ import logging
 import os
 import pickle
 import shutil
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -339,3 +340,14 @@ def create_entity_and_relation_name_set_file(dataset):
             relation_name_set_file.write(
                 f"{relation_name};{len(triples)};{round(len(triples) / total_triples * 100, 3)}%\n")
         relation_name_set_file.write(f"total_triples;{total_triples};100%")
+
+
+def get_info_directory_path(dataset_out_dir, args):
+    hyper_param_str = f"results_{args.aggregation_method[2]}_{args.theta_calculation[2]}"
+
+    if not args.no_time_dependent_file_path:
+        hyper_param_str += datetime.now().strftime('_%m.%d_%H_%M')
+
+    info_directory = os.path.join(dataset_out_dir, hyper_param_str)
+    check_directory(info_directory)
+    return info_directory

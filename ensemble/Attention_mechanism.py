@@ -27,7 +27,7 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
         if theta_calculation[0] == Constants.NO_THETA:
             return
 
-        elif theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+        elif theta_calculation[0] == Constants.REGULAR_THETA[0]:
             # EXAMPLE WN18RR dimensions (40943 entities, 11*2 relation names, N subgraphs)
             # GOAL: att_weights_ent.size() = [40943, 32, N]     att_weights_ent.size() = [22, 32, N]
             # INPUT: theta_ent = [40943, 32, N]                 theta_rel = [22, 32, N]
@@ -101,7 +101,7 @@ def get_cands(embedding_models, batch_size):
     theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
     theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
 
-    if args.theta_calculation[0] == Constants.UNCHANGED_THETA[0]:
+    if args.theta_calculation[0] == Constants.REGULAR_THETA[0]:
         # theta_ent = theta_ent
         # theta_rel = theta_rel
         theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
