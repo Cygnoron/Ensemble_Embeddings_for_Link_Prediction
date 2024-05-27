@@ -12,7 +12,7 @@ import torch.optim
 import models as models
 import optimizers.regularizers as regularizers
 from datasets.kg_dataset import KGDataset
-from ensemble import util
+from ensemble import util, Constants
 from models import all_models
 from optimizers.kg_optimizer import KGOptimizer
 from utils.train import get_savedir, avg_both, format_metrics, count_params
@@ -121,6 +121,7 @@ def train(args):
     dataset_path = os.path.join(DATA_PATH, args.dataset)
     dataset = KGDataset(dataset_path, args.debug)
     args.sizes = dataset.get_shape()
+    args.theta_calculation = Constants.NO_THETA
 
     # load data
     logging.info("\t " + str(dataset.get_shape()))
