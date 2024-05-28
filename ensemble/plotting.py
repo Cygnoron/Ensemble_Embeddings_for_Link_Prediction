@@ -21,7 +21,7 @@ def create_graphml(info_directory, directory, to_convert=None):
     if to_convert is None:
         to_convert = [TRAIN]
     directory_split = directory.split("\\")
-    info_directory = util_files.check_directory(os.path.abspath(f"{info_directory}\\graphml"))
+    info_directory = util_files.check_directory(os.path.abspath(os.path.join(info_directory, "graphml")))
 
     # scan given directory for either subgraph directory or data files
     for file_dir in os.listdir(directory):
@@ -30,10 +30,10 @@ def create_graphml(info_directory, directory, to_convert=None):
             for subgraph in os.listdir(directory + "\\" + file_dir):
                 for data in to_convert:
                     if subgraph in data:
-                        print(f"create .graphml representation of {directory}\\{file_dir}: {subgraph} ...")
+                        print(f"create .graphml representation of {os.path.join(directory, file_dir)} {subgraph} ...")
 
                         # Read the Triples File
-                        triples_file = f"{directory}\\{file_dir}\\{subgraph}"
+                        triples_file = os.path.join(directory, file_dir, subgraph)
                         with open(triples_file, "r") as file:
                             triples = [line.strip().split() for line in file]
 

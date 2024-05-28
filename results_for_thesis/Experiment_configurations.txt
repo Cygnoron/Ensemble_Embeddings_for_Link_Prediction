@@ -1,0 +1,6 @@
+Embedding method {TransE, DistMult, ComplEx, RotatE, AttE, AttH}
+Datasets {WN18RR, YAGO3-10, NELL-995}
+N = {10,30,60}
+{Entity sampling, Feature sampling: rho = {2, 1, 0.5}}
+Score combination {Max, Average}
+Theta {no (without attention), unchanged, reversed, relation, multiplied}

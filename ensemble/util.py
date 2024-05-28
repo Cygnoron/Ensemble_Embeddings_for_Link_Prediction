@@ -307,7 +307,7 @@ def generate_general_embeddings(general_dataset: str, args):
     logging.debug("Creating general embeddings and context vectors.")
 
     # load data
-    dataset = KGDataset(os.path.abspath(f"data\\{general_dataset}"), args.debug)
+    dataset = KGDataset(os.path.abspath(os.path.join("data", general_dataset)), args.debug)
     sizes_ent, sizes_rel, _ = dataset.get_shape()
 
     if args.dtype == "double":

@@ -32,7 +32,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     """
 
     util_files.delete_paths(f"{info_directory}", "Ensemble_Embedding_for_Link_Prediction.log")
-    dataset_in_train = f"data\\{dataset_in}\\train"
+    dataset_in_train = os.path.join("data", dataset_in, "train")
 
     logging.info(f"Sampling {subgraph_amount} subgraphs with a relative size {subgraph_size_range} from "
                  f"{dataset_in} with {sampling_method[1]}")
@@ -44,7 +44,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     time_start = time.time()
 
     # columns for .csv file with stats about the subgraphs
-    config_directory = f"{info_directory}\\subgraph_config.csv"
+    config_directory = os.path.join(info_directory, "subgraph_config.csv")
     with open(config_directory, 'w') as config_file:
         config_file.write(f"original_kg;sampling_method;relation_names_rho;directory;sampling_time;"
                           f"subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;"
@@ -84,15 +84,16 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
             time_start_sub = time.time()
 
             # create directory for subgraph, if non-existent
-            os.makedirs(f"{dataset_out_dir}\\sub_{subgraph_num:03d}", exist_ok=True)
+            os.makedirs(os.path.join(dataset_out_dir, f"sub_{subgraph_num:03d}"), exist_ok=True)
 
             logging.info(f"-/\tSampling subgraph {dataset_out_dir}\\sub_{subgraph_num:03d} from {dataset_in} with "
                          f"params:\n\t\t\t\t\t\t\t {sampling_method[1]}{hyperparameter_str} and {subgraph_size_range} "
                          f"relative subgraph size.\t\\-")
 
-            with (open(os.path.abspath(f"{dataset_out_dir}\\sub_{subgraph_num:03d}\\train.pickle"),
+            with (open(os.path.abspath(os.path.join(dataset_out_dir, f"sub_{subgraph_num:03d}", "train.pickle")),
                        'wb') as output_file_pickle,
-                  open(os.path.abspath(f"{dataset_out_dir}\\sub_{subgraph_num:03d}\\train"), 'w') as output_file_raw):
+                  open(os.path.abspath(os.path.join(dataset_out_dir, f"sub_{subgraph_num:03d}", "train")),
+                       'w') as output_file_raw):
 
                 # Create Delta
                 # -- Special case: subgraph_num ==  --
@@ -129,7 +130,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 with open(config_directory, 'a') as config_file:
                     triples_deviation = len(delta_triples) - math.ceil(len(data) * subgraph_size_range[1])
                     config_file.write(f"\n{dataset_in};{sampling_method[1]};{relation_name_amount};"
-                                      f"{dataset_out_dir}\\sub_{subgraph_num:03d};"
+                                      f"{os.path.join(dataset_out_dir, f'sub_{subgraph_num:03d}')};"
                                       f"{round(time_stop_sub - time_start_sub, 3)};{subgraph_size_range};"
                                       f"{round(len(delta_triples) / len(data), 3)};{subgraph_num};"
                                       f"{len(delta_triples)};{triples_deviation};{len(used_entity_set)};"
@@ -146,7 +147,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
         if not init_successful:
             logging.error(f"File {dataset_in_train}.pickle was not found!")
         else:
-            logging.error(f"File {dataset_out_dir}\\sub_{subgraph_num:03d}\\train was not found!")
+            logging.error(f"File {os.path.join(dataset_out_dir, f'sub_{subgraph_num:03d}', 'train')} was not found!")
     except IndexError:
         logging.error(f"The selected sampling method {sampling_method[1]} is not yet implemented or doesn't exist!")
         traceback.print_exc()

@@ -255,16 +255,16 @@ def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, m
         for embedding_model in embedding_models:
             args = embedding_model["args"]
             # Save the model
-            torch.save(embedding_model['model'].cpu().state_dict(), f"{model_file_dir}\\model_{args.subgraph}_"
-                                                                    f"{args.model_name}.pt")
+            torch.save(embedding_model['model'].cpu().state_dict(),
+                       os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
     else:
         logging.info(f"Loading best models saved at epoch {valid_args.best_epoch}")
         # Iterate over models
         for embedding_model in embedding_models:
             args = embedding_model["args"]
             # Load the best model
-            embedding_model["model"].load_state_dict(torch.load(f"{model_file_dir}\\model_{args.subgraph}_"
-                                                                f"{args.model_name}.pt"))
+            embedding_model["model"].load_state_dict(
+                torch.load(os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt")))
 
 
 def print_loss_to_file(loss_file_path, epoch, loss_dict):
@@ -305,9 +305,9 @@ def create_entity_and_relation_name_set_file(dataset):
     """
     logging.debug(f"Creating csv files containing the entity and relation name sets for dataset {dataset}")
 
-    with (open(os.path.abspath(f"{dataset}\\train.pickle"), 'rb') as pickle_file,
-          open(f"{dataset}\\entity_set.csv", 'w') as entity_set_file,
-          open(f"{dataset}\\relation_name_set.csv", 'w') as relation_name_set_file):
+    with (open(os.path.abspath(os.path.join(dataset, "train.pickle")), 'rb') as pickle_file,
+          open(os.path.join(dataset, "entity_set.csv"), 'w') as entity_set_file,
+          open(os.path.join(dataset, "relation_name_set.csv"), 'w') as relation_name_set_file):
 
         logging.debug("Loading data from .pickle file")
         # load data from train.pickle file

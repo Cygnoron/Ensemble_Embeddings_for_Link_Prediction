@@ -160,7 +160,7 @@ def run_embedding(args):
     if not args.no_time_dependent_file_path:
         dataset_out += datetime.now().strftime('_%y.%m.%d_%H_%M')
 
-    dataset_out_dir = f"data\\{dataset_out}"
+    dataset_out_dir = os.path.join("data", dataset_out)
     args.dataset_in = args.dataset
     args.dataset = dataset_out
     args.dataset_dir = dataset_out_dir
@@ -178,11 +178,10 @@ def run_embedding(args):
                                  subgraph_size_range=args.subgraph_size_range,
                                  relation_name_amount=args.rho)
 
-    args.kge_models = util.get_embedding_methods(args.model)
-
     error = False
     try:
         if not args.no_training:
+            args.kge_models = util.get_embedding_methods(args.model)
             run.train(info_directory, args)
 
     except Exception:

@@ -16,13 +16,7 @@ from models import hyperbolic
 from optimizers import regularizers as regularizers, KGOptimizer
 from utils.train import count_params
 
-try:
-    # path on pc
-    DATA_PATH = "data"
-    os.listdir(DATA_PATH)
-except FileNotFoundError:
-    # path on laptop
-    DATA_PATH = "C:\\Users\\timbr\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\data"
+DATA_PATH = "data"
 
 
 def train(info_directory, args):
@@ -64,13 +58,13 @@ def train(info_directory, args):
     time_total_start = time.time()
 
     # set directories and ensure that they exist
-    model_setup_config_dir = util_files.check_directory(f"{info_directory}\\model_setup_configs")
-    model_file_dir = util_files.check_directory(f"{info_directory}\\model_files")
+    model_setup_config_dir = util_files.check_directory(os.path.join(info_directory, "model_setup_configs"))
+    model_file_dir = util_files.check_directory(os.path.join(info_directory, "model_files"))
 
     # set files and ensure that they exist
-    valid_loss_file_path = util_files.check_file(f"{info_directory}\\valid_loss.csv")
-    train_loss_file_path = util_files.check_file(f"{info_directory}\\train_loss.csv")
-    metrics_file_path = util_files.check_file(f"{info_directory}\\metrics_valid.csv")
+    valid_loss_file_path = util_files.check_file(os.path.join(info_directory, "valid_loss.csv"))
+    train_loss_file_path = util_files.check_file(os.path.join(info_directory, "train_loss.csv"))
+    metrics_file_path = util_files.check_file(os.path.join(info_directory, "metrics_valid.csv"))
 
     with (open(valid_loss_file_path, "w") as valid_loss_file, open(train_loss_file_path, "w") as train_loss_file,
           open(metrics_file_path, "w") as metrics_file):
@@ -185,8 +179,8 @@ def train(info_directory, args):
                 logging.info(f"Saving models at epoch {epoch} in {model_file_dir}")
                 for embedding_model in embedding_models:
                     args = embedding_model['args']
-                    torch.save(embedding_model['model'].cpu().state_dict(), f"{model_file_dir}\\model_{args.subgraph}_"
-                                                                            f"{args.model_name}.pt")
+                    torch.save(embedding_model['model'].cpu().state_dict(),
+                               os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
                     embedding_model['model'].cuda()
 
             else:
@@ -296,8 +290,8 @@ def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_gen
         embedding_models.append(embedding_model)
 
         # save config
-        with (open(f"{model_setup_config_dir}\\config_{subgraph}_{embedding_model['args'].model_name}.json", "w")
-              as json_file):
+        with (open(os.path.join(model_setup_config_dir, f"config_{subgraph}_{embedding_model['args'].model_name}.json"),
+                   "w") as json_file):
             json.dump(vars(args_subgraph), json_file)
 
     time_stop_model_creation = time.time()

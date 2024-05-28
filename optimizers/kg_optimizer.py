@@ -20,8 +20,7 @@ class KGOptimizer(object):
         double_neg: A boolean (True to sample both head and tail entities)
     """
 
-    def __init__(
-            self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, verbose=True):
+    def __init__(self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, verbose=True):
         """Inits KGOptimizer."""
         self.model = model
         self.regularizer = regularizer
