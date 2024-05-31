@@ -10,7 +10,7 @@ import torch
 class KGDataset(object):
     """Knowledge Graph dataset class."""
 
-    def __init__(self, data_path, debug, info_directory=""):
+    def __init__(self, data_path, debug, test_valid_file_dir=""):
         """Creates KG dataset object for data loading.
 
         Args:
@@ -21,7 +21,7 @@ class KGDataset(object):
         """
         self.relation_name_set = []
         self.entity_set = []
-        self.info_directory = info_directory
+        self.test_valid_file_dir = test_valid_file_dir
         self.data_path = data_path
         self.debug = debug
         self.data = {}
@@ -31,13 +31,13 @@ class KGDataset(object):
                 with open(file_path, "rb") as in_file:
                     self.data[split] = pkl.load(in_file)
             except FileNotFoundError:
-                file_path = os.path.join(info_directory, "data", split + ".pickle")
+                file_path = os.path.join(test_valid_file_dir, split + ".pickle")
                 with open(file_path, "rb") as in_file:
                     self.data[split] = pkl.load(in_file)
         try:
             filters_file = open(os.path.join(self.data_path, "to_skip.pickle"), "rb")
         except FileNotFoundError:
-            filters_file = open(os.path.join(info_directory, "data", "to_skip.pickle"), "rb")
+            filters_file = open(os.path.join(test_valid_file_dir, "to_skip.pickle"), "rb")
         self.to_skip = pkl.load(filters_file)
         filters_file.close()
         max_axis = np.max(self.data["train"], axis=0)

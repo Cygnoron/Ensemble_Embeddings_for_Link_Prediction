@@ -141,7 +141,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                                  f"sampling took {util.format_time(time_start_sub, time_stop_sub)}\t/-\n")
 
         # copy necessary files
-        util_files.copy_test_valid_filter_data(dataset_in, info_directory)
+        util_files.copy_test_valid_filter_data(dataset_in, dataset_out_dir)
 
     except FileNotFoundError:
         if not init_successful:
