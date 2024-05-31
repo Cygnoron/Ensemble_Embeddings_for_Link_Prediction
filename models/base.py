@@ -272,8 +272,6 @@ class KGModel(nn.Module, ABC):
                       f"Rel: {self.theta_rel.weight.data.size()}")
 
     def update_theta(self, queries):
-        logging.debug(f"Theta working sizes:\tEnt: {self.theta_ent.weight.data.size()}\t"
-                      f"Rel: {self.theta_rel.weight.data.size()}")
         if self.theta_calculation[0] == Constants.NO_THETA[0]:
             return
         elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
