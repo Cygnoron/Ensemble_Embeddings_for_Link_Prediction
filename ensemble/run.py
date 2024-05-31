@@ -20,11 +20,6 @@ DATA_PATH = "data"
 
 
 def train(info_directory, args):
-    #   subgraph_amount, args, dataset="WN18RR", dataset_directory="data\\WN18RR", kge_models=None,
-    #   regularizer="N3", reg=0, optimizer="Adagrad", max_epochs=50, patience=10, valid=3, rank=1000,
-    #   batch_size=1000, neg_sample_size=50, dropout=0, init_size=1e-3, learning_rate=1e-1, gamma=0,
-    #   bias="constant", dtype="double", double_neg=False, debug=False, multi_c=True,
-    #   aggregation_method=Constants.MAX_SCORE_AGGREGATION, theta_calculation=Constants.REGULAR_THETA):
     """
     The train function is a wrapper for the general train function in the general run.py file.
     It allows us to run multiple models at once, and save them all in one folder with
@@ -32,34 +27,13 @@ def train(info_directory, args):
     takes all the arguments that are passed into the general train, but also takes an additional argument: multi_c.
 
 
-    :param info_directory: Directory for all
-    :param dataset: default="WN18RR", choices=["FB15K", "WN", "WN18RR", "WN18RR_sampled", "FB237", "YAGO3-10"], help="Knowledge Graph dataset"
-    :param dataset_directory: The directory, where the dataset is located, default="data\\WN18RR"
-    :param kge_models: default="RotE", all allowed KGE models
-    :param regularizer: choices=["N3", "F2"], default="N3", help="Regularizer"
-    :param reg: default=0, type=float, help="Regularization weight"
-    :param optimizer: choices=["Adagrad", "Adam", "SparseAdam"], default="Adagrad", help="Optimizer"
-    :param max_epochs: default=50, type=int, help="Maximum number of epochs to train for"
-    :param patience: default=10, type=int, help="Number of epochs before early stopping"
-    :param valid: default=3, type=float, help="Number of epochs before validation"
-    :param rank: default=1000, type=int, help="Embedding dimension"
-    :param batch_size: default=1000, type=int, help="Batch size"
-    :param neg_sample_size: default=50, type=int, help="Negative sample size, -1 to not use negative sampling"
-    :param dropout: default=0, type=float, help="Dropout rate"
-    :param init_size: default=1e-3, type=float, help="Initial embeddings' scale"
-    :param learning_rate: default=1e-1, type=float, help="Learning rate"
-    :param gamma: default=0, type=float, help="Margin for distance-based losses"
-    :param bias: default="constant", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)"
-    :param dtype: default="double", type=str, choices=["single", "double"], help="Machine precision"
-    :param double_neg: action="store_true", help="Whether to negative sample both head and tail entities"
-    :param debug: action="store_true", help="Only use 1000 examples for debugging"
-    :param multi_c: action="store_true", help="Multiple curvatures per relation", needed for AttH
     """
     time_total_start = time.time()
 
     # set directories and ensure that they exist
     model_setup_config_dir = util_files.check_directory(os.path.join(info_directory, "model_setup_configs"))
     model_file_dir = util_files.check_directory(os.path.join(info_directory, "model_files"))
+    test_valid_file_dir = util_files.check_directory(os.path.join(args.dataset_dir, "data"))
 
     # set files and ensure that they exist
     valid_loss_file_path = util_files.check_file(os.path.join(info_directory, "valid_loss.csv"))
@@ -89,7 +63,7 @@ def train(info_directory, args):
 
     subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
-    embedding_models = setup_models(subgraph_embedding_mapping, args, info_directory, embedding_general_ent,
+    embedding_models = setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embedding_general_ent,
                                     embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape,
                                     model_setup_config_dir, dataset_path)
 
@@ -123,12 +97,17 @@ def train(info_directory, args):
         # initialize dict for train losses
         train_losses[epoch] = {}
         # Iterate over models
-        for embedding_model in embedding_models:
+        for index, embedding_model in enumerate(embedding_models):
             args = embedding_model['args']
             model = embedding_model['model']
 
-            logging.info(f"Training subgraph {embedding_model['subgraph']} in epoch {epoch} with model "
-                         f"{args.model_name}")
+            if args.model_dropout:
+                train_losses[epoch][embedding_model['args'].subgraph] = "dropout"
+                continue
+
+            logging.info(
+                f"Training subgraph {embedding_model['subgraph']} (ensemble step {index+1}/{len(embedding_models)}) "
+                f"in epoch {epoch} with model {args.model_name}")
 
             # Train step
             model.train()
@@ -163,8 +142,11 @@ def train(info_directory, args):
 
         # print validation losses
         util_files.print_loss_to_file(valid_loss_file_path, epoch, valid_losses[epoch])
-        logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses: {valid_losses[epoch]}")
+        logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses:\n"
+                      f"{util.format_dict(valid_losses[epoch])}")
         logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
+
+        check_model_dropout(embedding_models, valid_losses[epoch])
 
         if (epoch + 1) % valid_args.valid == 0:
 
@@ -214,7 +196,7 @@ def train(info_directory, args):
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
 
 
-def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_general_ent, embedding_general_rel,
+def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embedding_general_ent, embedding_general_rel,
                  theta_general_ent, theta_general_rel, general_dataset_shape, model_setup_config_dir, dataset_path):
     # --- setting up embedding models ---
     logging.info("-/\tSetting up embedding models\t\\-")
@@ -237,7 +219,8 @@ def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_gen
 
         # load data
         logging.info(f"Loading data for subgraph {subgraph}.")
-        dataset = KGDataset(dataset_path + f"\\{subgraph}", args_subgraph.debug, info_directory=info_directory)
+        dataset = KGDataset(os.path.join(dataset_path, subgraph), args_subgraph.debug,
+                            test_valid_file_dir=test_valid_file_dir)
         train_examples = dataset.get_examples("train")
         valid_examples = dataset.get_examples("valid")
         test_examples = dataset.get_examples("test")
@@ -249,6 +232,8 @@ def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_gen
         args_subgraph.sizes = general_dataset_shape
 
         logging.debug(f"Sizes: old {dataset.get_shape()}\tnew {args_subgraph.sizes}")
+
+        args_subgraph.model_dropout = False
 
         # create model
         model = getattr(models, args_subgraph.model)(args_subgraph)
@@ -286,7 +271,7 @@ def setup_models(subgraph_embedding_mapping, args, info_directory, embedding_gen
         embedding_model = {"dataset": dataset, "model": model, "train_examples": train_examples,
                            "valid_examples": valid_examples, "test_examples": test_examples,
                            "filters": filters, "subgraph": subgraph, "args": args_subgraph,
-                           "load_from_file": False}
+                           "first_valid_loss": None, "size_rhs": None, "size_lhs": None}
         embedding_models.append(embedding_model)
 
         # save config
@@ -336,3 +321,31 @@ def set_context_vectors(model, rank, theta_calculation, theta_general_ent, theta
     model.theta_rel.weight.data = torch.zeros(theta_general_rel.weight.data.size())
     model.theta_rel.weight.data[theta_rel_set] = torch.rand((len(theta_rel_set), rank))
     logging.debug(f"Theta_rel size: {model.theta_rel.weight.data.size()}")
+
+
+def check_model_dropout(embedding_models, valid_losses):
+    for embedding_model in embedding_models:
+        args = embedding_model['args']
+        subgraph = embedding_model['subgraph']
+
+        if valid_losses[subgraph] == "dropout":
+            continue
+
+        if embedding_model['first_valid_loss'] is None:
+            # if "1" in subgraph:
+            #     embedding_model['first_valid_loss'] = float(valid_losses[subgraph] / 20)
+            # else:
+            embedding_model['first_valid_loss'] = float(valid_losses[subgraph])
+
+        if (valid_losses[subgraph] >=
+                embedding_model['first_valid_loss'] * args.model_dropout_factor):
+            # exclude model from ensemble if valid loss was to high, indicating diverging behaviour
+            logging.info(f"Excluding model {subgraph} from ensemble since {valid_losses[subgraph]} is larger than "
+                         f"{args.model_dropout_factor} times the first validation loss "
+                         f"{embedding_model['first_valid_loss']}")
+
+            # "hard dropout" -> completly exclude model if it diverged once
+            args.model_dropout = True
+
+            # TODO "soft dropout": load best performing model and retrain from that stage,
+            #  if still diverging exclude completely
