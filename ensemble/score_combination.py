@@ -79,10 +79,16 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
     targets_rhs = None
     progress_bar_testing = None
 
+    logging.info(f"Calculating {eval_mode} scores for the ensemble.")
     # Iterate over each embedding model
     for embedding_model in embedding_models:
         model = embedding_model['model']
         args = embedding_model['args']
+
+        if args.model_dropout:
+            logging.debug(f"Skipping calculation of scores for {args.subgraph}, since the valid scores diverged "
+                          f"to much (factor {args.model_dropout_factor}).")
+            continue
 
         # Get the number of candidate answers
         candidate_answers = len(model.get_rhs(examples, eval_mode=True)[0])
@@ -188,8 +194,12 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
     logging.info(f"Combining scores of all models with {aggregation_method[1]}.")
 
     # Get the size of scores for rhs and lhs directions
-    size = {'rhs': embedding_models[0]['scores_rhs'].size(),
-            'lhs': embedding_models[0]['scores_lhs'].size()}
+    if embedding_models[0]['size_rhs'] is None or embedding_models[0]['size_lhs'] is None:
+        embedding_models[0]['size_rhs'] = embedding_models[0]['scores_rhs'].size()
+        embedding_models[0]['size_lhs'] = embedding_models[0]['scores_lhs'].size()
+
+    size = {'rhs': embedding_models[0]['size_rhs'],
+            'lhs': embedding_models[0]['size_lhs']}
 
     # Initialize progress bar for tracking progress
     progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine {eval_mode} scores",
@@ -216,6 +226,9 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
             # Collect scores from all models
             model_scores = []
             for embedding_model in embedding_models:
+                if embedding_model['args'].model_dropout:
+                    continue
+
                 if mode == "lhs":
                     model_scores += [embedding_model['scores_lhs'][b_begin:b_begin + batch_size]]
                 else:
@@ -441,6 +454,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
 def calculate_valid_loss(embedding_models):
     valid_loss_dict = {}
     valid_loss = 0.0
+    active_models = len(embedding_models)
     # Iterate over all embedding models
     for embedding_model in embedding_models:
         # Setup variables
@@ -448,6 +462,11 @@ def calculate_valid_loss(embedding_models):
         optimizer = embedding_model["optimizer"]
         valid_examples = embedding_model["valid_examples"]
         subgraph = embedding_model["subgraph"]
+
+        if embedding_model['args'].model_dropout:
+            valid_loss_dict[subgraph] = "dropout"
+            active_models -= 1
+            continue
 
         # calculate single validation loss
         model.eval()
@@ -458,6 +477,6 @@ def calculate_valid_loss(embedding_models):
         valid_loss_dict[subgraph] = valid_loss_sub.item()
 
     # average valid loss over all "len(embedding_models)" models
-    valid_loss /= len(embedding_models)
+    valid_loss /= active_models
 
     return valid_loss, valid_loss_dict
