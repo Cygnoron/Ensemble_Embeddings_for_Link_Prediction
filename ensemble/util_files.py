@@ -294,11 +294,13 @@ def print_loss_to_file(loss_file_path, epoch, loss_dict):
 def print_metrics_to_file(metrics_file_path, metrics, epoch, mode):
     with open(f"{metrics_file_path}", 'a') as metrics_file:
         logging.debug(f"Printing metrics to {metrics_file_path}.")
-        metrics_file.write(f"{epoch};{mode};{metrics['MR']};{metrics['MRR']};{metrics['hits@[1,3,10]'][0]};"
-                           f"{metrics['hits@[1,3,10]'][1]};{metrics['hits@[1,3,10]'][2]};{metrics['AMRI']};"
-                           f"{metrics['MR_deviation']}")
+        for metric_type in ['average', 'rhs', 'lhs']:
+            metrics_file.write(f"{epoch};{mode};{metric_type};{metrics['MR'][metric_type]};"
+                               f"{metrics['MRR'][metric_type]};{metrics['hits@[1,3,10]'][metric_type][0]};"
+                               f"{metrics['hits@[1,3,10]'][metric_type][1]};{metrics['hits@[1,3,10]'][metric_type][2]};"
+                               f"{metrics['AMRI'][metric_type]};{metrics['rank_deviation'][metric_type]}")
 
-        metrics_file.write("\n")
+            metrics_file.write("\n")
 
 
 def create_entity_and_relation_name_set_file(dataset):

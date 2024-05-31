@@ -5,6 +5,8 @@ import time
 import traceback
 from datetime import datetime
 
+import wandb
+
 from ensemble import Constants, util_files, util, run, subsampling
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -112,6 +114,10 @@ parser.add_argument(
     help="The method by which all scores from the ensemble are combined."
 )
 parser.add_argument(
+    "--model_dropout_factor", default=1000, type=int,
+    help="The method by which all scores from the ensemble are combined."
+)
+parser.add_argument(
     "--theta_method", default="regular", choices=["no", "regular", "reversed", "relation", "multiplied"],
     help="The method by which the context vectors (cv) are used in order to calculate attention values for the unified "
          "embedding:\n"
@@ -182,6 +188,9 @@ def run_embedding(args):
     try:
         if not args.no_training:
             args.kge_models = util.get_embedding_methods(args.model)
+
+            wandb.init(project="First test runs", config=args)
+
             run.train(info_directory, args)
 
     except Exception:
@@ -203,7 +212,7 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 5
+    subgraph_amount = 3
     subgraph_size_range = (0.3, 0.35)
     relation_name_amount = 0.5
     model_dropout_factor = 1.5
@@ -301,7 +310,6 @@ def run_embedding_manual():
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
 
-
         # --- training process ---
 
         # for i in range(1):
@@ -320,7 +328,7 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 30
+                    args.max_epochs = 10
                     args.batch_size = 750
                     args.rank = 32
                     args.learning_rate = 0.1
@@ -335,9 +343,11 @@ def run_embedding_manual():
                     args.gamma = 0
                     args.bias = "none"
                     args.dtype = "single"
-                    args.debug = True
+                    args.debug = False
                     args.multi_c = True
                     args.double_neg = False
+
+                    wandb.init(project="First test runs", config=vars(args))
 
                     run.train(info_directory, args)
 
@@ -356,8 +366,10 @@ def run_embedding_manual():
 
 
 if __name__ == "__main__":
+    wandb.login()
+
     # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    # run_embedding(parser.parse_args())
 
     # Function to run manual via IDE
-    # run_embedding_manual()
+    run_embedding_manual()

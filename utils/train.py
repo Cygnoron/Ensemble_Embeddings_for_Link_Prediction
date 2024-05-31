@@ -2,6 +2,8 @@
 import datetime
 import os
 
+import wandb
+
 LOGS_PATH = "\\logs"
 
 
@@ -15,7 +17,7 @@ def get_savedir(model, dataset):
     return save_dir
 
 
-def avg_both(mrs, mrrs, hits, amris, mr_deviations):
+def avg_both(mrs, mrrs, hits, amris, rank_deviations):
     """Aggregate metrics for missing lhs and rhs.
 
     Args:
@@ -23,32 +25,38 @@ def avg_both(mrs, mrrs, hits, amris, mr_deviations):
         mrrs: Dict[str, float]
         hits: Dict[str, torch.FloatTensor]
         amris: Dict[str, float]
-        mr_deviations: Dict[str, float]
+        rank_deviations: Dict[str, float]
     Returns:
         Dict[str, torch.FloatTensor] mapping metric name to averaged score
     """
-    mr = (mrs['lhs'] + mrs['rhs']) / 2.
-    mrr = (mrrs['lhs'] + mrrs['rhs']) / 2.
-    h = (hits['lhs'] + hits['rhs']) / 2.
+    mrs['average'] = (mrs['lhs'] + mrs['rhs']) / 2.
+    mrrs['average'] = (mrrs['lhs'] + mrrs['rhs']) / 2.
+    hits['average'] = (hits['lhs'] + hits['rhs']) / 2.
 
-    # added AMRI and MR_deviation
-    amri = (amris['lhs'] + amris['rhs']) / 2.
-    mr_deviation = (mr_deviations['lhs'] + mr_deviations['rhs']) / 2.
+    # added AMRI and rank_deviation
+    amris['average'] = (amris['lhs'] + amris['rhs']) / 2.
+    rank_deviations['average'] = (rank_deviations['lhs'] + rank_deviations['rhs']) / 2.
+    hits_wandb = {'HITS@1': {'average': hits['average'][0], 'lhs': hits['lhs'][0], 'rhs': hits['rhs'][0]},
+                  'HITS@3': {'average': hits['average'][1], 'lhs': hits['lhs'][1], 'rhs': hits['rhs'][1]},
+                  'HITS@10': {'average': hits['average'][2], 'lhs': hits['lhs'][2], 'rhs': hits['rhs'][2]}}
+    wandb.log({'MR': mrs, 'MRR': mrrs, 'HITS@k': hits_wandb, 'AMRI': amris, 'rank_deviation': rank_deviations})
 
-    return {'MR': mr, 'MRR': mrr, 'hits@[1,3,10]': h, 'AMRI': amri, 'MR_deviation': mr_deviation}
+    return {'MR': mrs, 'MRR': mrrs, 'hits@[1,3,10]': hits, 'AMRI': amris, 'rank_deviation': rank_deviations}
 
 
 def format_metrics(metrics, split):
     """Format metrics for logging."""
-    result = "\t {} MR: {:.2f} | ".format(split, metrics['MR'])
-    result += "MRR: {:.3f} | ".format(metrics['MRR'])
-    result += "H@1: {:.3f} | ".format(metrics['hits@[1,3,10]'][0])
-    result += "H@3: {:.3f} | ".format(metrics['hits@[1,3,10]'][1])
-    result += "H@10: {:.3f} | ".format(metrics['hits@[1,3,10]'][2])
+    result = ""
+    for mode in ['average', 'rhs', 'lhs']:
+        result += f"{mode} {split} metrics:\tMR: {metrics['MR'][mode]:.2f} | "
+        result += f"MRR: {metrics['MRR'][mode]:.3f} | "
+        result += f"H@1: {metrics['hits@[1,3,10]'][mode][0]:.3f} | "
+        result += f"H@3: {metrics['hits@[1,3,10]'][mode][1]:.3f} | "
+        result += f"H@10: {metrics['hits@[1,3,10]'][mode][2]:.3f} | "
 
-    # added AMRI and MR_deviation
-    result += "AMRI: {:.6f} | ".format(metrics['AMRI'])
-    result += "MR_deviation: {:.3f}".format(metrics['MR_deviation'])
+        # added AMRI and rank_deviation
+        result += f"AMRI: {metrics['AMRI'][mode]:.3f} | "
+        result += f"rank_deviation: {metrics['rank_deviation'][mode]:.3f}\n"
     return result
 
 
@@ -60,9 +68,9 @@ def write_metrics(writer, step, metrics, split):
     writer.add_scalar('{}_H3'.format(split), metrics['hits@[1,3,10]'][1], global_step=step)
     writer.add_scalar('{}_H10'.format(split), metrics['hits@[1,3,10]'][2], global_step=step)
 
-    # added AMRI and MR_deviation
+    # added AMRI and rank_deviation
     writer.add_scalar('{}_AMRI'.format(split), metrics['AMRI'], global_step=step)
-    writer.add_scalar('{}_MR_deviation'.format(split), metrics['MR_deviation'], global_step=step)
+    writer.add_scalar('{}_rank_deviation'.format(split), metrics['rank_deviation'], global_step=step)
 
 
 def count_params(model):

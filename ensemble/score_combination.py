@@ -163,15 +163,6 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         embedding_model['targets_rhs'] = targets_rhs
         embedding_model['candidate_answers'] = candidate_answers
 
-    # Aggregate target scores into a dictionary
-    targets = {'rhs': targets_rhs, 'lhs': targets_lhs}
-    logging.debug(f"lhs")
-    for embedding_model in embedding_models:
-        logging.debug(embedding_model['targets_lhs'])
-    logging.debug(f"rhs")
-    for embedding_model in embedding_models:
-        logging.debug(embedding_model['targets_rhs'])
-
     # Complete progress bar and close
     progress_bar_testing.n = progress_bar_testing.total
     progress_bar_testing.refresh()

@@ -50,7 +50,7 @@ class KGModel(nn.Module, ABC):
         self.theta_calculation = theta_calculation
         self.theta_ent = None
         self.theta_rel = None
-        self.init_theta(theta_calculation, sizes, rank)
+        self.init_theta()
         self.act = nn.Softmax(dim=1)
         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
 
@@ -159,32 +159,39 @@ class KGModel(nn.Module, ABC):
         factors = self.get_factors(queries)
         return predictions, factors
 
-    def get_ranking(self, queries, filters, batch_size=1000):
+    def get_ranking(self, queries, filters, ensemble_args=None, batch_size=1000):
         """Compute filtered ranking of correct entity for evaluation.
 
         Args:
             queries: torch.LongTensor with query triples (head, relation, tail)
             filters: filters[(head, relation)] gives entities to ignore (filtered setting)
+            ensemble_args (tuple): (aggregated_scores[mode], ensemble_targets[mode]).
+                                   Defaults to None if no ensemble is evaluated.
             batch_size: int for evaluation batch size
 
         Returns:
             ranks_opt: torch.Tensor with optimistic ranks or correct entities
-            ranks_pes: torch.Tensor with pessimistic ranks or correct entities
+            rank_deviation: torch.Tensor with rank_deviation metric
         """
-        ranks_opt = torch.ones(len(queries))
-        ranks_pes = torch.ones(len(queries))
+
+        rank_deviation = 0
 
         with torch.no_grad():
             b_begin = 0
             candidates = self.get_rhs(queries, eval_mode=True)
+            ranks_opt = torch.ones(len(queries))
             while b_begin < len(queries):
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
-                q = self.get_queries(these_queries)
-                rhs = self.get_rhs(these_queries, eval_mode=False)
+                if ensemble_args[0] is None:
+                    q = self.get_queries(these_queries)
+                    rhs = self.get_rhs(these_queries, eval_mode=False)
 
-                scores = self.score(q, candidates, eval_mode=True)
-                targets = self.score(q, rhs, eval_mode=False)
+                    scores = self.score(q, candidates, eval_mode=True)
+                    targets = self.score(q, rhs, eval_mode=False)
+                else:
+                    scores = ensemble_args[0][b_begin:b_begin + batch_size]  # aggregated_scores
+                    targets = ensemble_args[1][b_begin:b_begin + batch_size]  # aggregated_targets
 
                 # set filtered and true scores to -1e6 to be ignored
                 for i, query in enumerate(these_queries):
@@ -195,32 +202,34 @@ class KGModel(nn.Module, ABC):
                 # Calculate optimistic rank
                 ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).float(), dim=1).cpu()
 
-                # Calculate pessimistic rank
-                pessimistic_rank = torch.sum((scores > targets).float(), dim=1)
-                # Adjust for pessimistic rank (subtract 1 if target score is included)
-                target_subtraction = torch.sum((scores == targets).float(), dim=1)
+                # Calculate rank_deviation
+                rank_deviation_buffer = torch.sum((scores == targets).float(), dim=1)
 
-                ranks_pes[b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
+                rank_deviation += torch.sum(torch.abs(rank_deviation_buffer))
+                logging.debug(f"{rank_deviation}")
+
+                # ranks_pes[b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
 
                 b_begin += batch_size
-        return ranks_opt, ranks_pes
+        return ranks_opt, rank_deviation
 
-    def compute_metrics(self, examples, filters, sizes, batch_size=500):
+    def compute_metrics(self, examples, filters, sizes, ensemble_args=(None, None), batch_size=500):
         """Compute ranking-based evaluation metrics.
     
         Args:
             examples: torch.LongTensor of size n_examples x 3 containing triples' indices
             filters: Dict with entities to skip per query for evaluation in the filtered setting
+            ensemble_args (tuple): (aggregated_scores, aggregated_targets).Defaults to None if no ensemble is evaluated.
             batch_size: integer for batch size to use to compute scores
 
         Returns:
-            Evaluation metrics (mean rank, mean reciprocical rank and hits)
+            Evaluation metrics (mean rank, mean reciprocical rank, hits, amri and rank_deviation)
         """
         mean_rank = {}
         mean_reciprocal_rank = {}
         hits_at = {}
         amri = {}
-        mr_deviation = {}
+        rank_deviation = {}
 
         for m in ["rhs", "lhs"]:
             q = examples.clone()
@@ -230,7 +239,8 @@ class KGModel(nn.Module, ABC):
                 q[:, 2] = tmp
                 q[:, 1] += self.sizes[1] // 2
 
-            ranks_opt, ranks_pes = self.get_ranking(q, filters[m], batch_size=batch_size)
+            ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
+                                                            ensemble_args=(ensemble_args[0][m], ensemble_args[1][m]))
 
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
@@ -244,29 +254,26 @@ class KGModel(nn.Module, ABC):
             sum_scores = ranks_opt.size()[0] * sizes[0]
             amri[m] = 1 - (2 * sum_ranks) / sum_scores
 
-            # Compute MR_deviation
-            mr_deviation[m] = torch.sum(ranks_opt - ranks_pes)
+        return mean_rank, mean_reciprocal_rank, hits_at, amri, rank_deviation
 
-        return mean_rank, mean_reciprocal_rank, hits_at, amri, mr_deviation
-
-    def init_theta(self, theta_calculation, sizes, rank):
-        logging.debug(f"{theta_calculation[1]} was set for calculating theta.")
-        if theta_calculation[0] == Constants.NO_THETA[0]:
+    def init_theta(self):
+        logging.debug(f"{self.theta_calculation[1]} was set for calculating theta.")
+        if self.theta_calculation[0] == Constants.NO_THETA[0]:
             return
-        elif theta_calculation[0] == Constants.REGULAR_THETA[0]:
-            self.theta_ent = nn.Embedding(sizes[0], rank)
-            self.theta_rel = nn.Embedding(sizes[1], rank)
-        elif theta_calculation[0] == Constants.REVERSED_THETA[0]:
-            self.theta_ent = nn.Embedding(sizes[1], rank)
-            self.theta_rel = nn.Embedding(sizes[0], rank)
-        elif theta_calculation[0] == Constants.RELATION_THETA[0]:
-            self.theta_ent = nn.Embedding(sizes[1], rank)
-            self.theta_rel = nn.Embedding(sizes[1], rank)
-        elif theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
-            self.theta_ent = nn.Embedding(sizes[0], rank)
-            self.theta_rel = nn.Embedding(sizes[1], rank)
+        elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
+            self.theta_ent = nn.Embedding(self.sizes[0], self.rank)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
+        elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
+            self.theta_ent = nn.Embedding(self.sizes[1], self.rank)
+            self.theta_rel = nn.Embedding(self.sizes[0], self.rank)
+        elif self.theta_calculation[0] == Constants.RELATION_THETA[0]:
+            self.theta_ent = nn.Embedding(self.sizes[1], self.rank)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
+        elif self.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
+            self.theta_ent = nn.Embedding(self.sizes[0], self.rank)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
         else:
-            logging.error(f"The given '{theta_calculation}' is not implemented as a way to calculate theta!")
+            logging.error(f"The given '{self.theta_calculation}' is not implemented as a way to calculate theta!")
             assert ValueError
         logging.debug(f"Theta init sizes:\tEnt: {self.theta_ent.weight.data.size()}\t"
                       f"Rel: {self.theta_rel.weight.data.size()}")

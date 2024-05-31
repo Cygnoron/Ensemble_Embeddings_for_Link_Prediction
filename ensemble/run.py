@@ -47,7 +47,7 @@ def train(info_directory, args):
             subgraphs_str += f";sub_{sub_num:03d}"
         valid_loss_file.write(f"epoch;average valid loss{subgraphs_str}\n")
         train_loss_file.write(f"epoch;average train loss{subgraphs_str}\n")
-        metrics_file.write(f"epoch;mode;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;MR_deviation\n")
+        metrics_file.write(f"epoch;mode;metric_type;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;rank_deviation\n")
 
     logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
     logging.info(f"### Saving .pt files of stored models in: {model_file_dir} ###")
@@ -106,7 +106,7 @@ def train(info_directory, args):
                 continue
 
             logging.info(
-                f"Training subgraph {embedding_model['subgraph']} (ensemble step {index+1}/{len(embedding_models)}) "
+                f"Training subgraph {embedding_model['subgraph']} (ensemble step {index + 1}/{len(embedding_models)}) "
                 f"in epoch {epoch} with model {args.model_name}")
 
             # Train step
@@ -153,7 +153,7 @@ def train(info_directory, args):
             valid_metrics = evaluate_ensemble(embedding_models, args.aggregation_method, mode="valid",
                                               metrics_file_path=metrics_file_path, epoch=epoch)
 
-            valid_mrr = valid_metrics["MRR"]
+            valid_mrr = valid_metrics["MRR"]['average']
             if not valid_args.best_mrr or valid_mrr > valid_args.best_mrr:
                 valid_args.best_mrr = valid_mrr
                 valid_args.counter = 0
