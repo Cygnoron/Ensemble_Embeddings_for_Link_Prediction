@@ -126,7 +126,7 @@ parser.add_argument(
          "cv for relation names is only influenced by relation name embeddings\n"
 )
 parser.add_argument(
-    '--model', type=str, required=True, default="{TransE:[\'all\']}",
+    '--model', type=str, default="{TransE:[\'all\']}",
     help='JSON string of the mapping from embedding methods to subgraphs.\n'
          '- \'all\' in a mapping sets all subgraphs to this method\n'
          '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
@@ -161,7 +161,7 @@ def run_embedding(args):
         dataset_out += datetime.now().strftime('_%y.%m.%d_%H_%M')
 
     dataset_out_dir = os.path.join("data", dataset_out)
-    args.dataset_in = args.dataset
+    dataset_in = args.dataset
     args.dataset = dataset_out
     args.dataset_dir = dataset_out_dir
 
@@ -173,7 +173,7 @@ def run_embedding(args):
                        logging_level=args.logging)
 
     if not args.no_sampling:
-        subsampling.sample_graph(info_directory, args.dataset_in, dataset_out_dir, args.sampling_method,
+        subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
                                  subgraph_size_range=args.subgraph_size_range,
                                  relation_name_amount=args.rho)
@@ -203,17 +203,18 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 3
+    subgraph_amount = 5
     subgraph_size_range = (0.3, 0.35)
-
     relation_name_amount = 0.5
+    model_dropout_factor = 1.5
 
-    args = argparse.Namespace(sampling=True, training=True, time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True,
                               subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
                               relation_name_amount=relation_name_amount,
-                              sampling_method=Constants.FEATURE_SAMPLING,
+                              sampling_method=Constants.ENTITY_SAMPLING,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              theta_calculation=Constants.REGULAR_THETA)
+                              theta_calculation=Constants.NO_THETA,
+                              model_dropout_factor=model_dropout_factor)
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -264,7 +265,7 @@ def run_embedding_manual():
         #     util.create_entity_and_relation_name_set_file(dataset.name)
 
         # --- sampling process ---
-        if args.sampling:
+        if not args.no_sampling:
             subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                      subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
                                      relation_name_amount=args.relation_name_amount)
@@ -291,11 +292,15 @@ def run_embedding_manual():
         # allowed_kge_models = {Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [2, 3], Constants.ROTAT_E: ["rest"],
         #                       Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
 
-        # allowed_kge_models = [{Constants.TRANS_E: [0, "rest"], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
-        #                        Constants.COMPL_EX: [3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
+        allowed_kge_models = [{Constants.TRANS_E: [0, "rest"], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
+                               Constants.COMPL_EX: [3, "rest"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [1, 0, "rest"], Constants.DIST_MULT: [13], Constants.ROTAT_E: [21],
         #                        Constants.COMPL_EX: [2, 3, "rest"], Constants.ATT_E: [50]}]
+
+        # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
+        #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
+
 
         # --- training process ---
 
@@ -304,18 +309,18 @@ def run_embedding_manual():
         #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
         #                     rank=32, debug=False)
 
-        allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
-                              {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
+        # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
+        #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
 
-        allowed_kge_models = [allowed_kge_models[0]]
+        # allowed_kge_models = [allowed_kge_models[0]]
 
         error = False
         for models in allowed_kge_models:
             try:
-                if args.training:
+                if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 3
+                    args.max_epochs = 30
                     args.batch_size = 750
                     args.rank = 32
                     args.learning_rate = 0.1
