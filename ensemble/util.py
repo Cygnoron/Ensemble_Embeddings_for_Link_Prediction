@@ -159,7 +159,7 @@ def assign_model_to_subgraph(kge_models, args):
             # Clear mapping, if some subgraphs were already mapped (-> "all" overrides all other specifications)
             subgraph_embedding_mapping.clear()
 
-            for subgraph in os.listdir(os.path.abspath(args.dataset_directory)):
+            for subgraph in os.listdir(os.path.abspath(args.dataset_dir)):
                 # Ignore folders which don't contain a subgraph
                 if "sub_" not in subgraph:
                     continue
@@ -219,6 +219,8 @@ def assign_model_to_subgraph(kge_models, args):
             args.model = random.choice(kge_models_adjusted)
             subgraph_embedding_mapping[subgraph_num] = args.model
             logging.info(f"Randomly selected embedding method {args.model} for subgraph {subgraph}")
+
+    dict(sorted(subgraph_embedding_mapping.items()))
 
     logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
     return subgraph_embedding_mapping
