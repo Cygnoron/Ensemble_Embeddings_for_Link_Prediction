@@ -197,13 +197,13 @@ def csv_to_file(input_csv_path, output_pickle_path, delim=';', only_unique=False
         pickle.dump(np.array(examples).astype("int64"), output_pickle_file)
 
 
-def copy_test_valid_filter_data(dataset_in: str, info_directory: str):
+def copy_test_valid_filter_data(dataset_in: str, dataset_dir: str):
     """
       Copy necessary files from the input dataset directory to the info directory for all subgraphs.
 
       Args:
           dataset_in (str): The name of the dataset containing the files to be copied.
-          info_directory (str): The directory where the files will be copied.
+          dataset_dir (str): The directory where the files will be copied.
 
       Raises:
           FileNotFoundError: If any of the required files are not found in the dataset directory or fail to copy.
@@ -216,9 +216,9 @@ def copy_test_valid_filter_data(dataset_in: str, info_directory: str):
     # List to store names of successfully copied files
     copied_files = []
     # Source directory where files are located within the dataset
-    source_dir = f"data\\{dataset_in}"
+    source_dir = os.path.join("data", dataset_in)
     # Target directory where files will be copied to
-    target_dir = f"{info_directory}\\data"
+    target_dir = os.path.join(dataset_dir, "data")
     # Create the target directory if it doesn't exist
     check_directory(target_dir)
 
@@ -274,10 +274,14 @@ def print_loss_to_file(loss_file_path, epoch, loss_dict):
         keys_sorted.sort()
         logging.debug(f"Output keys sorted: {keys_sorted}")
 
+        active_models = len(keys_sorted)
         average_loss = 0.
         for subgraph in loss_dict:
-            average_loss += loss_dict[subgraph]
-        average_loss /= len(keys_sorted)
+            if loss_dict[subgraph] != "dropout":
+                average_loss += loss_dict[subgraph]
+            else:
+                active_models -= 1
+        average_loss /= active_models
 
         out_str = f"{epoch};{average_loss}"
         for subgraph in keys_sorted:
