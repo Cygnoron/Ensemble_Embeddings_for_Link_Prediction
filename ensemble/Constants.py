@@ -28,3 +28,7 @@ REVERSED_THETA = [22, "reversed theta", "reversed_theta"]
 RELATION_THETA = [23, "relation theta", "relation_theta"]
 MULTIPLIED_THETA = [24, "multiplied theta", "multiplied_theta"]
 THETA_METHODS = [NO_THETA, REGULAR_THETA, REVERSED_THETA, RELATION_THETA, MULTIPLIED_THETA]
+
+# Wandb settings
+LOG_WANDB = False
+PROJECT_NAME = "Experiments"

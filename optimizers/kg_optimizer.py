@@ -20,7 +20,8 @@ class KGOptimizer(object):
         double_neg: A boolean (True to sample both head and tail entities)
     """
 
-    def __init__(self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, verbose=True):
+    def __init__(self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, no_progress_bar,
+                 verbose=True):
         """Inits KGOptimizer."""
         self.model = model
         self.regularizer = regularizer
@@ -31,6 +32,7 @@ class KGOptimizer(object):
         self.loss_fn = nn.CrossEntropyLoss(reduction='mean')
         self.neg_sample_size = neg_sample_size
         self.n_entities = model.sizes[0]
+        self.no_progress_bar = no_progress_bar
 
     def reduce_lr(self, factor=0.8):
         """Reduce learning rate.
@@ -159,26 +161,31 @@ class KGOptimizer(object):
         Returns:
             loss: torch.Tensor with loss averaged over all training examples
         """
-        actual_examples = examples[torch.randperm(examples.shape[0]), :]
-        with tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose) as bar:
+        bar = None
+        if not self.no_progress_bar:
+            bar = tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose)
             bar.set_description(f'train loss')
-            b_begin = 0
-            total_loss = 0.0
-            counter = 0
-            while b_begin < examples.shape[0]:
-                input_batch = actual_examples[
-                              b_begin:b_begin + self.batch_size
-                              ].cuda()
 
-                # gradient step
-                l = self.calculate_loss(input_batch)
-                self.optimizer.zero_grad()
-                l.backward()
-                self.optimizer.step()
+        actual_examples = examples[torch.randperm(examples.shape[0]), :]
 
-                b_begin += self.batch_size
-                total_loss += l
-                counter += 1
+        b_begin = 0
+        total_loss = 0.0
+        counter = 0
+        while b_begin < examples.shape[0]:
+            input_batch = actual_examples[
+                          b_begin:b_begin + self.batch_size
+                          ].cuda()
+
+            # gradient step
+            l = self.calculate_loss(input_batch)
+            self.optimizer.zero_grad()
+            l.backward()
+            self.optimizer.step()
+
+            b_begin += self.batch_size
+            total_loss += l
+            counter += 1
+            if not self.no_progress_bar:
                 bar.update(input_batch.shape[0])
                 bar.set_postfix(loss=f'{l.item():.4f}')
         total_loss /= counter

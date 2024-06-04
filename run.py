@@ -8,6 +8,7 @@ import os
 
 import torch
 import torch.optim
+import wandb
 
 import models as models
 import optimizers.regularizers as regularizers
@@ -123,6 +124,8 @@ def train(args):
     args.sizes = dataset.get_shape()
     args.theta_calculation = Constants.NO_THETA
 
+    wandb.init(project=Constants.PROJECT_NAME, config=args)
+
     # load data
     logging.info("\t " + str(dataset.get_shape()))
     train_examples = dataset.get_examples("train")
@@ -164,10 +167,10 @@ def train(args):
         logging.info("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
 
         if (step + 1) % args.valid == 0:
-            valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes))
+            valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch=step)
             logging.info(format_metrics(valid_metrics, split="valid"))
 
-            valid_mrr = valid_metrics["MRR"]
+            valid_mrr = valid_metrics["MRR"]["average"]
             if not best_mrr or valid_mrr > best_mrr:
                 best_mrr = valid_mrr
                 counter = 0
@@ -195,11 +198,11 @@ def train(args):
     model.eval()
 
     # Validation metrics
-    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes))
+    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch="best_valid")
     logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes), epoch="test")
     logging.info(format_metrics(test_metrics, split="test"))
 
 

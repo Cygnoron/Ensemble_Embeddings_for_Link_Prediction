@@ -38,9 +38,15 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     args = embedding_models[0]["args"]
     model = embedding_models[0]["model"]
 
+    if epoch is None:
+        if mode == "test":
+            epoch = args.best_epoch + 20
+        elif mode == "valid":
+            epoch = args.best_epoch + 10
+
     # calculate metrics from the ranks
     metrics = avg_both(*model.compute_metrics(examples, filters, args.sizes, (aggregated_scores, aggregated_targets),
-                                              batch_size=batch_size))
+                                              batch_size=batch_size), epoch=epoch)
     logging.info(format_metrics(metrics, split=mode))
 
     if metrics_file_path != "":
@@ -77,13 +83,12 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
     """
 
     # Initialize variables to store target scores
-    targets_lhs = None
-    targets_rhs = None
     progress_bar_testing = None
+    args = None
 
     logging.info(f"Calculating {eval_mode} scores for the ensemble.")
     # Iterate over each embedding model
-    for embedding_model in embedding_models:
+    for step, embedding_model in enumerate(embedding_models):
         model = embedding_model['model']
         args = embedding_model['args']
 
@@ -103,9 +108,12 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         targets_rhs = torch.zeros((len(examples), candidate_answers))
         targets_lhs = torch.zeros((len(examples), candidate_answers))
 
-        # Update progress bar
-        progress_bar_testing = tqdm(total=len(examples) * 2, desc=f"Calculating {eval_mode} scores for {args.subgraph}",
-                                    unit=" queries", position=0, leave=True)
+        if not args.no_progress_bar:
+            # Update progress bar
+            progress_bar_testing = tqdm(total=len(examples) * 2,
+                                        desc=f"Calculating {eval_mode} scores for {args.subgraph} "
+                                             f"(step {step}/{len(embedding_models)})",
+                                        unit=" queries", position=0, leave=True)
 
         # calculate scores, adapted from base.compute_metrics() and base.get_rankings()
         # Iterate over each mode (rhs and lhs)
@@ -125,12 +133,13 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
                 candidates = model.get_rhs(queries, eval_mode=True)
 
                 while b_begin < len(queries):
-                    # Update progress bar
-                    if mode == 'lhs':
-                        progress_bar_testing.n = b_begin + len(examples)
-                    else:
-                        progress_bar_testing.n = b_begin
-                    progress_bar_testing.refresh()
+                    if not args.no_progress_bar:
+                        # Update progress bar
+                        if mode == 'lhs':
+                            progress_bar_testing.n = b_begin + len(examples)
+                        else:
+                            progress_bar_testing.n = b_begin
+                        progress_bar_testing.refresh()
 
                     these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
@@ -154,8 +163,9 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
 
                     b_begin += batch_size
 
-        progress_bar_testing.n = progress_bar_testing.total
-        progress_bar_testing.close()
+        if not args.no_progress_bar:
+            progress_bar_testing.n = progress_bar_testing.total
+            progress_bar_testing.close()
         # Update embedding model dictionary with calculated scores
         embedding_model['scores_lhs'] = scores_lhs
         embedding_model['scores_rhs'] = scores_rhs
@@ -163,10 +173,11 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         embedding_model['targets_rhs'] = targets_rhs
         embedding_model['candidate_answers'] = candidate_answers
 
-    # Complete progress bar and close
-    progress_bar_testing.n = progress_bar_testing.total
-    progress_bar_testing.refresh()
-    progress_bar_testing.close()
+    if not args.no_progress_bar:
+        # Complete progress bar and close
+        progress_bar_testing.n = progress_bar_testing.total
+        progress_bar_testing.refresh()
+        progress_bar_testing.close()
 
     return embedding_models
 
@@ -200,10 +211,13 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
     size = {'rhs': embedding_models[0]['size_rhs'],
             'lhs': embedding_models[0]['size_lhs']}
 
-    # Initialize progress bar for tracking progress
-    progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine {eval_mode} scores",
-                                    unit=" scores")
+    args = embedding_models[0]['args']
 
+    progress_bar_combination = None
+    if not args.no_progress_bar:
+        # Initialize progress bar for tracking progress
+        progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine {eval_mode} scores",
+                                        unit=" scores")
     # Initialize dictionary to store aggregated scores
     aggregated_scores = {'rhs': torch.zeros(size['rhs']),
                          'lhs': torch.zeros(size['lhs'])}
@@ -217,12 +231,13 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
 
         # Iterate over each batch of queries
         while b_begin < size[mode][0]:
-            # Update progress bar
-            if mode == 'lhs':
-                progress_bar_combination.n = b_begin + size['rhs'][0]
-            else:
-                progress_bar_combination.n = b_begin
-            progress_bar_combination.refresh()
+            if not args.no_progress_bar:
+                # Update progress bar
+                if mode == 'lhs':
+                    progress_bar_combination.n = b_begin + size['rhs'][0]
+                else:
+                    progress_bar_combination.n = b_begin
+                progress_bar_combination.refresh()
 
             # Collect scores from all models
             model_scores = []
@@ -302,10 +317,11 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
 
             b_begin += batch_size
 
-    # Update progress bar and close
-    progress_bar_combination.n = progress_bar_combination.total
-    progress_bar_combination.refresh()
-    progress_bar_combination.close()
+    if not args.no_progress_bar:
+        # Update progress bar and close
+        progress_bar_combination.n = progress_bar_combination.total
+        progress_bar_combination.refresh()
+        progress_bar_combination.close()
 
     logging.info(f"Successfully aggregated all scores and targets with aggregation method {aggregation_method[1]}.")
 

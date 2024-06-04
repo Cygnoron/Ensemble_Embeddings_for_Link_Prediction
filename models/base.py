@@ -183,7 +183,7 @@ class KGModel(nn.Module, ABC):
             while b_begin < len(queries):
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
-                if ensemble_args[0] is None:
+                if ensemble_args is None:
                     q = self.get_queries(these_queries)
                     rhs = self.get_rhs(these_queries, eval_mode=False)
 
@@ -213,7 +213,7 @@ class KGModel(nn.Module, ABC):
                 b_begin += batch_size
         return ranks_opt, rank_deviation
 
-    def compute_metrics(self, examples, filters, sizes, ensemble_args=(None, None), batch_size=500):
+    def compute_metrics(self, examples, filters, sizes, ensemble_args=None, batch_size=500):
         """Compute ranking-based evaluation metrics.
     
         Args:
@@ -239,8 +239,12 @@ class KGModel(nn.Module, ABC):
                 q[:, 2] = tmp
                 q[:, 1] += self.sizes[1] // 2
 
-            ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
-                                                            ensemble_args=(ensemble_args[0][m], ensemble_args[1][m]))
+            if ensemble_args is None:
+                ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size)
+            else:
+                ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
+                                                                ensemble_args=
+                                                                (ensemble_args[0][m], ensemble_args[1][m]))
 
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()

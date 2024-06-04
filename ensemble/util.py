@@ -5,6 +5,7 @@ import random
 from collections import defaultdict
 
 import torch
+import wandb
 from torch import nn
 
 from datasets.kg_dataset import KGDataset
@@ -222,11 +223,13 @@ def assign_model_to_subgraph(kge_models, args):
 
     dict(sorted(subgraph_embedding_mapping.items()))
 
+    list(subgraph_embedding_mapping.keys()).sort()
+
     logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
     return subgraph_embedding_mapping
 
 
-def setup_logging(info_directory: str, log_file_name: str, logging_level="info"):
+def setup_logging(info_directory: str, log_file_name: str, logging_level="info", wandb_log=False):
     """
     Set up logging configuration.
 

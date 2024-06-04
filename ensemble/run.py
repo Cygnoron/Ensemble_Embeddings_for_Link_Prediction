@@ -86,7 +86,7 @@ def train(info_directory, args):
         regularizer = (getattr(regularizers, args.regularizer)(args.reg))
         optim_method = (getattr(torch.optim, args.optimizer)(model.parameters(), lr=args.learning_rate))
         embedding_model['optimizer'] = KGOptimizer(model, regularizer, optim_method, args.batch_size,
-                                                   args.neg_sample_size, bool(args.double_neg))
+                                                   args.neg_sample_size, bool(args.double_neg), args.no_progress_bar)
 
     train_losses = {}
     valid_losses = {}

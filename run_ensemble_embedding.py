@@ -3,10 +3,8 @@ import logging
 import os
 import time
 import traceback
-from datetime import datetime
 
 import wandb
-
 from ensemble import Constants, util_files, util, run, subsampling
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -163,9 +161,6 @@ def run_embedding(args):
         dataset_out = (f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}"
                        f"_min{args.subgraph_size_range[0]}_max{args.subgraph_size_range[1]}")
 
-    if not args.no_time_dependent_file_path:
-        dataset_out += datetime.now().strftime('_%y.%m.%d_%H_%M')
-
     dataset_out_dir = os.path.join("data", dataset_out)
     dataset_in = args.dataset
     args.dataset = dataset_out
@@ -189,7 +184,7 @@ def run_embedding(args):
         if not args.no_training:
             args.kge_models = util.get_embedding_methods(args.model)
 
-            wandb.init(project="First test runs", config=args)
+            wandb.init(project=Constants.PROJECT_NAME, config=args)
 
             run.train(info_directory, args)
 
@@ -217,13 +212,12 @@ def run_embedding_manual():
     relation_name_amount = 0.5
     model_dropout_factor = 1.5
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True,
-                              subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
-                              relation_name_amount=relation_name_amount,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True, wandb_log=False,
+                              no_progress_bar=True, subgraph_amount=subgraph_amount,
+                              subgraph_size_range=subgraph_size_range, relation_name_amount=relation_name_amount,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              theta_calculation=Constants.NO_THETA,
-                              model_dropout_factor=model_dropout_factor)
+                              theta_calculation=Constants.NO_THETA, model_dropout_factor=model_dropout_factor)
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -251,7 +245,7 @@ def run_embedding_manual():
         args.info_directory = info_directory
 
         util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
-                           logging_level="debug")
+                           logging_level="info")
 
         # --- if a new debugging dataset was created ---
 
@@ -347,7 +341,9 @@ def run_embedding_manual():
                     args.multi_c = True
                     args.double_neg = False
 
-                    wandb.init(project="First test runs", config=vars(args))
+                    if Constants.LOG_WANDB:
+                        wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
+                        wandb.login()
 
                     run.train(info_directory, args)
 
@@ -366,8 +362,6 @@ def run_embedding_manual():
 
 
 if __name__ == "__main__":
-    wandb.login()
-
     # Function to run via command prompt
     # run_embedding(parser.parse_args())
 
