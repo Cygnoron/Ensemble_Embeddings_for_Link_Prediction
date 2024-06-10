@@ -6,7 +6,7 @@ import wandb
 
 from ensemble import Constants
 
-LOGS_PATH = "\\logs"
+LOGS_PATH = "logs"
 
 
 def get_savedir(model, dataset):

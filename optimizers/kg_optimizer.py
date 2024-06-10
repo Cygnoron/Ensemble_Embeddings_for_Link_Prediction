@@ -143,9 +143,7 @@ class KGOptimizer(object):
         counter = 0
         with torch.no_grad():
             while b_begin < examples.shape[0]:
-                input_batch = examples[
-                              b_begin:b_begin + self.batch_size
-                              ].cuda()
+                input_batch = examples[b_begin:b_begin + self.batch_size].cuda()
                 b_begin += self.batch_size
                 loss += self.calculate_loss(input_batch)
                 counter += 1
@@ -188,5 +186,6 @@ class KGOptimizer(object):
             if not self.no_progress_bar:
                 bar.update(input_batch.shape[0])
                 bar.set_postfix(loss=f'{l.item():.4f}')
+
         total_loss /= counter
         return total_loss

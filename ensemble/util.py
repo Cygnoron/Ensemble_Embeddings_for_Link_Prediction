@@ -5,7 +5,6 @@ import random
 from collections import defaultdict
 
 import torch
-import wandb
 from torch import nn
 
 from datasets.kg_dataset import KGDataset

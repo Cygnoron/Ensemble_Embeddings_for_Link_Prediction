@@ -10,7 +10,7 @@ from utils.train import avg_both, format_metrics
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
-                      metrics_file_path="", batch_size=500, epoch="final"):
+                      metrics_file_path="", batch_size=500, epoch=None):
     if mode == "test":
         logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]

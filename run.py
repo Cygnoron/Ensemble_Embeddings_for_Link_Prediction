@@ -148,7 +148,7 @@ def train(args):
     regularizer = getattr(regularizers, args.regularizer)(args.reg)
     optim_method = getattr(torch.optim, args.optimizer)(model.parameters(), lr=args.learning_rate)
     optimizer = KGOptimizer(model, regularizer, optim_method, args.batch_size, args.neg_sample_size,
-                            bool(args.double_neg))
+                            bool(args.double_neg), no_progress_bar=args.no_progress_bar)
     counter = 0
     best_mrr = None
     best_epoch = None

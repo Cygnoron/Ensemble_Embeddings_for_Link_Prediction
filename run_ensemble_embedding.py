@@ -6,6 +6,7 @@ import traceback
 
 import wandb
 from ensemble import Constants, util_files, util, run, subsampling
+from run import train
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
@@ -85,6 +86,9 @@ parser.add_argument(
     "--no_training", action='store_true', help="Turn off training, if only sampling should be done"
 )
 parser.add_argument(
+    "--no_progress_bar", action='store_true', help="Turn off all progress bars"
+)
+parser.add_argument(
     "--no_time_dependent_file_path", action='store_true', help="Specify current time in file path, when "
                                                                "creating logs and other files"
 )
@@ -143,6 +147,10 @@ parser.add_argument(
                                       "- \'data: Also contains embedding weights and other data from variables, "
                                       "which is printed directly to the log\'"
 )
+
+
+def run_baseline(args):
+    train(args)
 
 
 def run_embedding(args):
@@ -365,5 +373,27 @@ if __name__ == "__main__":
     # Function to run via command prompt
     # run_embedding(parser.parse_args())
 
+    # Function to run baseline
+    args = parser.parse_args()
+
+    args.model = "ComplEx"
+    args.dataset = "WN18RR"
+    args.rank = 32
+    args.regularizer = "N3"
+    args.reg = 0.05
+    args.optimizer = "Adagrad"
+    args.max_epochs = 500
+    args.patience = 15
+    args.valid = 1
+    args.batch_size = 750
+    args.neg_sample_size = -1
+    args.init_size = 0.001
+    args.learning_rate = 0.1
+    args.gamma = 0.0
+    args.bias = "none"
+    args.dtype = "single"
+
+    run_baseline(args)
+
     # Function to run manual via IDE
-    run_embedding_manual()
+    # run_embedding_manual()
