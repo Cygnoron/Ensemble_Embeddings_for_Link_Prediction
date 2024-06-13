@@ -225,6 +225,11 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
         valid_examples = dataset.get_examples("valid")
         test_examples = dataset.get_examples("test")
         filters = dataset.get_filters()
+
+        dtype = torch.float
+        if args.dtype == 'double':
+            dtype = torch.double
+        logging.critical(f"dtype: {dtype}")
         # args_subgraph.sizes = dataset.get_shape()
         # set shape of dataset to that of the general
         #  -> calculation of size in KGDataset is with max id
@@ -242,22 +247,39 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
         entity_set, relation_name_set = dataset.get_entities_relation_names(args_subgraph.sizes, double_relations=True)
 
         # set embeddings
-        model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim)
-        # initialize with zeros and set present entities to one
-        model.entity.weight.data = torch.zeros(embedding_general_ent.weight.data.size())
-        model.entity.weight.data[entity_set] = torch.rand((len(entity_set), rank))
-        logging.debug(f"Entity size: {model.entity.weight.data.size()}")
+        model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim,
+                                    dtype=dtype)
+        model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim,
+                                 dtype=dtype)
+        if dtype == torch.double:
+            # initialize with zeros and set present entities to random number
+            model.entity.weight.data = torch.zeros(embedding_general_ent.weight.data.size()).double()
+            model.entity.weight.data[entity_set] = torch.rand((len(entity_set), rank)).double()
+            logging.debug(f"Entity size: {model.entity.weight.data.size()}")
 
-        if args_subgraph.model_name in hyperbolic.HYP_MODELS:
-            model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
-            # initialize with zeros and set present relation names to one
-            model.rel.weight.data = torch.rand(args_subgraph.sizes[0], args_subgraph.rank * 2)
-            # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
+            if args_subgraph.model_name in hyperbolic.HYP_MODELS:
+                # initialize with zeros and set present relation names to one
+                model.rel.weight.data = torch.rand(args_subgraph.sizes[0], args_subgraph.rank * 2).double()
+                # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
+            else:
+                # initialize with zeros and set present relation names to one
+                model.rel.weight.data = torch.zeros(embedding_general_rel.weight.data.size()).double()
+                model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank)).double()
         else:
-            model.rel = nn.Embedding(embedding_general_rel.num_embeddings, embedding_general_rel.embedding_dim)
-            # initialize with zeros and set present relation names to one
-            model.rel.weight.data = torch.zeros(embedding_general_rel.weight.data.size())
-            model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank))
+            # initialize with zeros and set present entities to random number
+            model.entity.weight.data = torch.zeros(embedding_general_ent.weight.data.size()).float()
+            model.entity.weight.data[entity_set] = torch.rand((len(entity_set), rank)).float()
+            logging.debug(f"Entity size: {model.entity.weight.data.size()}")
+
+            if args_subgraph.model_name in hyperbolic.HYP_MODELS:
+                # initialize with zeros and set present relation names to one
+                model.rel.weight.data = torch.rand(args_subgraph.sizes[0], args_subgraph.rank * 2).float()
+                # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
+            else:
+                # initialize with zeros and set present relation names to one
+                model.rel.weight.data = torch.zeros(embedding_general_rel.weight.data.size()).float()
+                model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank)).float()
+
         logging.debug(f"Relation size: {model.rel.weight.data.size()}")
 
         # set context vectors
@@ -265,12 +287,18 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
                             relation_name_set)
 
         logging.info(f"-\\\tTotal number of parameters: {total}\t/-")
-        device = "cuda"
+
+        # Wrap the model in DataParallel to use multiple GPUs
+        # if torch.cuda.device_count() > 1:
+        #     logging.info(f"Using {torch.cuda.device_count()} GPUs.")
+        #     model = nn.DataParallel(model)
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         model.to(device)
 
         embedding_model = {"dataset": dataset, "model": model, "train_examples": train_examples,
                            "valid_examples": valid_examples, "test_examples": test_examples,
-                           "filters": filters, "subgraph": subgraph, "args": args_subgraph,
+                           "filters": filters, "subgraph": subgraph, "args": args_subgraph, "data_type": dtype,
                            "first_valid_loss": None, "size_rhs": None, "size_lhs": None}
         embedding_models.append(embedding_model)
 
@@ -346,6 +374,3 @@ def check_model_dropout(embedding_models, valid_losses):
 
             # "hard dropout" -> completly exclude model if it diverged once
             args.model_dropout = True
-
-            # TODO "soft dropout": load best performing model and retrain from that stage,
-            #  if still diverging exclude completely

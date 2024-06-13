@@ -40,9 +40,9 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
 
     if epoch is None:
         if mode == "test":
-            epoch = args.best_epoch + 20
+            epoch = args.max_epochs + 20
         elif mode == "valid":
-            epoch = args.best_epoch + 10
+            epoch = args.max_epochs + 10
 
     # calculate metrics from the ranks
     metrics = avg_both(*model.compute_metrics(examples, filters, args.sizes, (aggregated_scores, aggregated_targets),
@@ -91,6 +91,7 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
     for step, embedding_model in enumerate(embedding_models):
         model = embedding_model['model']
         args = embedding_model['args']
+        dtype = embedding_model['data_type']
 
         if args.model_dropout:
             logging.debug(f"Skipping calculation of scores for {args.subgraph}, since the valid scores diverged "
@@ -102,11 +103,16 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         logging.debug(f"candidate_answers: {candidate_answers}\tExamples: {len(examples)}")
 
         # Initialize tensors to store scores and targets
-        scores_rhs = torch.zeros((len(examples), candidate_answers))
-        scores_lhs = torch.zeros((len(examples), candidate_answers))
+        scores_rhs = torch.zeros((len(examples), candidate_answers), dtype=dtype)
+        scores_lhs = torch.zeros((len(examples), candidate_answers), dtype=dtype)
 
-        targets_rhs = torch.zeros((len(examples), candidate_answers))
-        targets_lhs = torch.zeros((len(examples), candidate_answers))
+        targets_rhs = torch.zeros((len(examples), candidate_answers), dtype=dtype)
+        targets_lhs = torch.zeros((len(examples), candidate_answers), dtype=dtype)
+
+        logging.debug(f"scores_rhs size: {((scores_rhs.element_size() * scores_rhs.nelement()) / 1024) / 1024} MB")
+        logging.debug(f"scores_lhs size: {((scores_lhs.element_size() * scores_lhs.nelement()) / 1024) / 1024} MB")
+        logging.debug(f"targets_rhs size: {((targets_rhs.element_size() * targets_rhs.nelement()) / 1024) / 1024} MB")
+        logging.debug(f"targets_lhs size: {((targets_lhs.element_size() * targets_lhs.nelement()) / 1024) / 1024} MB")
 
         if not args.no_progress_bar:
             # Update progress bar
@@ -171,7 +177,6 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
         embedding_model['scores_rhs'] = scores_rhs
         embedding_model['targets_lhs'] = targets_lhs
         embedding_model['targets_rhs'] = targets_rhs
-        embedding_model['candidate_answers'] = candidate_answers
 
     if not args.no_progress_bar:
         # Complete progress bar and close
@@ -212,6 +217,7 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
             'lhs': embedding_models[0]['size_lhs']}
 
     args = embedding_models[0]['args']
+    dtype = embedding_models[0]['data_type']
 
     progress_bar_combination = None
     if not args.no_progress_bar:
@@ -219,10 +225,10 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
         progress_bar_combination = tqdm(total=size['rhs'][0] + size['lhs'][0], desc=f"Combine {eval_mode} scores",
                                         unit=" scores")
     # Initialize dictionary to store aggregated scores
-    aggregated_scores = {'rhs': torch.zeros(size['rhs']),
-                         'lhs': torch.zeros(size['lhs'])}
-    aggregated_targets = {'rhs': torch.zeros(size['rhs']),
-                          'lhs': torch.zeros(size['lhs'])}
+    aggregated_scores = {'rhs': torch.zeros(size['rhs']).to(dtype),
+                         'lhs': torch.zeros(size['lhs']).to(dtype)}
+    aggregated_targets = {'rhs': torch.zeros(size['rhs']).to(dtype),
+                          'lhs': torch.zeros(size['lhs']).to(dtype)}
 
     # Iterate over both directions (rhs and lhs)
     for mode in ["rhs", "lhs"]:

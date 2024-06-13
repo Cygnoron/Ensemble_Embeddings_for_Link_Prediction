@@ -45,7 +45,7 @@ class KGModel(nn.Module, ABC):
         self.bh.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
         self.bt = nn.Embedding(sizes[0], 1)
         self.bt.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
-        logging.critical(self.bt.weight.data.dtype)
+        # logging.critical(self.bt.weight.data.dtype)
 
         # ensemble attention
         self.theta_calculation = theta_calculation
@@ -200,11 +200,19 @@ class KGModel(nn.Module, ABC):
                     filter_out += [queries[b_begin + i, 2].item()]
                     scores[i, torch.LongTensor(filter_out)] = -1e6
 
+                # if self.data_type == torch.double:
                 # Calculate optimistic rank
-                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).float(), dim=1).cpu()
+                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1).cpu()
 
                 # Calculate rank_deviation
-                rank_deviation_buffer = torch.sum((scores == targets).float(), dim=1)
+                rank_deviation_buffer = torch.sum((scores == targets).to(self.data_type), dim=1)
+
+                # else:
+                #     # Calculate optimistic rank
+                #     ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).float(), dim=1).cpu()
+                #
+                #     # Calculate rank_deviation
+                #     rank_deviation_buffer = torch.sum((scores == targets).float(), dim=1)
 
                 rank_deviation += torch.sum(torch.abs(rank_deviation_buffer))
                 logging.debug(f"{rank_deviation}")
@@ -244,8 +252,8 @@ class KGModel(nn.Module, ABC):
                 ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size)
             else:
                 ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
-                                                                ensemble_args=
-                                                                (ensemble_args[0][m], ensemble_args[1][m]))
+                                                                ensemble_args=(
+                                                                ensemble_args[0][m], ensemble_args[1][m]))
 
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
@@ -266,17 +274,17 @@ class KGModel(nn.Module, ABC):
         if self.theta_calculation[0] == Constants.NO_THETA[0]:
             return
         elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[0], self.rank)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
+            self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
         elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[1], self.rank)
-            self.theta_rel = nn.Embedding(self.sizes[0], self.rank)
+            self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+            self.theta_rel = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
         elif self.theta_calculation[0] == Constants.RELATION_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[1], self.rank)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
+            self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
         elif self.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[0], self.rank)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank)
+            self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
         else:
             logging.error(f"The given '{self.theta_calculation}' is not implemented as a way to calculate theta!")
             assert ValueError

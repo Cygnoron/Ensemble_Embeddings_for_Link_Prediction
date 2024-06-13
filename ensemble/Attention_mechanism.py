@@ -189,6 +189,7 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
 
         logging.info(f"Applying general embeddings to all models.")
         sizes = embedding_models[0]['args'].sizes
+        dtype = embedding_models[0]['data_type']
         # write new unified embedding into all models
         for embedding_model in embedding_models:
             if ('entities' not in embedding_model.keys()) or ('relation_names' not in embedding_model.keys()):
@@ -197,8 +198,17 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
                 embedding_model['entities'] = entities
                 embedding_model['relation_names'] = relation_names
 
+            entities = embedding_model['entities']
+            relation_names = embedding_model['relation_names']
+
             # only set the embeddings, which are contained in the corresponding subgraph
-            embedding_model['model'].entity.weight.data[embedding_model['entities']] = (
-                general_embedding_ent.weight.data[embedding_model['entities']].to(torch.float))
-            embedding_model['model'].rel.weight.data[embedding_model['relation_names']] = (
-                general_embedding_rel.weight.data[embedding_model['relation_names']].to(torch.float))
+            if dtype == torch.double:
+                embedding_model['model'].entity.weight.data[entities] = (
+                    general_embedding_ent.weight.data[entities].double())
+                embedding_model['model'].rel.weight.data[relation_names] = (
+                    general_embedding_rel.weight.data[relation_names].double())
+            else:
+                embedding_model['model'].entity.weight.data[entities] = (
+                    general_embedding_ent.weight.data[entities].to(dtype))
+                embedding_model['model'].rel.weight.data[relation_names] = (
+                    general_embedding_rel.weight.data[relation_names].to(dtype))

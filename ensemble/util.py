@@ -228,7 +228,7 @@ def assign_model_to_subgraph(kge_models, args):
     return subgraph_embedding_mapping
 
 
-def setup_logging(info_directory: str, log_file_name: str, logging_level="info", wandb_log=False):
+def setup_logging(info_directory: str, log_file_name: str, logging_level="info"):
     """
     Set up logging configuration.
 
@@ -238,26 +238,26 @@ def setup_logging(info_directory: str, log_file_name: str, logging_level="info",
         logging_level (str): Logging level for the logger, will be converted to logging class (e.g. logging.INFO) if
          available.
     """
-    # logging levels:
-    #  CRITICAL - 50
-    #  ERROR - 40
-    #  WARNING - 30
-    #  INFO - 20
-    #  DEBUG - 10
-    #  DATA - 5
+
     logging.addLevelName(Constants.DATA_LEVEL_LOGGING, "DATA")
     logging_level = logging_level.lower()
     if logging_level == "critical":
+        #  CRITICAL - 50
         logging_level = logging.CRITICAL
     elif logging_level == "error":
+        #  ERROR - 40
         logging_level = logging.ERROR
     elif logging_level == "warning":
+        #  WARNING - 30
         logging_level = logging.WARNING
     elif logging_level == "info":
+        #  INFO - 20
         logging_level = logging.INFO
     elif logging_level == "debug":
+        #  DEBUG - 10
         logging_level = logging.DEBUG
     elif logging_level == "data":
+        #  DATA - 5
         logging_level = Constants.DATA_LEVEL_LOGGING
     else:
         raise ValueError("Invalid logging level")
@@ -322,7 +322,8 @@ def generate_general_embeddings(general_dataset: str, args):
     # embeddings
     embedding_general_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
     embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-
+    logging.debug(f"general embedding datatype: {type(embedding_general_ent.weight.data.dtype)}, "
+                     f"{embedding_general_ent.weight.data.dtype}")
     # context vectors
     theta_ent = None
     theta_rel = None
