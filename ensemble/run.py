@@ -229,7 +229,7 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
         dtype = torch.float
         if args.dtype == 'double':
             dtype = torch.double
-        logging.critical(f"dtype: {dtype}")
+        logging.debug(f"dtype: {dtype}")
         # args_subgraph.sizes = dataset.get_shape()
         # set shape of dataset to that of the general
         #  -> calculation of size in KGDataset is with max id

@@ -45,7 +45,7 @@ class KGModel(nn.Module, ABC):
         self.bh.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
         self.bt = nn.Embedding(sizes[0], 1)
         self.bt.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
-        # logging.critical(self.bt.weight.data.dtype)
+        # logging.debug(self.bt.weight.data.dtype)
 
         # ensemble attention
         self.theta_calculation = theta_calculation
