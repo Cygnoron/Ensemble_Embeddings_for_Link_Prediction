@@ -124,7 +124,8 @@ def train(args):
     args.sizes = dataset.get_shape()
     args.theta_calculation = Constants.NO_THETA
 
-    wandb.init(project=Constants.PROJECT_NAME, config=args)
+    if Constants.LOG_WANDB:
+        wandb.init(project=Constants.PROJECT_NAME, config=args)
 
     # load data
     logging.info("\t " + str(dataset.get_shape()))
