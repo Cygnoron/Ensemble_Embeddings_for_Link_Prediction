@@ -26,12 +26,15 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     time_eval_start = time.time()
 
     # calculate scores for all models
-    embedding_models = calculate_scores(embedding_models, examples, batch_size=batch_size,
-                                        eval_mode=mode)
-
-    # combine the calculated scores from all models, according to the given aggregation method
-    aggregated_scores, aggregated_targets = combine_scores(embedding_models, aggregation_method, batch_size=batch_size,
-                                                           eval_mode=mode)
+    aggregated_scores, aggregated_targets = calculate_and_combine_scores(embedding_models, examples,
+                                                                         aggregation_method, eval_mode=mode,
+                                                                         batch_size=batch_size)
+    # embedding_models = calculate_scores(embedding_models, examples, batch_size=batch_size,
+    #                                     eval_mode=mode)
+    #
+    # # combine the calculated scores from all models, according to the given aggregation method
+    # aggregated_scores, aggregated_targets = combine_scores(embedding_models, aggregation_method, batch_size=batch_size,
+    #                                                        eval_mode=mode)
 
     # compute the ranks for all queries
     filters = embedding_models[0]["filters"]
@@ -66,7 +69,292 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     return metrics
 
 
-def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test"):
+def calculate_and_combine_scores(embedding_models, examples, aggregation_method, eval_mode=None, batch_size=500):
+    """
+        Calculate and combine scores from multiple embedding models for given examples.
+
+        Args:
+            embedding_models (list): List of embedding models with their parameters and data types.
+            examples (Tensor): Tensor containing the examples for which scores need to be calculated.
+            aggregation_method (tuple): Method used to aggregate scores (e.g., max, min, average).
+            eval_mode (str, optional): Evaluation mode for the models. Defaults to None.
+            batch_size (int, optional): Size of the batches for processing examples. Defaults to 500.
+
+        Returns:
+            dict: Aggregated scores for 'rhs' and 'lhs' directions.
+            dict: Aggregated targets for 'rhs' and 'lhs' directions.
+        """
+    # Get the size of scores for rhs and lhs directions
+    args = embedding_models[0]['args']
+    dtype = embedding_models[0]['data_type']
+    candidate_answers = len(embedding_models[0]['model'].get_rhs(examples, eval_mode=True)[0])
+
+    size = {'rhs': (len(examples), candidate_answers),
+            'lhs': (len(examples), candidate_answers)}
+
+    # Initialize dictionary to store aggregated scores
+    aggregated_scores = {'rhs': torch.zeros(size['rhs']).to(dtype),
+                         'lhs': torch.zeros(size['lhs']).to(dtype)}
+    aggregated_targets = {'rhs': torch.zeros(size['rhs']).to(dtype),
+                          'lhs': torch.zeros(size['lhs']).to(dtype)}
+
+    b_begin = 0
+    steps = len(examples)
+    progress_bar_testing = None
+
+    if not args.no_progress_bar:
+        # Update progress bar
+        progress_bar_testing = tqdm(total=len(examples) * 2,
+                                    desc=f"Calculating and combining scores",
+                                    unit=" queries", position=0, leave=True)
+
+    while b_begin < steps:
+        logging.info(f"Calculating {eval_mode} scores for the ensemble for indices "
+                     f"{b_begin} to {b_begin + batch_size}.")
+        if not args.no_progress_bar:
+            # Update progress bar
+            progress_bar_testing.n = b_begin
+            progress_bar_testing.refresh()
+
+        model_scores_lhs = []
+        model_scores_rhs = []
+        model_targets_lhs = []
+        model_targets_rhs = []
+
+        for step, embedding_model in enumerate(embedding_models):
+            args = embedding_model['args']
+            if args.model_dropout:
+                logging.debug(f"Skipping calculation of scores for {args.subgraph}, since the valid scores diverged "
+                              f"to much (factor {args.model_dropout_factor}).")
+                continue
+
+            model = embedding_model['model']
+            dtype = embedding_model['data_type']
+
+            # Get the number of candidate answers
+            candidate_answers = len(model.get_rhs(examples, eval_mode=True)[0])
+            logging.debug(f"candidate_answers: {candidate_answers}\tExamples: {len(examples)}")
+
+            scores_lhs, scores_rhs, targets_lhs, targets_rhs = calculate_scores(examples, model, dtype,
+                                                                                candidate_answers, b_begin, batch_size)
+
+            logging.info(f"Combining scores of  with {aggregation_method[1]} for indices "
+                         f"{b_begin} to {b_begin + batch_size}.")
+
+            # Collect scores
+            model_scores_lhs += [scores_lhs]
+            model_scores_rhs += [scores_rhs]
+            model_targets_lhs += [targets_lhs]
+            model_targets_rhs += [targets_rhs]
+
+            logging.debug(
+                f"scores_lhs size: {((scores_lhs.element_size() * scores_lhs.nelement()) / 1024) / 1024} MB")
+            logging.debug(
+                f"scores_rhs size: {((scores_rhs.element_size() * scores_rhs.nelement()) / 1024) / 1024} MB")
+            logging.debug(
+                f"targets_lhs size: {((targets_lhs.element_size() * targets_lhs.nelement()) / 1024) / 1024} MB")
+            logging.debug(
+                f"targets_rhs size: {((targets_rhs.element_size() * targets_rhs.nelement()) / 1024) / 1024} MB")
+
+        (aggregated_scores['lhs'][b_begin:b_begin + batch_size],
+         aggregated_scores['rhs'][b_begin:b_begin + batch_size],
+         aggregated_targets['lhs'][b_begin:b_begin + batch_size],
+         aggregated_targets['rhs'][b_begin:b_begin + batch_size]) = combine_scores(aggregation_method,
+                                                                                   model_scores_lhs,
+                                                                                   model_scores_rhs,
+                                                                                   model_targets_lhs,
+                                                                                   model_targets_rhs)
+
+        b_begin += batch_size
+
+    del model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs
+    return aggregated_scores, aggregated_targets
+
+
+def calculate_scores(examples, model, dtype, candidate_answers, b_begin, batch_size):
+    """
+        Calculate scores and targets for given examples using a specified model.
+
+        Args:
+            examples (Tensor): Tensor containing the examples for which scores need to be calculated.
+            model (Model): The embedding model used to calculate scores.
+            dtype (torch.dtype): Data type of the scores and targets.
+            candidate_answers (int): Number of candidate answers for each example.
+            b_begin (int): Starting index for the batch of examples.
+            batch_size (int): Size of the batch of examples.
+
+        Returns:
+            Tensor: Scores for 'lhs' direction.
+            Tensor: Scores for 'rhs' direction.
+            Tensor: Targets for 'lhs' direction.
+            Tensor: Targets for 'rhs' direction.
+        """
+    # calculate scores, adapted from base.compute_metrics() and base.get_rankings()
+
+    # Initialize tensors to store scores and targets
+    scores_rhs = torch.zeros((batch_size, candidate_answers), dtype=dtype)
+    scores_lhs = torch.zeros((batch_size, candidate_answers), dtype=dtype)
+    targets_rhs = torch.zeros((batch_size, candidate_answers), dtype=dtype)
+    targets_lhs = torch.zeros((batch_size, candidate_answers), dtype=dtype)
+
+    for mode in ["rhs", "lhs"]:
+        logging.debug(f"Current mode: {mode}")
+        queries = examples[b_begin:b_begin + batch_size].clone()
+
+        # Swap subject and object for lhs mode
+        if mode == "lhs":
+            tmp = torch.clone(queries[:, 0])
+            queries[:, 0] = queries[:, 2]
+            queries[:, 2] = tmp
+            queries[:, 1] += model.sizes[1] // 2
+
+        # Disable gradient computation for inference
+        with torch.no_grad():
+            candidates = model.get_rhs(queries, eval_mode=True)
+
+            these_queries = queries.cuda()
+
+            q = model.get_queries(these_queries)
+            rhs = model.get_rhs(these_queries, eval_mode=False)
+
+            if mode == "lhs":
+                scores_lhs = model.score(q, candidates, eval_mode=True)
+                targets_lhs = model.score(q, rhs, eval_mode=False)
+            else:
+                scores_rhs = model.score(q, candidates, eval_mode=True)
+                targets_rhs = model.score(q, rhs, eval_mode=False)
+
+        del queries
+
+    return scores_lhs, scores_rhs, targets_lhs, targets_rhs
+
+
+def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs):
+    """
+    Combine scores from multiple models using the specified aggregation method.
+
+    Args:
+        aggregation_method (tuple): Method used to aggregate scores (e.g., max, min, average).
+        model_scores_lhs (list): List of 'lhs' scores from different models.
+        model_scores_rhs (list): List of 'rhs' scores from different models.
+        model_targets_lhs (list): List of 'lhs' targets from different models.
+        model_targets_rhs (list): List of 'rhs' targets from different models.
+
+    Returns:
+        Tensor: Aggregated scores for 'lhs' direction.
+        Tensor: Aggregated scores for 'rhs' direction.
+        Tensor: Aggregated targets for 'lhs' direction.
+        Tensor: Aggregated targets for 'rhs' direction.
+    """
+    aggregated_scores_lhs, aggregated_scores_rhs = None, None
+    aggregated_targets_lhs, aggregated_targets_rhs = None, None
+
+    # Aggregate scores based on the specified method
+    if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+        # select maximum score between all models
+        try:
+            stacked_tensor = torch.stack(model_scores_lhs, dim=1)
+            aggregated_scores_lhs, _ = torch.max(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_scores_rhs, dim=1)
+            aggregated_scores_rhs, _ = torch.max(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_lhs, dim=1)
+            aggregated_targets_lhs, _ = torch.max(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_rhs, dim=1)
+            aggregated_targets_rhs, _ = torch.max(stacked_tensor, dim=1)
+
+        except Exception as e:
+            logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
+            return
+
+    # Aggregate scores based on the specified method
+    elif aggregation_method[0] == Constants.MIN_SCORE_AGGREGATION[0]:
+        # select maximum score between all models
+        try:
+            stacked_tensor = torch.stack(model_scores_lhs, dim=1)
+            aggregated_scores_lhs, _ = torch.min(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_scores_rhs, dim=1)
+            aggregated_scores_rhs, _ = torch.min(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_lhs, dim=1)
+            aggregated_targets_lhs, _ = torch.min(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_rhs, dim=1)
+            aggregated_targets_rhs, _ = torch.min(stacked_tensor, dim=1)
+
+        except Exception as e:
+            logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
+            return
+
+    elif aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+        # average the score across all models
+        try:
+            stacked_tensor = torch.stack(model_scores_lhs, dim=1)
+            aggregated_scores_lhs = torch.mean(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_scores_rhs, dim=1)
+            aggregated_scores_rhs = torch.mean(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_lhs, dim=1)
+            aggregated_targets_lhs = torch.mean(stacked_tensor, dim=1)
+
+            stacked_tensor = torch.stack(model_targets_rhs, dim=1)
+            aggregated_targets_rhs = torch.mean(stacked_tensor, dim=1)
+
+        except Exception as e:
+            logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
+            return
+
+    elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
+        # calculate attention between all models and average scores based on this attention
+        logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
+        # TODO implement attention score
+        pass
+
+    else:
+        logging.error(f"Selected aggregation method '{aggregation_method}' does not exist!")
+
+    return aggregated_scores_lhs, aggregated_scores_rhs, aggregated_targets_lhs, aggregated_targets_rhs
+
+
+def calculate_valid_loss(embedding_models):
+    valid_loss_dict = {}
+    valid_loss = 0.0
+    active_models = len(embedding_models)
+    # Iterate over all embedding models
+    for embedding_model in embedding_models:
+        # Setup variables
+        model = embedding_model["model"]
+        optimizer = embedding_model["optimizer"]
+        valid_examples = embedding_model["valid_examples"]
+        subgraph = embedding_model["subgraph"]
+
+        if embedding_model['args'].model_dropout:
+            valid_loss_dict[subgraph] = "dropout"
+            active_models -= 1
+            continue
+
+        # calculate single validation loss
+        model.eval()
+        # save individual valid losses for display
+        valid_loss_sub = optimizer.calculate_valid_loss(valid_examples)
+        # sum up valid losses
+        valid_loss += valid_loss_sub
+        valid_loss_dict[subgraph] = valid_loss_sub.item()
+
+    # average valid loss over all "len(embedding_models)" models
+    valid_loss /= active_models
+
+    return valid_loss, valid_loss_dict
+
+
+# --- unused functions ---
+
+
+def calculate_scores_depreciated(embedding_models, examples, batch_size=500, eval_mode="test"):
     """
        Calculate scores for all queries and models provided.
 
@@ -187,8 +475,8 @@ def calculate_scores(embedding_models, examples, batch_size=500, eval_mode="test
     return embedding_models
 
 
-def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, batch_size=500,
-                   eval_mode="test"):
+def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, batch_size=500,
+                               eval_mode="test"):
     """
         Combine scores from multiple models using the specified aggregation method.
 
@@ -333,39 +621,6 @@ def combine_scores(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGR
 
     return aggregated_scores, aggregated_targets
 
-
-def calculate_valid_loss(embedding_models):
-    valid_loss_dict = {}
-    valid_loss = 0.0
-    active_models = len(embedding_models)
-    # Iterate over all embedding models
-    for embedding_model in embedding_models:
-        # Setup variables
-        model = embedding_model["model"]
-        optimizer = embedding_model["optimizer"]
-        valid_examples = embedding_model["valid_examples"]
-        subgraph = embedding_model["subgraph"]
-
-        if embedding_model['args'].model_dropout:
-            valid_loss_dict[subgraph] = "dropout"
-            active_models -= 1
-            continue
-
-        # calculate single validation loss
-        model.eval()
-        # save individual valid losses for display
-        valid_loss_sub = optimizer.calculate_valid_loss(valid_examples)
-        # sum up valid losses
-        valid_loss += valid_loss_sub
-        valid_loss_dict[subgraph] = valid_loss_sub.item()
-
-    # average valid loss over all "len(embedding_models)" models
-    valid_loss /= active_models
-
-    return valid_loss, valid_loss_dict
-
-
-# --- unused functions ---
 
 def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
     """
