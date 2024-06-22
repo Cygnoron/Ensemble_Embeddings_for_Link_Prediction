@@ -15,7 +15,7 @@ from ensemble.util import get_unique_triple_ids
 
 
 def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sampling_method, subgraph_amount=10,
-                 subgraph_size_range=(0.1, 0.7), relation_name_amount=-1, entities_per_step=1):
+                 subgraph_size_range=(0.1, 0.7), relation_name_amount=-1, entities_per_step=1, no_progress_bar=False):
     """
     The sample_graph function takes in a dataset name, an output directory, and two optional parameters:
     subgraph_amount (default 10) - the number of subgraphs to create from the original dataset
@@ -102,7 +102,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 delta_triples, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = calculate_delta(
                     subgraph_size_range, data, subgraph_num, subgraph_amount, entity_set,
                     relation_name_set, entity_ids_unused, relation_name_ids_unused,
-                    sampling_method, relation_name_amount, entities_per_step)
+                    sampling_method, relation_name_amount, entities_per_step, no_progress_bar=no_progress_bar)
 
                 # Initialize a mask with False values
                 mask = np.zeros(len(data), dtype=bool)
@@ -161,7 +161,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
 def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount, entity_set, relation_name_set,
                     entity_ids_unused, relation_name_ids_unused, sampling_method, relation_name_amount,
-                    entities_per_step, enforcement=2):
+                    entities_per_step, enforcement=2, no_progress_bar=False):
     """
     The calculate_delta function calculates, which triples will be deleted from the input dataset and returns the
     indices of these triples as array.
@@ -181,9 +181,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
     """
 
     # initialize general variables
-    # delta = []
     delta = set()
-    samples = []
     enforce_relation_names = False
     enforce_entities = False
     subgraph_relation_names = []
@@ -223,18 +221,20 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                 enforce_relation_names = False
 
             # initialize progress bar
-            if progress_bar is None:
+            if progress_bar is None and not no_progress_bar:
                 progress_bar = tqdm(total=math.ceil(len(dataset) * subgraph_size),
                                     desc=f"Sampling Progress for subgraph {subgraph_num}", unit=" triple")
 
             # sample entities
             buffer_var = sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused,
                                   dataset, delta, sampling_method, enforce_relation_names, enforce_entities,
-                                  progress_bar, subgraph_relation_names, sampled_entity_ids, entities_per_step)
+                                  progress_bar, no_progress_bar, subgraph_relation_names, sampled_entity_ids,
+                                  entities_per_step)
             (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused,
              subgraph_relation_names, sampled_entity_ids) = buffer_var
 
-        progress_bar.close()
+        if not no_progress_bar:
+            progress_bar.close()
         logging.info(f"Current subgraph size {len(delta) / len(dataset)} reached or exceeded target size "
                      f"{subgraph_size}.")
         logging.info(f"Created subgraph {subgraph_num} with {len(entity_ids_unused)} entities and "
@@ -286,14 +286,15 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         while len(delta) / len(dataset) < subgraph_size:
 
             # initialize progress bar
-            if progress_bar is None:
+            if progress_bar is None and not no_progress_bar:
                 progress_bar = tqdm(total=math.ceil(len(dataset) * subgraph_size),
                                     desc=f"Sampling subgraph {subgraph_num}", unit=" triple")
 
             # sample entities and relation names
             buffer_var = sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused,
                                   dataset, delta, sampling_method, enforce_relation_names, enforce_entities,
-                                  progress_bar, subgraph_relation_names, sampled_entity_ids, entities_per_step,
+                                  progress_bar, no_progress_bar, subgraph_relation_names, sampled_entity_ids,
+                                  entities_per_step,
                                   relation_names_amount=relation_name_amount)
             (entity_set, relation_name_set, delta, entity_ids_unused, relation_name_ids_unused, relation_name_amount,
              subgraph_relation_names, sampled_entity_ids) = buffer_var
@@ -302,10 +303,12 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                 if subgraph_size != subgraph_size_range[0]:
                     subgraph_size = subgraph_size_range[0]
                     logging.info(f"Changing relative subgraph size to minimum subgraph size {subgraph_size}.")
-                    progress_bar.total = math.ceil(len(dataset) * subgraph_size)
+                    if not no_progress_bar:
+                        progress_bar.total = math.ceil(len(dataset) * subgraph_size)
 
                 if len(delta) / len(dataset) >= subgraph_size:
-                    progress_bar.close()
+                    if not no_progress_bar:
+                        progress_bar.close()
                     logging.info(f"Current subgraph size {len(delta) / len(dataset)} reached or exceeded target size "
                                  f"{subgraph_size}.")
                     logging.info(f"Created subgraph {subgraph_num} with {len(entity_ids_unused)} entities and "
@@ -323,7 +326,8 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                     entity_set = get_entity_set(relation_name_set, dataset)
                     max_relation_name_index += 1
 
-        progress_bar.close()
+        if not no_progress_bar:
+            progress_bar.close()
         logging.info(f"Current subgraph size {len(delta) / len(dataset)} reached or exceeded target size "
                      f"{subgraph_size}.")
         logging.info(f"Created subgraph {subgraph_num} with {len(entity_ids_unused)} entities and "
@@ -341,8 +345,8 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
 
 
 def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids_unused, dataset, delta,
-             sampling_method, enforce_relation_names, enforce_entities, progress_bar, subgraph_relation_names,
-             sampled_entity_ids, entities_per_step, relation_names_amount=-1):
+             sampling_method, enforce_relation_names, enforce_entities, progress_bar, no_progress_bar,
+             subgraph_relation_names, sampled_entity_ids, entities_per_step, relation_names_amount=-1):
     """
     Perform sampling of entities and relation names for subgraph creation.
 
@@ -433,8 +437,9 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         del entity_set[sampled_entity_id]
 
     # update progress bar
-    progress_bar.n = len(delta)
-    progress_bar.refresh()
+    if not no_progress_bar:
+        progress_bar.n = len(delta)
+        progress_bar.refresh()
 
     # return all changed lists for the different sampling methods
     if sampling_method == Constants.FEATURE_SAMPLING:

@@ -10,7 +10,7 @@ from models import hyperbolic
 def calculate_self_attention(embedding_models, theta_calculation, batch_size=500):
     if theta_calculation[0] == Constants.NO_THETA[0]:
         # Do nothing, if no context vector was created
-        pass
+        return
 
     else:
         logging.info(f"Calculating self-attention...")
@@ -24,17 +24,16 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
         att_weights_ent = None
         att_weights_rel = None
 
-        if theta_calculation[0] == Constants.NO_THETA:
-            return
-
-        elif theta_calculation[0] == Constants.REGULAR_THETA[0]:
+        if theta_calculation[0] == Constants.REGULAR_THETA[0]:
             # EXAMPLE WN18RR dimensions (40943 entities, 11*2 relation names, N subgraphs)
             # GOAL: att_weights_ent.size() = [40943, 32, N]     att_weights_ent.size() = [22, 32, N]
             # INPUT: theta_ent = [40943, 32, N]                 theta_rel = [22, 32, N]
             #        cands_ent = [40943, 32, N]                 cands_rel = [22, 32, N]
             logging.debug(f"BEFORE\t\ttheta_ent: {theta_ent.size()}\ncands_ent: {cands_ent.size()}")
+            
             att_weights_ent = torch.sum(theta_ent * cands_ent, dim=-1, keepdim=True)
             att_weights_rel = torch.sum(theta_rel * cands_rel, dim=-1, keepdim=True)
+
             logging.debug(f"att_weights_ent size: {att_weights_ent.size()}")
             logging.debug(f"att_weights_rel size: {att_weights_rel.size()}")
 
@@ -93,37 +92,42 @@ def get_cands(embedding_models, batch_size):
     steps = args.sizes[0]
     logging.debug(args.sizes)
 
-    cands_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
-    cands_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
+    if args.dtype == "double":
+        dtype = torch.double
+    else:
+        dtype = torch.float
+
+    cands_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount, dtype=dtype)
+    cands_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
     cands_ent.to('cuda')
     cands_rel.to('cuda')
 
-    theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
-    theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
+    theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount, dtype=dtype)
+    theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
 
     if args.theta_calculation[0] == Constants.REGULAR_THETA[0]:
         # theta_ent = theta_ent
         # theta_rel = theta_rel
-        theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
-        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
+        theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount, dtype=dtype)
+        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
 
     elif args.theta_calculation[0] == Constants.REVERSED_THETA[0]:
         # theta_ent = theta_rel
         # theta_rel = theta_ent
-        theta_ent = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
-        theta_rel = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
+        theta_ent = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
+        theta_rel = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount, dtype=dtype)
 
     elif args.theta_calculation[0] == Constants.RELATION_THETA[0]:
         # theta_ent = theta_rel
         # theta_rel = theta_rel
-        theta_ent = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
-        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
+        theta_ent = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
+        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
 
     elif args.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
         # theta_ent = theta_ent * theta_rel
         # theta_rel = theta_rel
-        theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount)
-        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount)
+        theta_ent = torch.zeros(args.sizes[0], args.rank, args.subgraph_amount, dtype=dtype)
+        theta_rel = torch.zeros(args.sizes[1], args.rank, args.subgraph_amount, dtype=dtype)
 
     theta_ent.to('cuda')
     theta_rel.to('cuda')
@@ -141,6 +145,7 @@ def get_cands(embedding_models, batch_size):
             cands_ent_temp.append(model.entity.weight.data[b_begin:b_begin + batch_size])
             theta_ent_temp.append(model.theta_ent.weight.data[b_begin:b_begin + batch_size])
             model = embedding_model["model"]
+            # handle special case for hyperbolic models
             if embedding_model["args"].model_name in hyperbolic.HYP_MODELS:
                 logging.debug(f"HYPERBOLIC")
                 cands_rel_temp.append(torch.chunk(model.rel.weight.data[b_begin:b_begin + batch_size], 2, dim=1))

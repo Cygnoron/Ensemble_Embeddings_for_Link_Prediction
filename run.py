@@ -1,17 +1,16 @@
 """Train Knowledge Graph embeddings for link prediction."""
 
 import argparse
-import datetime
 import json
 import logging
 import os
 
 import torch
 import torch.optim
-import wandb
 
 import models as models
 import optimizers.regularizers as regularizers
+import wandb
 from datasets.kg_dataset import KGDataset
 from ensemble import util, Constants
 from models import all_models
@@ -199,11 +198,11 @@ def train(args):
     model.eval()
 
     # Validation metrics
-    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch="best_valid")
+    valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch=args.max_epochs + 10)
     logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes), epoch="test")
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes), epoch=args.max_epochs + 20)
     logging.info(format_metrics(test_metrics, split="test"))
 
 

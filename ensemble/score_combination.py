@@ -29,12 +29,6 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     aggregated_scores, aggregated_targets = calculate_and_combine_scores(embedding_models, examples,
                                                                          aggregation_method, eval_mode=mode,
                                                                          batch_size=batch_size)
-    # embedding_models = calculate_scores(embedding_models, examples, batch_size=batch_size,
-    #                                     eval_mode=mode)
-    #
-    # # combine the calculated scores from all models, according to the given aggregation method
-    # aggregated_scores, aggregated_targets = combine_scores(embedding_models, aggregation_method, batch_size=batch_size,
-    #                                                        eval_mode=mode)
 
     # compute the ranks for all queries
     filters = embedding_models[0]["filters"]
@@ -89,14 +83,14 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
     dtype = embedding_models[0]['data_type']
     candidate_answers = len(embedding_models[0]['model'].get_rhs(examples, eval_mode=True)[0])
 
-    size = {'rhs': (len(examples), candidate_answers),
-            'lhs': (len(examples), candidate_answers)}
+    size = {'score': (len(examples), candidate_answers),
+            'target': (len(examples), 1)}
 
     # Initialize dictionary to store aggregated scores
-    aggregated_scores = {'rhs': torch.zeros(size['rhs']).to(dtype),
-                         'lhs': torch.zeros(size['lhs']).to(dtype)}
-    aggregated_targets = {'rhs': torch.zeros(size['rhs']).to(dtype),
-                          'lhs': torch.zeros(size['lhs']).to(dtype)}
+    aggregated_scores = {'rhs': torch.zeros(size['score']).to(dtype),
+                         'lhs': torch.zeros(size['score']).to(dtype)}
+    aggregated_targets = {'rhs': torch.zeros(size['target']).to(dtype),
+                          'lhs': torch.zeros(size['target']).to(dtype)}
 
     b_begin = 0
     steps = len(examples)

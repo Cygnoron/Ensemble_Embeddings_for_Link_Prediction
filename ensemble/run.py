@@ -6,6 +6,7 @@ import os
 import time
 
 import torch
+from pympler import asizeof
 from torch import nn
 
 import models as models
@@ -146,12 +147,16 @@ def train(info_directory, args):
                       f"{util.format_dict(valid_losses[epoch])}")
         logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
 
-        check_model_dropout(embedding_models, valid_losses[epoch])
+        run_diverged = check_model_dropout(embedding_models, valid_losses[epoch])
+        if run_diverged:
+            logging.critical(f"The run diverged and is now stopped. "
+                             f"Please try a other combination of embedding methods.")
 
         if (epoch + 1) % valid_args.valid == 0:
 
             valid_metrics = evaluate_ensemble(embedding_models, args.aggregation_method, mode="valid",
-                                              metrics_file_path=metrics_file_path, epoch=epoch)
+                                              metrics_file_path=metrics_file_path, epoch=epoch,
+                                              batch_size=args.batch_size)
 
             valid_mrr = valid_metrics["MRR"]['average']
             if not valid_args.best_mrr or valid_mrr > valid_args.best_mrr:
@@ -176,6 +181,9 @@ def train(info_directory, args):
                     for embedding_model in embedding_models:
                         embedding_model['optimizer'].reduce_lr()
 
+        accurate_size = asizeof.asizeof(embedding_models)
+        logging.critical(f"Memory requirement for embedding models in epoch {epoch} is {accurate_size/1024/1024:.3f}MB")
+
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{util.format_time(time_start_training_sub, time_stop_training_sub)}\t/-")
@@ -190,7 +198,8 @@ def train(info_directory, args):
 
     # --- Testing with aggregated scores ---
 
-    evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, metrics_file_path=metrics_file_path)
+    evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, metrics_file_path=metrics_file_path,
+                      batch_size=args.batch_size)
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
@@ -374,3 +383,10 @@ def check_model_dropout(embedding_models, valid_losses):
 
             # "hard dropout" -> completly exclude model if it diverged once
             args.model_dropout = True
+
+    run_diverged = True
+    for embedding_model in embedding_models:
+        if not embedding_model["args"].model_dropout:
+            run_diverged = False
+
+    return run_diverged

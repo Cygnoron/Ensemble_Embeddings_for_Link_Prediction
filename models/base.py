@@ -202,10 +202,12 @@ class KGModel(nn.Module, ABC):
 
                 # if self.data_type == torch.double:
                 # Calculate optimistic rank
-                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1).cpu()
+                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type),
+                                                                     dim=1).cpu()
 
                 # Calculate rank_deviation
-                rank_deviation_buffer = torch.sum((scores == targets).to(self.data_type), dim=1)
+                buffer = scores.to(self.data_type) == targets.to(self.data_type)
+                rank_deviation_buffer = torch.sum(buffer, dim=1)
 
                 # else:
                 #     # Calculate optimistic rank
@@ -220,6 +222,9 @@ class KGModel(nn.Module, ABC):
                 # ranks_pes[b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
 
                 b_begin += batch_size
+
+            rank_deviation = (rank_deviation / len(queries)).to(self.data_type)
+
         return ranks_opt, rank_deviation
 
     def compute_metrics(self, examples, filters, sizes, ensemble_args=None, batch_size=500):
@@ -253,7 +258,7 @@ class KGModel(nn.Module, ABC):
             else:
                 ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
                                                                 ensemble_args=(
-                                                                ensemble_args[0][m], ensemble_args[1][m]))
+                                                                    ensemble_args[0][m], ensemble_args[1][m]))
 
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()

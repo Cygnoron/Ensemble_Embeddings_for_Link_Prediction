@@ -163,7 +163,7 @@ def run_embedding(args):
     dataset_out = ""
     if args.sampling_method == Constants.FEATURE_SAMPLING:
         dataset_out = (
-            f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}_rho{args.relation_name_amount}"
+            f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}_rho{args.rho}"
             f"_min{args.subgraph_size_range[0]}_max{args.subgraph_size_range[1]}")
     elif args.sampling_method == Constants.ENTITY_SAMPLING:
         dataset_out = (f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}"
@@ -185,7 +185,7 @@ def run_embedding(args):
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
                                  subgraph_size_range=args.subgraph_size_range,
-                                 relation_name_amount=args.rho)
+                                 relation_name_amount=args.rho, no_progress_bar=args.no_progress_bar)
 
     error = False
     try:
@@ -216,16 +216,16 @@ def run_embedding_manual():
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
     subgraph_amount = 3
-    subgraph_size_range = (0.3, 0.35)
+    subgraph_size_range = (0.2, 0.25)
     relation_name_amount = 0.5
-    model_dropout_factor = 1.5
+    model_dropout_factor = 10
 
     args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True, wandb_log=False,
-                              no_progress_bar=True, subgraph_amount=subgraph_amount,
+                              no_progress_bar=False, subgraph_amount=subgraph_amount,
                               subgraph_size_range=subgraph_size_range, relation_name_amount=relation_name_amount,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              theta_calculation=Constants.NO_THETA, model_dropout_factor=model_dropout_factor)
+                              theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -236,7 +236,7 @@ def run_embedding_manual():
 
         dataset_out = ""
         if args.sampling_method == Constants.FEATURE_SAMPLING:
-            dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}_rho{args.relation_name_amount}"
+            dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}_rho{args.rho}"
                            f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
         elif args.sampling_method == Constants.ENTITY_SAMPLING:
             dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}"
@@ -253,7 +253,7 @@ def run_embedding_manual():
         args.info_directory = info_directory
 
         util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
-                           logging_level="info")
+                           logging_level="critical")
 
         # --- if a new debugging dataset was created ---
 
@@ -279,7 +279,7 @@ def run_embedding_manual():
         if not args.no_sampling:
             subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                      subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
-                                     relation_name_amount=args.relation_name_amount)
+                                     relation_name_amount=args.rho, no_progress_bar=args.no_progress_bar)
 
         # sampling_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
         #                   150, 200, 300, 400, 500]
@@ -304,7 +304,7 @@ def run_embedding_manual():
         #                       Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
 
         allowed_kge_models = [{Constants.TRANS_E: [0, "rest"], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
-                               Constants.COMPL_EX: [3, "rest"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
+                               Constants.COMPL_EX: [3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [1, 0, "rest"], Constants.DIST_MULT: [13], Constants.ROTAT_E: [21],
         #                        Constants.COMPL_EX: [2, 3, "rest"], Constants.ATT_E: [50]}]
@@ -330,24 +330,24 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 10
-                    args.batch_size = 750
+                    args.max_epochs = 50
+                    args.batch_size = 2500
                     args.rank = 32
                     args.learning_rate = 0.1
                     args.reg = 0.05
                     args.regularizer = "N3"
                     args.optimizer = "Adagrad"
                     args.patience = 15
-                    args.valid = 2
+                    args.valid = 5
                     args.neg_sample_size = -1
                     args.dropout = 0
                     args.init_size = 0.001
                     args.gamma = 0
-                    args.bias = "none"
-                    args.dtype = "single"
+                    args.bias = "learn"
+                    args.dtype = "double"
                     args.debug = False
                     args.multi_c = True
-                    args.double_neg = False
+                    args.double_neg = True
 
                     if Constants.LOG_WANDB:
                         wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
@@ -377,7 +377,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.model = "ComplEx"
-    args.dataset = "WN18RR"
+    args.dataset = "NELL-995"
     args.rank = 32
     args.regularizer = "N3"
     args.reg = 0.05
@@ -385,15 +385,17 @@ if __name__ == "__main__":
     args.max_epochs = 500
     args.patience = 15
     args.valid = 1
-    args.batch_size = 750
+    args.batch_size = 2500
     args.neg_sample_size = -1
     args.init_size = 0.001
-    args.learning_rate = 0.1
+    args.learning_rate = 0.001
     args.gamma = 0.0
     args.bias = "none"
     args.dtype = "single"
+    args.debug = True
+    args.double_neg = False
 
-    run_baseline(args)
+    # run_baseline(args)
 
     # Function to run manual via IDE
-    # run_embedding_manual()
+    run_embedding_manual()
