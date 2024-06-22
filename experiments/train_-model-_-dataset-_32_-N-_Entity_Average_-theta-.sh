@@ -1,16 +1,28 @@
 #!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --time=03:00:00
+#SBATCH --mem=488000
+#SBATCH --job-name=Ensemble_experiment
+#SBATCH --partition=accelerated
+#SBATCH --gres=gpu:4
+#SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments
+#SBATCH --mail-user="st162185@stud.uni-stuttgart.de"
+#SBATCH --mail-type=ALL
+
 cd ..
 source set_env.sh
 
 # lists of parameters
-params_dataset=("WN18RR" "YAGO3-10" "NELL-995")
-#params_dataset=("WN18RR")
-params_model=('{"TransE":[]}' '{"DistMult":[]}' '{"RotatE":[]}' '{"ComplEx":[]}' '{"AttE":[]}' '{"AttH":[]}')
-#params_model=('{"TransE":[]}')
-params_subgraph_amount=("10" "30" "60")
-#params_subgraph_amount=("10")
-params_theta=("no" "regular" "reversed" "relation")
-#params_theta=("regular")
+# params_dataset=("WN18RR" "YAGO3-10" "NELL-995")
+params_dataset=("WN18RR")
+# params_model=('{"TransE":[]}' '{"DistMult":[]}' '{"RotatE":[]}' '{"ComplEx":[]}' '{"AttE":[]}' '{"AttH":[]}')
+params_model=('{"ComplEx":[]}')
+# params_subgraph_amount=("10" "30" "60")
+# params_subgraph_amount=("10")
+params_subgraph_amount=("30")
+# params_subgraph_amount=("60")
+# params_theta=("regular" "reversed" "relation")
+params_theta=("regular")
 
 # iterate over datasets
 for dataset in "${params_dataset[@]}"; do
@@ -43,7 +55,9 @@ for dataset in "${params_dataset[@]}"; do
                                                  --aggregation_method average \
                                                  --no_time_dependent_file_path \
                                                  --no_sampling \
-                                                 --theta "$theta"
+                                                 #--no_progress_bar \
+                                                 --theta "$theta" \
+                                                 --model_dropout_factor 10
             done
         done
     done
