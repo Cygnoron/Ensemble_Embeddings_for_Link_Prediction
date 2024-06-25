@@ -176,11 +176,12 @@ class KGModel(nn.Module, ABC):
         """
 
         rank_deviation = 0
+        ranks = torch.ones(len(queries))
 
         with torch.no_grad():
             b_begin = 0
             candidates = self.get_rhs(queries, eval_mode=True)
-            ranks_opt = torch.ones(len(queries))
+
             while b_begin < len(queries):
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
@@ -198,34 +199,27 @@ class KGModel(nn.Module, ABC):
                 for i, query in enumerate(these_queries):
                     filter_out = filters[(query[0].item(), query[1].item())]
                     filter_out += [queries[b_begin + i, 2].item()]
+
+                    if query[0].item() != query[2].item():
+                        filter_out += [queries[b_begin + i, 0].item()]
+
                     scores[i, torch.LongTensor(filter_out)] = -1e6
 
-                # if self.data_type == torch.double:
                 # Calculate optimistic rank
-                ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type),
-                                                                     dim=1).cpu()
+                ranks[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1).cpu()
 
                 # Calculate rank_deviation
                 buffer = scores.to(self.data_type) == targets.to(self.data_type)
                 rank_deviation_buffer = torch.sum(buffer, dim=1)
 
-                # else:
-                #     # Calculate optimistic rank
-                #     ranks_opt[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).float(), dim=1).cpu()
-                #
-                #     # Calculate rank_deviation
-                #     rank_deviation_buffer = torch.sum((scores == targets).float(), dim=1)
-
                 rank_deviation += torch.sum(torch.abs(rank_deviation_buffer))
                 logging.debug(f"{rank_deviation}")
-
-                # ranks_pes[b_begin:b_begin + batch_size] += (pessimistic_rank - target_subtraction).cpu()
 
                 b_begin += batch_size
 
             rank_deviation = (rank_deviation / len(queries)).to(self.data_type)
 
-        return ranks_opt, rank_deviation
+        return ranks, rank_deviation
 
     def compute_metrics(self, examples, filters, sizes, ensemble_args=None, batch_size=500):
         """Compute ranking-based evaluation metrics.
