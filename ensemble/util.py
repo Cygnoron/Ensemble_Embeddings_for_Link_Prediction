@@ -1,3 +1,5 @@
+import argparse
+import copy
 import json
 import logging
 import os
@@ -197,7 +199,7 @@ def assign_model_to_subgraph(kge_models, args):
     # List containing only specific mappings for subgraphs
     mapped_subgraphs = list(subgraph_embedding_mapping.keys())
 
-    logging.info(f"Subgraphs with fixed embedding: {format_dict(subgraph_embedding_mapping)}\n\t\t"
+    logging.info(f"Subgraphs with fixed embedding:\n{format_dict(subgraph_embedding_mapping)}\n\t\t"
                  f"Remaining subgraphs will be embedded by random embedding methods {kge_models_adjusted}")
 
     for subgraph in os.listdir(os.path.abspath(args.dataset_dir)):
@@ -323,7 +325,7 @@ def generate_general_embeddings(general_dataset: str, args):
     embedding_general_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
     embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
     logging.debug(f"general embedding datatype: {type(embedding_general_ent.weight.data.dtype)}, "
-                     f"{embedding_general_ent.weight.data.dtype}")
+                  f"{embedding_general_ent.weight.data.dtype}")
     # context vectors
     theta_ent = None
     theta_rel = None
@@ -350,86 +352,6 @@ def generate_general_embeddings(general_dataset: str, args):
         theta_rel.to("cuda")
 
     return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel, dataset.get_shape()
-
-
-def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False, file_identifier=""):
-    """
-    Compute the difference between two embeddings and write the results to a CSV file.
-
-    Args:
-        embedding_before (torch.tensor): The embedding before some transformation.
-        embedding_after (torch.tensor): The embedding after the same transformation.
-        output_path (str): The path to save the output CSV file.
-        ent (bool): Set True if embedding is from entities, affects output filename
-        rel (bool): Set True if embedding is from relation names, affects output filename
-        file_identifier (str): Additional string, that is attached to the output filename
-
-    Returns:
-        None
-
-    """
-    output_path = os.path.abspath(output_path)
-    if ent:
-        output_file_name = "difference_embeddings_ent"
-    elif rel:
-        output_file_name = "difference_embeddings_rel"
-    else:
-        output_file_name = "difference_embeddings"
-
-    if file_identifier != "":
-        file_identifier = f"_{file_identifier}"
-
-    logging.debug(f"Calculating difference between embeddings an saving it to {output_path}.")
-
-    embedding_difference = embedding_before - embedding_after
-
-    with open(os.path.join(output_path, f"{output_file_name}{file_identifier}.csv"), "w") as output_file:
-        logging.debug("Write embeddings before some transformation")
-        # iterate through all embeddings
-        for embedding_before_id in embedding_before:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_before_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
-        output_file.write("\n")
-
-        logging.debug("Write embeddings after some transformation")
-        # iterate through all embeddings
-        for embedding_after_id in embedding_after:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_after_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
-        output_file.write("\n")
-
-        logging.debug("Write difference between embeddings after some transformation")
-        # iterate through all embeddings
-        for embedding_difference_id in embedding_difference:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_difference_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
 
 
 def format_time(time_total_start, time_total_end, divisor=1, multiplier=1, precision=2):
@@ -592,3 +514,128 @@ def handle_methods(method_str, mode):
             return candidate_method
     raise ValueError(f"The given sampling method \'{method_str}\' does not exist!\n"
                      f"Please check if your spelling was correct, if the method should exist.")
+
+
+def get_args(args, model):
+    if model == "general_args":
+        general_args = argparse.Namespace()
+        general_args.rank = args.rank
+        general_args.dtype = args.dtype
+        general_args.debug = args.debug
+        general_args.theta_calculation = args.theta_calculation
+        return general_args
+
+    else:
+        args_subgraph = copy.copy(args)
+        args_list = ["batch_size",
+                     "bias",
+                     "double_neg",
+                     "dropout",
+                     "gamma",
+                     "init_size",
+                     "learning_rate",
+                     "multi_c",
+                     "neg_sample_size",
+                     "optimizer",
+                     "regularizer",
+                     "reg"]
+        counter = 0
+        for key in vars(args):
+            if key in args_list:
+                value = vars(args)[key]
+                if type(value) is dict:
+                    if "all" in list(value.keys()):
+                        vars(args_subgraph)[key] = value['all']
+                    elif model in list(value.keys()):
+                        vars(args_subgraph)[key] = value[model]
+                    elif "rest" in list(value.keys()):
+                        vars(args_subgraph)[key] = value['rest']
+                    else:
+                        first_key = next(iter(value.keys()))
+                        vars(args_subgraph)[key] = value[first_key]
+                    counter += 1
+
+        logging.debug(f"{counter} parameters were changed due to specific mapping.")
+        return args_subgraph
+
+
+# --- unused functions ---
+
+def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False, file_identifier=""):
+    """
+    Compute the difference between two embeddings and write the results to a CSV file.
+
+    Args:
+        embedding_before (torch.tensor): The embedding before some transformation.
+        embedding_after (torch.tensor): The embedding after the same transformation.
+        output_path (str): The path to save the output CSV file.
+        ent (bool): Set True if embedding is from entities, affects output filename
+        rel (bool): Set True if embedding is from relation names, affects output filename
+        file_identifier (str): Additional string, that is attached to the output filename
+
+    Returns:
+        None
+
+    """
+    output_path = os.path.abspath(output_path)
+    if ent:
+        output_file_name = "difference_embeddings_ent"
+    elif rel:
+        output_file_name = "difference_embeddings_rel"
+    else:
+        output_file_name = "difference_embeddings"
+
+    if file_identifier != "":
+        file_identifier = f"_{file_identifier}"
+
+    logging.debug(f"Calculating difference between embeddings an saving it to {output_path}.")
+
+    embedding_difference = embedding_before - embedding_after
+
+    with open(os.path.join(output_path, f"{output_file_name}{file_identifier}.csv"), "w") as output_file:
+        logging.debug("Write embeddings before some transformation")
+        # iterate through all embeddings
+        for embedding_before_id in embedding_before:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_before_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")
+        output_file.write("\n")
+
+        logging.debug("Write embeddings after some transformation")
+        # iterate through all embeddings
+        for embedding_after_id in embedding_after:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_after_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")
+        output_file.write("\n")
+
+        logging.debug("Write difference between embeddings after some transformation")
+        # iterate through all embeddings
+        for embedding_difference_id in embedding_difference:
+            output_string = ""
+            # iterate through all dimensions
+            for entry in embedding_difference_id:
+                output_string += f"{entry};"
+
+            # delete last semicolon
+            if output_string.endswith(";"):
+                output_string = output_string[:-1]
+
+            # write to output_file
+            output_file.write(output_string + "\n")

@@ -168,7 +168,6 @@ def train(info_directory, args):
                 valid_args.best_epoch = epoch
                 logging.info(f"Saving models at epoch {epoch} in {model_file_dir}")
 
-                # TODO - save attention from best model
                 torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
                 torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
 
@@ -196,7 +195,6 @@ def train(info_directory, args):
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{util.format_time(time_start_training_sub, time_stop_training_sub)}\t/-")
 
-    # TODO - load attention from best model
     # load or save best models after completed training
     cands_att_dict = util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir, cands_att_dict)
 
@@ -206,7 +204,6 @@ def train(info_directory, args):
                  f"{util.format_time(time_start_training_total, time_stop_training_total)}\t/-")
 
     # --- Testing with aggregated scores ---
-    # TODO - input attention values
     if args.aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
         evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method,
                           metrics_file_path=metrics_file_path,

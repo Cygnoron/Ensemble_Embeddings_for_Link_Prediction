@@ -136,15 +136,16 @@ parser.add_argument(
 parser.add_argument(
     '--model', type=str, default="{TransE:[\'all\']}",
     help='JSON string of the mapping from embedding methods to subgraphs.\n'
+         '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
          '- \'all\' in a mapping sets all subgraphs to this method\n'
          '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
-         'If no \'rest\' was specified, all subgraphs can be embedded by all given embedding methods.'
+         'If nothing was specified, all subgraphs can be embedded by the given embedding method.'
 )
 parser.add_argument(
     "--logging", default="info", help="Determines the level of logging.\n"
-                                      "- \'info\': Contains information about the progress"
-                                      "- \'debug: Also contains information about variables, e.g. tensor sizes\'"
-                                      "- \'data: Also contains embedding weights and other data from variables, "
+                                      "- \'info\': Contains information about the progress\n"
+                                      "- \'debug\': Also contains information about variables, e.g. tensor sizes\n"
+                                      "- \'data\': Also contains embedding weights and other data from variables, "
                                       "which is printed directly to the log\'"
 )
 
@@ -185,7 +186,7 @@ def run_embedding(args):
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
                                  subgraph_size_range=args.subgraph_size_range,
-                                 relation_name_amount=args.rho, no_progress_bar=args.no_progress_bar)
+                                 rho=args.rho, no_progress_bar=args.no_progress_bar)
 
     error = False
     try:
@@ -215,17 +216,18 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "YAGO3-10"
     # dataset_in = "NELL-995"
-    subgraph_amount = 3
-    subgraph_size_range = (0.2, 0.25)
-    relation_name_amount = 0.5
+    subgraph_amount = 4
+    subgraph_size_range = (0.3, 0.7)
+    rho = 2
     model_dropout_factor = 10
 
     args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True, wandb_log=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount,
-                              subgraph_size_range=subgraph_size_range, relation_name_amount=relation_name_amount,
+                              subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
-                              aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
+                              # sampling_method=Constants.FEATURE_SAMPLING,
+                              aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
+                              theta_calculation=Constants.RELATION_THETA, model_dropout_factor=model_dropout_factor)
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
@@ -253,7 +255,7 @@ def run_embedding_manual():
         args.info_directory = info_directory
 
         util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
-                           logging_level="critical")
+                           logging_level="info")
 
         # --- if a new debugging dataset was created ---
 
@@ -279,14 +281,14 @@ def run_embedding_manual():
         if not args.no_sampling:
             subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                      subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
-                                     relation_name_amount=args.rho, no_progress_bar=args.no_progress_bar)
+                                     rho=args.rho, no_progress_bar=args.no_progress_bar)
 
         # sampling_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
         #                   150, 200, 300, 400, 500]
         # for i in sampling_sizes:
         #     subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
         #                              subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
-        #                              relation_name_amount=relation_name_amount,
+        #                              rho=rho,
         #                              entities_per_step=i)
 
         # --- create .graphml files for dataset visualization ---
@@ -303,8 +305,8 @@ def run_embedding_manual():
         # allowed_kge_models = {Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [2, 3], Constants.ROTAT_E: ["rest"],
         #                       Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, "rest"], Constants.DIST_MULT: [1], Constants.ROTAT_E: [2],
-                               Constants.COMPL_EX: [3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
+        allowed_kge_models = [{Constants.TRANS_E: [0, 1, "rest"], Constants.DIST_MULT: [10], Constants.ROTAT_E: [20],
+                               Constants.COMPL_EX: [2, 3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [5]}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [1, 0, "rest"], Constants.DIST_MULT: [13], Constants.ROTAT_E: [21],
         #                        Constants.COMPL_EX: [2, 3, "rest"], Constants.ATT_E: [50]}]
@@ -331,23 +333,37 @@ def run_embedding_manual():
                     args.kge_models = models
 
                     args.max_epochs = 50
-                    args.batch_size = 2500
                     args.rank = 32
-                    args.learning_rate = 0.1
-                    args.reg = 0.05
-                    args.regularizer = "N3"
-                    args.optimizer = "Adagrad"
                     args.patience = 15
-                    args.valid = 5
-                    args.neg_sample_size = -1
-                    args.dropout = 0
-                    args.init_size = 0.001
-                    args.gamma = 0
-                    args.bias = "learn"
-                    args.dtype = "double"
+                    args.valid = 1
+                    args.dtype = "single"
                     args.debug = False
-                    args.multi_c = True
-                    args.double_neg = True
+
+                    # args.batch_size = 1000
+                    # args.learning_rate = 0.1
+                    # args.reg = 0.05
+                    # args.regularizer = "N3"
+                    # args.optimizer = "Adagrad"
+                    # args.neg_sample_size = -1
+                    # args.dropout = 0
+                    # args.init_size = 0.001
+                    # args.gamma = 0
+                    # args.bias = "learn"
+                    # args.multi_c = True
+                    # args.double_neg = True
+
+                    args.batch_size = {'ComplEx': 1000, 'rest': 500}
+                    args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001}
+                    args.reg = {'ComplEx': 0.05, 'TransE': 0.0}
+                    args.regularizer = {'all': "N3"}
+                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam"}
+                    args.init_size = {'all': 0.001}
+                    args.neg_sample_size = {'ComplEx': -1, "TransE": 250}
+                    args.dropout = {'all': 0}
+                    args.gamma = {'all': 0}
+                    args.bias = {'all': "learn"}
+                    args.multi_c = {'ComplEx': False}
+                    args.double_neg = {'ComplEx': True}
 
                     if Constants.LOG_WANDB:
                         wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
@@ -371,7 +387,7 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    # run_embedding(parser.parse_args())
+    run_embedding(parser.parse_args())
 
     # Function to run baseline
     args = parser.parse_args()
@@ -398,4 +414,4 @@ if __name__ == "__main__":
     # run_baseline(args)
 
     # Function to run manual via IDE
-    run_embedding_manual()
+    #run_embedding_manual()
