@@ -15,7 +15,7 @@ from ensemble.util import get_unique_triple_ids
 
 
 def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sampling_method, subgraph_amount=10,
-                 subgraph_size_range=(0.1, 0.7), relation_name_amount=-1, entities_per_step=1, no_progress_bar=False):
+                 subgraph_size_range=(0.1, 0.7), rho=-1, entities_per_step=1, no_progress_bar=False):
     """
     The sample_graph function takes in a dataset name, an output directory, and two optional parameters:
     subgraph_amount (default 10) - the number of subgraphs to create from the original dataset
@@ -27,7 +27,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     :param info_directory: Directory for saving info, log and config files
     :param subgraph_amount: Determine how many subgraphs should be created
     :param subgraph_size_range: Determine the range for the percentage of triples that will be kept in the subgraph
-    :param relation_name_amount: how many entities should be selected compared to relation names, only applied in FEATURE_SAMPLING
+    :param rho: how many entities should be selected compared to relation names, only applied in FEATURE_SAMPLING
     :param entities_per_step: The max amount of indices that may be sampled per step. (int or "max")
     """
 
@@ -68,11 +68,11 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
         # calculate number of relation names for the case Feature Sampling
         hyperparameter_str = ""
         if sampling_method == Constants.FEATURE_SAMPLING:
-            relation_name_amount, relation_name_amount_str = get_relation_name_amount(relation_name_set,
-                                                                                      relation_name_amount)
+            rho, relation_name_amount_str = get_relation_name_amount(relation_name_set,
+                                                                     rho)
             hyperparameter_str = f", rho = {relation_name_amount_str} "
         else:
-            relation_name_amount = len(relation_name_set.keys())
+            rho = len(relation_name_set.keys())
 
         # init was successful
         init_successful = True
@@ -102,7 +102,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                 delta_triples, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names = calculate_delta(
                     subgraph_size_range, data, subgraph_num, subgraph_amount, entity_set,
                     relation_name_set, entity_ids_unused, relation_name_ids_unused,
-                    sampling_method, relation_name_amount, entities_per_step, no_progress_bar=no_progress_bar)
+                    sampling_method, rho, entities_per_step, no_progress_bar=no_progress_bar)
 
                 # Initialize a mask with False values
                 mask = np.zeros(len(data), dtype=bool)
@@ -129,7 +129,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
                 with open(config_directory, 'a') as config_file:
                     triples_deviation = len(delta_triples) - math.ceil(len(data) * subgraph_size_range[1])
-                    config_file.write(f"\n{dataset_in};{sampling_method[1]};{relation_name_amount};"
+                    config_file.write(f"\n{dataset_in};{sampling_method[1]};{rho};"
                                       f"{os.path.join(dataset_out_dir, f'sub_{subgraph_num:03d}')};"
                                       f"{round(time_stop_sub - time_start_sub, 3)};{subgraph_size_range};"
                                       f"{round(len(delta_triples) / len(data), 3)};{subgraph_num};"
@@ -274,7 +274,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
 
         relation_name_set_safe = relation_name_set.copy()
         max_relation_name_index = relation_name_amount
-        # take the top relation_name_amount relations based on ranking
+        # take the top rho relations based on ranking
         top_ranked_relations = ranked_relation_names[:relation_name_amount]
         # insert top ranked relations into new dictionary
         relation_name_set = {k: relation_name_set[k] for k in top_ranked_relations}
