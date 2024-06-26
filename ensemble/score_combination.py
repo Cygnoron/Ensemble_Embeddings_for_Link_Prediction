@@ -97,6 +97,12 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
     b_begin = 0
     steps = len(examples)
     progress_bar_testing = None
+    active_models = []
+    for index, embedding_model in enumerate(embedding_models):
+        if not embedding_model['args'].model_dropout:
+            active_models.append(index)
+        else:
+            logging.debug(f"Found inactive model")
 
     if not args.no_progress_bar:
         # Update progress bar
@@ -155,7 +161,8 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
                                                                                    model_scores_rhs, model_targets_lhs,
                                                                                    model_targets_rhs, attention,
                                                                                    examples[b_begin:
-                                                                                            b_begin + batch_size])
+                                                                                            b_begin + batch_size],
+                                                                                   active_models)
 
         b_begin += batch_size
         if not args.no_progress_bar:
@@ -226,7 +233,7 @@ def calculate_scores(examples, model, dtype, candidate_answers, b_begin, batch_s
 
 
 def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs,
-                   attention, examples):
+                   attention, examples, active_models):
     """
     Combine scores from multiple models using the specified aggregation method.
 
@@ -302,9 +309,13 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             att_t = attention['ent'][examples[:, 2].unsqueeze(1)]
 
             # Combine Attention values for lhs and rhs, by summing across rank and using softmax
+            att_lhs = (att_r * att_t).squeeze()
+            att_rhs = (att_r * att_h).squeeze()
+
+            # Filter out inactive models and do softmax
             activation = nn.Softmax(dim=-1)
-            att_lhs = activation(att_r * att_t).squeeze()
-            att_rhs = activation(att_r * att_h).squeeze()
+            att_lhs = activation(att_lhs[:, active_models])
+            att_rhs = activation(att_rhs[:, active_models])
 
             # Stack model scores, then calculate attention weighted scores
             stacked_tensor = torch.stack(model_scores_lhs, dim=1)
@@ -322,12 +333,9 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             stacked_tensor = torch.stack(model_targets_rhs, dim=1)
             aggregated_targets_rhs = torch.sum(stacked_tensor.cuda() * att_rhs.unsqueeze(-1).cuda(), dim=1)
 
-
-
         except Exception as e:
             logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
             return
-
 
     else:
         logging.error(f"Selected aggregation method '{aggregation_method}' does not exist!")

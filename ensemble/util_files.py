@@ -261,10 +261,8 @@ def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, m
                        os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
     else:
         logging.info(f"Loading best models saved at epoch {valid_args.best_epoch}")
-        cands_att_dict['att_weights_ent'] = torch.load(cands_att_dict['att_weights_ent'],
-                                                       os.path.join(model_file_dir, "attention_ent.pt"))
-        cands_att_dict['att_weights_rel'] = torch.load(cands_att_dict['att_weights_rel'],
-                                                       os.path.join(model_file_dir, "attention_rel.pt"))
+        cands_att_dict['att_weights_ent'] = torch.load(os.path.join(model_file_dir, "attention_ent.pt"))
+        cands_att_dict['att_weights_rel'] = torch.load(os.path.join(model_file_dir, "attention_rel.pt"))
         # Iterate over models
         for embedding_model in embedding_models:
             args = embedding_model["args"]
@@ -289,7 +287,10 @@ def print_loss_to_file(loss_file_path, epoch, loss_dict):
                 average_loss += loss_dict[subgraph]
             else:
                 active_models -= 1
-        average_loss /= active_models
+        try:
+            average_loss /= active_models
+        except ZeroDivisionError:
+            average_loss = "inf"
 
         out_str = f"{epoch};{average_loss}"
         for subgraph in keys_sorted:

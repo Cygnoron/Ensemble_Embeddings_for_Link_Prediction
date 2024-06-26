@@ -5,7 +5,6 @@ import os
 import time
 
 import torch
-from pympler import asizeof
 from torch import nn
 
 import models as models
@@ -68,6 +67,7 @@ def train(info_directory, args):
                                     model_setup_config_dir, dataset_path)
 
     cands_att_dict = None
+    run_diverged = False
 
     # --- Training ---
     logging.info(f"-/\tStarting training\t\\-")
@@ -143,16 +143,16 @@ def train(info_directory, args):
         valid_loss, valid_losses[epoch] = score_combination.calculate_valid_loss(embedding_models)
 
         # print validation losses
+        run_diverged, valid_losses[epoch] = check_model_dropout(embedding_models, valid_losses[epoch])
         util_files.print_loss_to_file(valid_loss_file_path, epoch, valid_losses[epoch])
-        logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses:\n"
-                      f"{util.format_dict(valid_losses[epoch])}")
+
         logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f} | individual valid losses:\n"
                      f"{util.format_dict(valid_losses[epoch])}")
 
-        run_diverged = check_model_dropout(embedding_models, valid_losses[epoch])
         if run_diverged:
             logging.critical(f"The run diverged and is now stopped. "
-                             f"Please try a other combination of embedding methods.")
+                             f"Please try a other combination of embedding methods or a higher model dropout factor.")
+            break
 
         if (epoch + 1) % valid_args.valid == 0:
 
@@ -188,12 +188,15 @@ def train(info_directory, args):
                     for embedding_model in embedding_models:
                         embedding_model['optimizer'].reduce_lr()
 
-        dict_size = asizeof.asizeof(embedding_models)
-        logging.debug(f"Memory requirement for embedding models in epoch {epoch} is {dict_size / 1024 / 1024:.3f}MB")
+        # dict_size = asizeof.asizeof(embedding_models)
+        # logging.debug(f"Memory requirement for embedding models in epoch {epoch} is {dict_size / 1024 / 1024:.3f}MB")
 
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{util.format_time(time_start_training_sub, time_stop_training_sub)}\t/-")
+
+    if run_diverged:
+        return "The run diverged and was aborted."
 
     # load or save best models after completed training
     cands_att_dict = util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir, cands_att_dict)
@@ -393,7 +396,7 @@ def check_model_dropout(embedding_models, valid_losses):
             logging.info(f"Excluding model {subgraph} from ensemble since {valid_losses[subgraph]} is larger than "
                          f"{args.model_dropout_factor} times the first validation loss "
                          f"{embedding_model['first_valid_loss']}")
-
+            valid_losses[subgraph] = "dropout"
             # "hard dropout" -> completely exclude model if it diverged once
             args.model_dropout = True
 
@@ -402,4 +405,4 @@ def check_model_dropout(embedding_models, valid_losses):
         if not embedding_model["args"].model_dropout:
             run_diverged = False
 
-    return run_diverged
+    return run_diverged, valid_losses
