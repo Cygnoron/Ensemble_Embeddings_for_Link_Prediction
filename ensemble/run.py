@@ -1,5 +1,4 @@
 import argparse
-import copy
 import json
 import logging
 import os
@@ -60,13 +59,15 @@ def train(info_directory, args):
     dataset_general = util.get_dataset_name(args.dataset)
     # create model using original dataset and sizes, use returned embeddings in new models as initialization
     embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape \
-        = util.generate_general_embeddings(dataset_general, args)
+        = util.generate_general_embeddings(dataset_general, util.get_args(args, "general_args"))
 
     subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
     embedding_models = setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embedding_general_ent,
                                     embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape,
                                     model_setup_config_dir, dataset_path)
+
+    cands_att_dict = None
 
     # --- Training ---
     logging.info(f"-/\tStarting training\t\\-")
@@ -145,7 +146,8 @@ def train(info_directory, args):
         util_files.print_loss_to_file(valid_loss_file_path, epoch, valid_losses[epoch])
         logging.debug(f"Validation Epoch {epoch} per subgraph | average valid losses:\n"
                       f"{util.format_dict(valid_losses[epoch])}")
-        logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
+        logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f} | individual valid losses:\n"
+                     f"{util.format_dict(valid_losses[epoch])}")
 
         run_diverged = check_model_dropout(embedding_models, valid_losses[epoch])
         if run_diverged:
@@ -156,7 +158,8 @@ def train(info_directory, args):
 
             valid_metrics = evaluate_ensemble(embedding_models, args.aggregation_method, mode="valid",
                                               metrics_file_path=metrics_file_path, epoch=epoch,
-                                              batch_size=args.batch_size)
+                                              attention={'ent': cands_att_dict['att_weights_ent'],
+                                                         'rel': cands_att_dict['att_weights_rel']})
 
             valid_mrr = valid_metrics["MRR"]['average']
             if not valid_args.best_mrr or valid_mrr > valid_args.best_mrr:
@@ -164,6 +167,11 @@ def train(info_directory, args):
                 valid_args.counter = 0
                 valid_args.best_epoch = epoch
                 logging.info(f"Saving models at epoch {epoch} in {model_file_dir}")
+
+                # TODO - save attention from best model
+                torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
+                torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
+
                 for embedding_model in embedding_models:
                     args = embedding_model['args']
                     torch.save(embedding_model['model'].cpu().state_dict(),
@@ -181,15 +189,16 @@ def train(info_directory, args):
                     for embedding_model in embedding_models:
                         embedding_model['optimizer'].reduce_lr()
 
-        accurate_size = asizeof.asizeof(embedding_models)
-        logging.critical(f"Memory requirement for embedding models in epoch {epoch} is {accurate_size/1024/1024:.3f}MB")
+        dict_size = asizeof.asizeof(embedding_models)
+        logging.debug(f"Memory requirement for embedding models in epoch {epoch} is {dict_size / 1024 / 1024:.3f}MB")
 
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{util.format_time(time_start_training_sub, time_stop_training_sub)}\t/-")
 
+    # TODO - load attention from best model
     # load or save best models after completed training
-    util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir)
+    cands_att_dict = util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir, cands_att_dict)
 
     time_stop_training_total = time.time()
 
@@ -197,10 +206,15 @@ def train(info_directory, args):
                  f"{util.format_time(time_start_training_total, time_stop_training_total)}\t/-")
 
     # --- Testing with aggregated scores ---
-
-    evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, metrics_file_path=metrics_file_path,
-                      batch_size=args.batch_size)
-
+    # TODO - input attention values
+    if args.aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
+        evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method,
+                          metrics_file_path=metrics_file_path,
+                          attention={'ent': cands_att_dict['att_weights_ent'],
+                                     'rel': cands_att_dict['att_weights_rel']})
+    else:
+        evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method,
+                          metrics_file_path=metrics_file_path)
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
 
@@ -213,18 +227,20 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
 
     # create dataset and model objects and save them to list of dictionaries
     embedding_models = []
-    rank = args.rank
 
     # --- Training preparation ---
     for subgraph_num in list(subgraph_embedding_mapping.keys()):
-        args_subgraph = copy.copy(args)
-        args_subgraph.model = subgraph_embedding_mapping[subgraph_num]
+        model = subgraph_embedding_mapping[subgraph_num]
+        args_subgraph = util.get_args(args, model)
+
+        args_subgraph.model = model
         args_subgraph.model_name = args_subgraph.model
         args_subgraph.subgraph_num = subgraph_num
         subgraph = f"sub_{subgraph_num:03d}"
 
         logging.info(f"-/\tCreating new model from embedding method {args_subgraph.model} for subgraph {subgraph}\t\\-")
         args_subgraph.subgraph = subgraph
+        rank = args_subgraph.rank
 
         # load data
         logging.info(f"Loading data for subgraph {subgraph}.")
@@ -381,7 +397,7 @@ def check_model_dropout(embedding_models, valid_losses):
                          f"{args.model_dropout_factor} times the first validation loss "
                          f"{embedding_model['first_valid_loss']}")
 
-            # "hard dropout" -> completly exclude model if it diverged once
+            # "hard dropout" -> completely exclude model if it diverged once
             args.model_dropout = True
 
     run_diverged = True
