@@ -15,7 +15,7 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
     else:
         logging.info(f"Calculating self-attention...")
 
-        activation = nn.Softmax(dim=1)
+        activation = nn.Softmax(dim=-1)
         args = embedding_models[0]['args']
 
         cands_ent, cands_rel, theta_ent, theta_rel = get_cands(embedding_models, batch_size)
@@ -30,9 +30,11 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
             # INPUT: theta_ent = [40943, 32, N]                 theta_rel = [22, 32, N]
             #        cands_ent = [40943, 32, N]                 cands_rel = [22, 32, N]
             logging.debug(f"BEFORE\t\ttheta_ent: {theta_ent.size()}\ncands_ent: {cands_ent.size()}")
-            
-            att_weights_ent = torch.sum(theta_ent * cands_ent, dim=-1, keepdim=True)
-            att_weights_rel = torch.sum(theta_rel * cands_rel, dim=-1, keepdim=True)
+
+            # att_weights_ent = torch.sum(theta_ent * cands_ent, dim=0, keepdim=True)
+            # att_weights_rel = torch.sum(theta_rel * cands_rel, dim=0, keepdim=True)
+            att_weights_ent = theta_ent * cands_ent
+            att_weights_rel = theta_rel * cands_rel
 
             logging.debug(f"att_weights_ent size: {att_weights_ent.size()}")
             logging.debug(f"att_weights_rel size: {att_weights_rel.size()}")
@@ -217,3 +219,7 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
                     general_embedding_ent.weight.data[entities].to(dtype))
                 embedding_model['model'].rel.weight.data[relation_names] = (
                     general_embedding_rel.weight.data[relation_names].to(dtype))
+
+        cands_att_dict['att_weights_ent'] = torch.sum(cands_att_dict['att_weights_ent'], dim=1)
+        cands_att_dict['att_weights_rel'] = torch.sum(cands_att_dict['att_weights_rel'], dim=1)
+        return cands_att_dict

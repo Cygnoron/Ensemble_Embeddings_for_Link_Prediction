@@ -3,6 +3,7 @@ import time
 import traceback
 
 import torch
+from torch import nn
 from tqdm import tqdm
 
 from ensemble import Constants, util, util_files
@@ -10,7 +11,7 @@ from utils.train import avg_both, format_metrics
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
-                      metrics_file_path="", batch_size=500, epoch=None):
+                      metrics_file_path="", batch_size=100, epoch=None, attention=None):
     if mode == "test":
         logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]
@@ -27,7 +28,7 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
 
     # calculate scores for all models
     aggregated_scores, aggregated_targets = calculate_and_combine_scores(embedding_models, examples,
-                                                                         aggregation_method, eval_mode=mode,
+                                                                         aggregation_method, attention, eval_mode=mode,
                                                                          batch_size=batch_size)
 
     # compute the ranks for all queries
@@ -63,7 +64,8 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
     return metrics
 
 
-def calculate_and_combine_scores(embedding_models, examples, aggregation_method, eval_mode=None, batch_size=500):
+def calculate_and_combine_scores(embedding_models, examples, aggregation_method, attention, eval_mode=None,
+                                 batch_size=500):
     """
         Calculate and combine scores from multiple embedding models for given examples.
 
@@ -98,17 +100,13 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
 
     if not args.no_progress_bar:
         # Update progress bar
-        progress_bar_testing = tqdm(total=len(examples) * 2,
+        progress_bar_testing = tqdm(total=len(examples),
                                     desc=f"Calculating and combining scores",
                                     unit=" queries", position=0, leave=True)
 
     while b_begin < steps:
-        logging.info(f"Calculating {eval_mode} scores for the ensemble for indices "
-                     f"{b_begin} to {b_begin + batch_size}.")
-        if not args.no_progress_bar:
-            # Update progress bar
-            progress_bar_testing.n = b_begin
-            progress_bar_testing.refresh()
+        logging.debug(f"Calculating {eval_mode} scores for the ensemble for indices "
+                      f"{b_begin} to {b_begin + batch_size}.")
 
         model_scores_lhs = []
         model_scores_rhs = []
@@ -132,8 +130,8 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
             scores_lhs, scores_rhs, targets_lhs, targets_rhs = calculate_scores(examples, model, dtype,
                                                                                 candidate_answers, b_begin, batch_size)
 
-            logging.info(f"Combining scores of  with {aggregation_method[1]} for indices "
-                         f"{b_begin} to {b_begin + batch_size}.")
+            logging.debug(f"Combining scores of {args.subgraph} with {aggregation_method[1]} for indices "
+                          f"{b_begin} to {b_begin + batch_size}.")
 
             # Collect scores
             model_scores_lhs += [scores_lhs]
@@ -141,25 +139,29 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
             model_targets_lhs += [targets_lhs]
             model_targets_rhs += [targets_rhs]
 
-            logging.debug(
-                f"scores_lhs size: {((scores_lhs.element_size() * scores_lhs.nelement()) / 1024) / 1024} MB")
-            logging.debug(
-                f"scores_rhs size: {((scores_rhs.element_size() * scores_rhs.nelement()) / 1024) / 1024} MB")
-            logging.debug(
-                f"targets_lhs size: {((targets_lhs.element_size() * targets_lhs.nelement()) / 1024) / 1024} MB")
-            logging.debug(
-                f"targets_rhs size: {((targets_rhs.element_size() * targets_rhs.nelement()) / 1024) / 1024} MB")
+            # logging.debug(
+            #     f"scores_lhs size: {((scores_lhs.element_size() * scores_lhs.nelement()) / 1024) / 1024} MB")
+            # logging.debug(
+            #     f"scores_rhs size: {((scores_rhs.element_size() * scores_rhs.nelement()) / 1024) / 1024} MB")
+            # logging.debug(
+            #     f"targets_lhs size: {((targets_lhs.element_size() * targets_lhs.nelement()) / 1024) / 1024} MB")
+            # logging.debug(
+            #     f"targets_rhs size: {((targets_rhs.element_size() * targets_rhs.nelement()) / 1024) / 1024} MB")
 
         (aggregated_scores['lhs'][b_begin:b_begin + batch_size],
          aggregated_scores['rhs'][b_begin:b_begin + batch_size],
          aggregated_targets['lhs'][b_begin:b_begin + batch_size],
-         aggregated_targets['rhs'][b_begin:b_begin + batch_size]) = combine_scores(aggregation_method,
-                                                                                   model_scores_lhs,
-                                                                                   model_scores_rhs,
-                                                                                   model_targets_lhs,
-                                                                                   model_targets_rhs)
+         aggregated_targets['rhs'][b_begin:b_begin + batch_size]) = combine_scores(aggregation_method, model_scores_lhs,
+                                                                                   model_scores_rhs, model_targets_lhs,
+                                                                                   model_targets_rhs, attention,
+                                                                                   examples[b_begin:
+                                                                                            b_begin + batch_size])
 
         b_begin += batch_size
+        if not args.no_progress_bar:
+            # Update progress bar
+            progress_bar_testing.n = b_begin
+            progress_bar_testing.refresh()
 
     del model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs
     return aggregated_scores, aggregated_targets
@@ -223,7 +225,8 @@ def calculate_scores(examples, model, dtype, candidate_answers, b_begin, batch_s
     return scores_lhs, scores_rhs, targets_lhs, targets_rhs
 
 
-def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs):
+def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs,
+                   attention, examples):
     """
     Combine scores from multiple models using the specified aggregation method.
 
@@ -247,37 +250,21 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
     if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
         # select maximum score between all models
         try:
+            # Stack model scores, then select max scores
             stacked_tensor = torch.stack(model_scores_lhs, dim=1)
             aggregated_scores_lhs, _ = torch.max(stacked_tensor, dim=1)
 
+            # Stack model scores, then select max scores
             stacked_tensor = torch.stack(model_scores_rhs, dim=1)
             aggregated_scores_rhs, _ = torch.max(stacked_tensor, dim=1)
 
+            # Stack model targets, then select max target
             stacked_tensor = torch.stack(model_targets_lhs, dim=1)
             aggregated_targets_lhs, _ = torch.max(stacked_tensor, dim=1)
 
+            # Stack model targets, then select max target
             stacked_tensor = torch.stack(model_targets_rhs, dim=1)
             aggregated_targets_rhs, _ = torch.max(stacked_tensor, dim=1)
-
-        except Exception as e:
-            logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
-            return
-
-    # Aggregate scores based on the specified method
-    elif aggregation_method[0] == Constants.MIN_SCORE_AGGREGATION[0]:
-        # select maximum score between all models
-        try:
-            stacked_tensor = torch.stack(model_scores_lhs, dim=1)
-            aggregated_scores_lhs, _ = torch.min(stacked_tensor, dim=1)
-
-            stacked_tensor = torch.stack(model_scores_rhs, dim=1)
-            aggregated_scores_rhs, _ = torch.min(stacked_tensor, dim=1)
-
-            stacked_tensor = torch.stack(model_targets_lhs, dim=1)
-            aggregated_targets_lhs, _ = torch.min(stacked_tensor, dim=1)
-
-            stacked_tensor = torch.stack(model_targets_rhs, dim=1)
-            aggregated_targets_rhs, _ = torch.min(stacked_tensor, dim=1)
 
         except Exception as e:
             logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
@@ -286,15 +273,19 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
     elif aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
         # average the score across all models
         try:
+            # Stack model scores, then calculate averaged scores
             stacked_tensor = torch.stack(model_scores_lhs, dim=1)
             aggregated_scores_lhs = torch.mean(stacked_tensor, dim=1)
 
+            # Stack model scores, then calculate averaged scores
             stacked_tensor = torch.stack(model_scores_rhs, dim=1)
             aggregated_scores_rhs = torch.mean(stacked_tensor, dim=1)
 
+            # Stack model targets, then calculate averaged target
             stacked_tensor = torch.stack(model_targets_lhs, dim=1)
             aggregated_targets_lhs = torch.mean(stacked_tensor, dim=1)
 
+            # Stack model targets, then calculate averaged target
             stacked_tensor = torch.stack(model_targets_rhs, dim=1)
             aggregated_targets_rhs = torch.mean(stacked_tensor, dim=1)
 
@@ -303,10 +294,40 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             return
 
     elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
-        # calculate attention between all models and average scores based on this attention
-        logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
-        # TODO implement attention score
-        pass
+        # calculate attention between all models and average scores based on the attention of entities and relation names
+        try:
+            # Collect attention values for queries
+            att_h = attention['ent'][examples[:, 0].unsqueeze(1)]
+            att_r = attention['rel'][examples[:, 1].unsqueeze(1)]
+            att_t = attention['ent'][examples[:, 2].unsqueeze(1)]
+
+            # Combine Attention values for lhs and rhs, by summing across rank and using softmax
+            activation = nn.Softmax(dim=-1)
+            att_lhs = activation(att_r * att_t).squeeze()
+            att_rhs = activation(att_r * att_h).squeeze()
+
+            # Stack model scores, then calculate attention weighted scores
+            stacked_tensor = torch.stack(model_scores_lhs, dim=1)
+            aggregated_scores_lhs = torch.sum(stacked_tensor.cuda() * att_lhs.unsqueeze(-1).cuda(), dim=1)
+
+            # Stack model scores, then calculate attention weighted scores
+            stacked_tensor = torch.stack(model_scores_rhs, dim=1)
+            aggregated_scores_rhs = torch.sum(stacked_tensor.cuda() * att_rhs.unsqueeze(-1).cuda(), dim=1)
+
+            # Stack model targets, then calculate attention weighted target
+            stacked_tensor = torch.stack(model_targets_lhs, dim=1)
+            aggregated_targets_lhs = torch.sum(stacked_tensor.cuda() * att_lhs.unsqueeze(-1).cuda(), dim=1)
+
+            # Stack model targets, then calculate attention weighted target
+            stacked_tensor = torch.stack(model_targets_rhs, dim=1)
+            aggregated_targets_rhs = torch.sum(stacked_tensor.cuda() * att_rhs.unsqueeze(-1).cuda(), dim=1)
+
+
+
+        except Exception as e:
+            logging.error(f"Error within {aggregation_method[0]}:\n{traceback.format_exception(e)}")
+            return
+
 
     else:
         logging.error(f"Selected aggregation method '{aggregation_method}' does not exist!")
@@ -597,7 +618,6 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
             elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
                 # calculate attention between all models and average scores based on this attention
                 logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
-                # TODO implement attention score
                 pass
 
             else:
@@ -616,7 +636,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
     return aggregated_scores, aggregated_targets
 
 
-def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
+def compute_metrics_from_ranks_depreciated(ranks_opt, ranks_pes, sizes):
     """
         Compute various evaluation metrics based on the computed ranks.
 
@@ -668,7 +688,7 @@ def compute_metrics_from_ranks(ranks_opt, ranks_pes, sizes):
     return mean_rank, mean_reciprocal_rank, hits_at, amri, rank_deviation
 
 
-def compute_ranks(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500):
+def compute_ranks_depreciated(embedding_models, examples, filters, targets, aggregated_scores, batch_size=500):
     """
         Compute ranks for each query based on the aggregated scores, targets, and filters.
 
