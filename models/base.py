@@ -213,7 +213,7 @@ class KGModel(nn.Module, ABC):
                 rank_deviation_buffer = torch.sum(buffer, dim=1)
 
                 rank_deviation += torch.sum(torch.abs(rank_deviation_buffer))
-                logging.debug(f"{rank_deviation}")
+                logging.debug(f"rank deviation step {b_begin}/{len(queries)}: {rank_deviation}")
 
                 b_begin += batch_size
 
