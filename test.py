@@ -8,6 +8,7 @@ import torch
 
 import models
 from datasets.kg_dataset import KGDataset
+from ensemble import Constants
 from utils.train import avg_both, format_metrics
 
 parser = argparse.ArgumentParser(description="Test")
@@ -19,9 +20,10 @@ def test(model_dir):
     with open(os.path.join(model_dir, "config.json"), "r") as f:
         config = json.load(f)
     args = argparse.Namespace(**config)
+    args.theta_calculation = Constants.NO_THETA
 
     # create dataset
-    dataset_path = os.path.join(os.environ["DATA_PATH"], args.dataset)
+    dataset_path = os.path.join("data", args.dataset)
     dataset = KGDataset(dataset_path, False)
     test_examples = dataset.get_examples("test")
     filters = dataset.get_filters()
@@ -33,7 +35,7 @@ def test(model_dir):
     model.load_state_dict(torch.load(os.path.join(model_dir, 'model.pt')))
 
     # eval
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters))
+    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
     return test_metrics
 
 
