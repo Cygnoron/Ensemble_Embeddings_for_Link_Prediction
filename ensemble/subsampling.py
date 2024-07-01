@@ -382,6 +382,9 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
             # iterate through all candidate triples
             for candidate in candidates:
                 head, _, tail = dataset[candidate]
+                # logging.info(f"({head},\t{_},\t{tail})")
+                if head == tail:
+                    pass
                 # Add tail entity to samples if head was already sampled
                 if head in sampled_entity_ids:
                     samples.add(tail)
@@ -390,6 +393,9 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
                 elif tail in sampled_entity_ids:
                     samples.add(head)
                     break
+                else:
+                    samples.add(head)
+                    samples.add(tail)
 
     # -- enforce entities --
     if enforce_entities and len(entity_ids_unused) > 0:
@@ -415,7 +421,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         else:
             # raise error if trapped in else statement
             safety_counter += 1
-            if safety_counter >= 20:
+            if safety_counter >= 5:
                 continue
                 # raise KeyError(f"There were entities enforced, which are not present in the subgraph. "
                 #                f"Try increasing the relative subgraph size.\n"
@@ -425,16 +431,20 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         # iterate through all candidate triples
         for candidate in candidates_list:
             head, relation, tail = dataset[candidate]
-            if head in sampled_entity_ids or tail in sampled_entity_ids:
+            if ((head in sampled_entity_ids) or (tail in sampled_entity_ids) or
+                    ((head == tail) and (head not in sampled_entity_ids))):
+                delta.add(candidate)
                 relation_name_ids_unused.discard(relation)
                 if relation not in subgraph_relation_names:
                     subgraph_relation_names.append(relation)
-                delta.add(candidate)
 
         # add sampled_entity_id to set of sampled_entity_ids, and remove it from unused entity ids
         sampled_entity_ids.add(sampled_entity_id)
         entity_ids_unused.discard(sampled_entity_id)
-        del entity_set[sampled_entity_id]
+        try:
+            del entity_set[sampled_entity_id]
+        except KeyError:
+            pass
 
     # update progress bar
     if not no_progress_bar:
