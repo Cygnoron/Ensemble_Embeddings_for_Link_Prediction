@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --ntasks=1
-#SBATCH --time=04:00:00
+#SBATCH --time=01:00:00
 #SBATCH --mem=488000
-#SBATCH --job-name=Create_subgraphs_NELL
+#SBATCH --job-name=Create_subgraphs_FB237
 #SBATCH --partition=cpuonly
 #SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments/subgraphs
 #SBATCH --mail-user="st162185@stud.uni-stuttgart.de"
@@ -23,7 +23,7 @@ for subgraph_amount in "${params_subgraph_amount[@]}"; do
         if [[ $sampling_method == "Feature" ]]; then
             for rho in "${params_rho[@]}"; do
                 echo "- Feature $rho -"
-                python run_ensemble_embedding.py  --dataset NELL-995 \
+                python run_ensemble_embedding.py  --dataset FB237 \
                                                   --subgraph_amount "$subgraph_amount" \
                                                   --sampling_method "$sampling_method" \
                                                   --rho "$rho" \
@@ -34,7 +34,7 @@ for subgraph_amount in "${params_subgraph_amount[@]}"; do
 
         elif [[ $sampling_method != "Feature" ]]; then
             echo "- Entity -"
-            python run_ensemble_embedding.py  --dataset NELL-995 \
+            python run_ensemble_embedding.py  --dataset FB237 \
                                               --subgraph_amount "$subgraph_amount" \
                                               --sampling_method "$sampling_method" \
                                               --no_time_dependent_file_path \
@@ -45,4 +45,4 @@ for subgraph_amount in "${params_subgraph_amount[@]}"; do
     done
 done
 
-cd experiments/subgraphs ||exit 1
+cd experiments/subgraphs || exit 1

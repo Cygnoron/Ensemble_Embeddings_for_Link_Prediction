@@ -12,7 +12,7 @@ cd ..
 cd ..
 source set_env.sh
 
-params_subgraph_amount=("10" "30" "60")
+params_subgraph_amount=("10" "30" "60" "90")
 params_sampling_method=("Entity" "Feature")
 params_rho=("0.5" "1" "2")
 
@@ -45,4 +45,4 @@ for subgraph_amount in "${params_subgraph_amount[@]}"; do
     done
 done
 
-cd experiments/subgraphs
+cd experiments/subgraphs || exit 1
