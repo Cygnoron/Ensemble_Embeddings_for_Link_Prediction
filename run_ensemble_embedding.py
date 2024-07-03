@@ -79,6 +79,7 @@ parser.add_argument(
     "--multi_c", action="store_true", help="Multiple curvatures per relation"
 )
 # --- Parameters for ensemble methods ---
+#   - System parameters -
 parser.add_argument(
     "--no_sampling", action='store_true', help="Turn off sampling, if subgraphs already exist"
 )
@@ -92,6 +93,15 @@ parser.add_argument(
     "--no_time_dependent_file_path", action='store_true', help="Specify current time in file path, when "
                                                                "creating logs and other files"
 )
+parser.add_argument(
+    "--logging", default="info", help="Determines the level of logging.\n"
+                                      "- \'info\': Contains information about the progress\n"
+                                      "- \'debug\': Also contains information about variables, e.g. tensor sizes\n"
+                                      "- \'data\': Also contains embedding weights and other data from variables, "
+                                      "which is printed directly to the log\'"
+)
+
+#   - Sampling parameters -
 parser.add_argument(
     "--subgraph_amount", default=10, type=int, help="The amount of subgraphs, that will be present in the ensemble"
 )
@@ -112,12 +122,18 @@ parser.add_argument(
     help="The sampling method, that should be used"
 )
 parser.add_argument(
+    "--sampling_seed", default="42",
+    help="The seed for sampling subgraphs. Type \'random\' for a random seed."
+)
+
+#   - Model parameters -
+parser.add_argument(
     "--aggregation_method", default="average", choices=["max", "average", "attention"],
-    help="The method by which all scores from the ensemble are combined."
+    help="The method by which all scores from the ensemble are aggregated."
 )
 parser.add_argument(
-    "--model_dropout_factor", default=1000, type=int,
-    help="The method by which all scores from the ensemble are combined."
+    "--model_dropout_factor", default=10, type=int,
+    help="The factor, which determines, if a model is considered diverged and therefore removed from the ensemble."
 )
 parser.add_argument(
     "--theta_method", default="regular", choices=["no", "regular", "reversed", "relation", "multiplied"],
@@ -140,13 +156,6 @@ parser.add_argument(
          '- \'all\' in a mapping sets all subgraphs to this method\n'
          '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
          'If nothing was specified, all subgraphs can be embedded by the given embedding method.'
-)
-parser.add_argument(
-    "--logging", default="info", help="Determines the level of logging.\n"
-                                      "- \'info\': Contains information about the progress\n"
-                                      "- \'debug\': Also contains information about variables, e.g. tensor sizes\n"
-                                      "- \'data\': Also contains embedding weights and other data from variables, "
-                                      "which is printed directly to the log\'"
 )
 
 
@@ -186,7 +195,7 @@ def run_embedding(args):
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
                                  subgraph_size_range=args.subgraph_size_range,
-                                 rho=args.rho, no_progress_bar=args.no_progress_bar)
+                                 rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
 
     error = False
     try:
@@ -216,12 +225,12 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
-    subgraph_amount = 10
-    subgraph_size_range = (0.3, 0.7)
+    subgraph_amount = 5
+    subgraph_size_range = (0.003, 0.01)
     rho = -1
     model_dropout_factor = 10
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False, wandb_log=True,
+    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False, wandb_log=True,
                               no_progress_bar=False, subgraph_amount=subgraph_amount,
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
@@ -308,7 +317,7 @@ def run_embedding_manual():
         # allowed_kge_models = [{Constants.TRANS_E: [1, "rest"], Constants.DIST_MULT: [10], Constants.ROTAT_E: [20],
         #                        Constants.COMPL_EX: [2, 3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [0]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, 1, 2], Constants.DIST_MULT: [3, 4, 5],
+        allowed_kge_models = [{Constants.TRANS_E: [0, 1, 2], Constants.DIST_MULT: [3, 4, 5, 'all'],
                                Constants.COMPL_EX: ['rest']}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
@@ -355,7 +364,7 @@ def run_embedding_manual():
                     args.batch_size = {'ComplEx': 450, 'TransE': 450, 'DistMult': 450}
                     args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001, 'DistMult': 0.1}
                     args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05}
-                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adam"}
+                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adagrad"}
                     args.neg_sample_size = {'ComplEx': -1, "TransE": 250, 'DistMult': -1}
                     args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True}
                     args.bias = {'ComplEx': "learn", 'TransE': "learn", 'DistMult': "none"}
@@ -388,7 +397,7 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    # run_embedding(parser.parse_args())
+    run_embedding(parser.parse_args())
 
     # Function to run baseline
     args = parser.parse_args()
@@ -416,4 +425,4 @@ if __name__ == "__main__":
     # run_baseline(args)
 
     # Function to run manual via IDE
-    run_embedding_manual()
+    # run_embedding_manual()
