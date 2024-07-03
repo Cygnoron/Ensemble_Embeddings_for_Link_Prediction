@@ -1,4 +1,4 @@
-# Ensemble Embedding for Link Prediction
+# Ensemble Approaches for Link Prediction
 
 ---
 
