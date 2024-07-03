@@ -208,11 +208,19 @@ def train(info_directory, args):
 
     # --- Testing with aggregated scores ---
     if args.aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
+        evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, mode="valid",
+                          metrics_file_path=metrics_file_path,
+                          attention={'ent': cands_att_dict['att_weights_ent'],
+                                     'rel': cands_att_dict['att_weights_rel']})
+
         evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method,
                           metrics_file_path=metrics_file_path,
                           attention={'ent': cands_att_dict['att_weights_ent'],
                                      'rel': cands_att_dict['att_weights_rel']})
     else:
+        evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method, mode="valid",
+                          metrics_file_path=metrics_file_path)
+
         evaluate_ensemble(embedding_models, aggregation_method=args.aggregation_method,
                           metrics_file_path=metrics_file_path)
     time_total_end = time.time()

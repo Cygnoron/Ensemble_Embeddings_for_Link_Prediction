@@ -99,7 +99,7 @@ parser.add_argument(
 
 def train(args):
     save_dir = get_savedir(args.model, args.dataset)
-    util.setup_logging(save_dir, "train.log")
+    util.setup_logging(save_dir, "train.log", logging_level="critical")
 
     # # file logger
     # logging.basicConfig(
@@ -159,12 +159,12 @@ def train(args):
         model.train()
 
         train_loss = optimizer.epoch(train_examples)
-        logging.info("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
+        logging.critical("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
 
         # Valid step
         model.eval()
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
-        logging.info("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
+        logging.critical("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
 
         if (step + 1) % args.valid == 0:
             valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch=step)

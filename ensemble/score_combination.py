@@ -11,7 +11,7 @@ from utils.train import avg_both, format_metrics
 
 
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
-                      metrics_file_path="", batch_size=100, epoch=None, attention=None):
+                      metrics_file_path="", batch_size=20, epoch=None, attention=None):
     if mode == "test":
         logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]
@@ -42,9 +42,14 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
         elif mode == "valid":
             epoch = args.max_epochs + 10
 
+    active_subgraphs = []
+    for embedding_model in embedding_models:
+        if not embedding_model['args'].model_dropout:
+            active_subgraphs.append(embedding_model['subgraph'])
+
     # calculate metrics from the ranks
     metrics = avg_both(*model.compute_metrics(examples, filters, args.sizes, (aggregated_scores, aggregated_targets),
-                                              batch_size=batch_size), epoch=epoch)
+                                              batch_size=batch_size), epoch=epoch, active_subgraphs=active_subgraphs)
     logging.info(format_metrics(metrics, split=mode))
 
     if metrics_file_path != "":

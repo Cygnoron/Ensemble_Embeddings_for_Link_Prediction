@@ -19,7 +19,7 @@ def get_savedir(model, dataset):
     return save_dir
 
 
-def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None):
+def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None, active_subgraphs="all"):
     """Aggregate metrics for missing lhs and rhs.
 
     Args:
@@ -45,7 +45,8 @@ def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None):
     if Constants.LOG_WANDB:
         # Online logging for metrics
         wandb.log({'MR': mrs, 'MRR': mrrs, 'HITS@1': hits1_wandb, 'HITS@3': hits3_wandb, 'HITS@10': hits10_wandb,
-                   'AMRI': amris, 'rank_deviation': rank_deviations, 'epoch': epoch})
+                   'AMRI': amris, 'rank_deviation': rank_deviations, 'epoch': epoch,
+                   'active_subgraphs': active_subgraphs})
 
     return {'MR': mrs, 'MRR': mrrs, 'hits@[1,3,10]': hits, 'AMRI': amris, 'rank_deviation': rank_deviations}
 

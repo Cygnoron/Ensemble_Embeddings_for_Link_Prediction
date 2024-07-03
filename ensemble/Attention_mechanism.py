@@ -149,6 +149,7 @@ def get_cands(embedding_models, batch_size):
             model = embedding_model["model"]
             # handle special case for hyperbolic models
             if embedding_model["args"].model_name in hyperbolic.HYP_MODELS:
+                # TODO Fix AttH having nan values
                 logging.debug(f"HYPERBOLIC")
                 cands_rel_temp.append(torch.chunk(model.rel.weight.data[b_begin:b_begin + batch_size], 2, dim=1))
             else:
