@@ -198,6 +198,7 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
         logging.info(f"Applying general embeddings to all models.")
         sizes = embedding_models[0]['args'].sizes
         dtype = embedding_models[0]['data_type']
+
         # write new unified embedding into all models
         for embedding_model in embedding_models:
             if ('entities' not in embedding_model.keys()) or ('relation_names' not in embedding_model.keys()):
@@ -208,19 +209,15 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
 
             entities = embedding_model['entities']
             relation_names = embedding_model['relation_names']
+            model = embedding_model['model']
 
-            # only set the embeddings, which are contained in the corresponding subgraph
-            if dtype == torch.double:
-                embedding_model['model'].entity.weight.data[entities] = (
-                    general_embedding_ent.weight.data[entities].double())
-                embedding_model['model'].rel.weight.data[relation_names] = (
-                    general_embedding_rel.weight.data[relation_names].double())
-            else:
-                embedding_model['model'].entity.weight.data[entities] = (
-                    general_embedding_ent.weight.data[entities].to(dtype))
-                embedding_model['model'].rel.weight.data[relation_names] = (
-                    general_embedding_rel.weight.data[relation_names].to(dtype))
+            # TODO change update to e_1 = a_1 * e_1 + a_2 * e_u
+            #  a_1, a_2 = softmax(theta_1 * e_1, theta_u * e_u)
+            model.entity.weight.data[entities] = (general_embedding_ent.weight.data[entities].to(dtype))
+            model.rel.weight.data[relation_names] = (general_embedding_rel.weight.data[relation_names].to(dtype))
 
-        cands_att_dict['att_weights_ent'] = torch.sum(cands_att_dict['att_weights_ent'], dim=1)
-        cands_att_dict['att_weights_rel'] = torch.sum(cands_att_dict['att_weights_rel'], dim=1)
+        # sum over ranks for attention based combination
+        activation = nn.Softmax(dim=-1)
+        cands_att_dict['att_weights_ent'] = activation(torch.mean(cands_att_dict['att_weights_ent'], dim=1))
+        cands_att_dict['att_weights_rel'] = activation(torch.mean(cands_att_dict['att_weights_rel'], dim=1))
         return cands_att_dict

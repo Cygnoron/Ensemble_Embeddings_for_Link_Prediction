@@ -131,11 +131,11 @@ def train(info_directory, args):
 
         # Calculate unified embedding
         cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models, args.theta_calculation)
-        Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
-                                                                  embedding_general_rel,
-                                                                  embedding_models,
-                                                                  cands_att_dict,
-                                                                  args.theta_calculation)
+        cands_att_dict = Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
+                                                                                   embedding_general_rel,
+                                                                                   embedding_models,
+                                                                                   cands_att_dict,
+                                                                                   args.theta_calculation)
         # print training losses to file
         util_files.print_loss_to_file(train_loss_file_path, epoch, train_losses[epoch])
 
