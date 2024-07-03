@@ -1,4 +1,4 @@
-# Ensemble_Embedding_for_Link_Prediction
+# Ensemble Embedding for Link Prediction
 
 ---
 
