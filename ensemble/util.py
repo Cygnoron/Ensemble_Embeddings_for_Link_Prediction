@@ -491,7 +491,19 @@ def format_dict(dictionary):
 
 
 def get_embedding_methods(mapping_json_str):
-    kge_mapping = json.loads(mapping_json_str)
+    kge_mapping = None
+
+    # Differenciate between inputs as dict and direct model inputs
+    try:
+        logging.debug(f"Multiple model input: {mapping_json_str}")
+        kge_mapping = json.loads(mapping_json_str)
+    except json.decoder.JSONDecodeError:
+        logging.debug(f"Single model input: {mapping_json_str}")
+        if mapping_json_str not in EMBEDDING_METHODS:
+            raise ValueError(f"The given embedding method \'{mapping_json_str}\' does not exist!\n"
+                             f"Please check if your spelling was correct, if the method should exist.")
+        return {mapping_json_str: []}
+
     for embedding_model in list(kge_mapping.keys()):
         if embedding_model not in EMBEDDING_METHODS:
             raise ValueError(f"The given embedding method \'{embedding_model}\' does not exist!\n"
