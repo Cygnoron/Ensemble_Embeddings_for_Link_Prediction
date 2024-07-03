@@ -32,3 +32,11 @@ THETA_METHODS = [NO_THETA, REGULAR_THETA, REVERSED_THETA, RELATION_THETA, MULTIP
 # Wandb settings
 LOG_WANDB = False
 PROJECT_NAME = "Experiments"
+
+
+def get_wandb(project_name=False):
+    global LOG_WANDB, PROJECT_NAME
+
+    if isinstance(project_name, str) and project_name.lower() != "false":
+        LOG_WANDB = True
+        PROJECT_NAME = project_name

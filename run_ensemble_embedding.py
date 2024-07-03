@@ -12,15 +12,42 @@ os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
 
 parser = argparse.ArgumentParser(
-    description="Ensemble methods for Knowledge Graph Embedding"
+    description="Ensemble methods for Link Prediction"
 )
 # --- Arguments for embedding models ---
+#   - General hyperparameters -
 parser.add_argument(
     "--dataset", default="WN18RR", help="Knowledge Graph dataset"
 )
-# parser.add_argument(
-#     "--model", default="RotE", choices=all_models, help="Knowledge Graph embedding model"
-# )
+parser.add_argument(
+    "--max_epochs", default=50, type=int, help="Maximum number of epochs to train for"
+)
+parser.add_argument(
+    "--rank", default=1000, type=int, help="Embedding dimension"
+)
+parser.add_argument(
+    "--patience", default=10, type=int, help="Number of epochs before early stopping"
+)
+parser.add_argument(
+    "--valid", default=3, type=float, help="Number of epochs before validation"
+)
+parser.add_argument(
+    "--dtype", default="double", type=str, choices=["single", "double"], help="Machine precision"
+)
+parser.add_argument(
+    "--debug", action="store_true",
+    help="Only use 1000 examples for debugging"
+)
+#   - Individually specifiable hyperparameters -
+parser.add_argument(
+    '--model', type=str, default="{TransE:[\'all\']}",
+    help='JSON string of the mapping from embedding methods to subgraphs.\n'
+         '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
+         '- \'all\' in a mapping sets all subgraphs to this method. This has the same effect as --model <MODEL_NAME>\n'
+         '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
+         'If nothing was specified in the mapping, all subgraphs can be embedded by the given embedding method.'
+
+)
 parser.add_argument(
     "--regularizer", choices=["N3", "F2"], default="N3", help="Regularizer"
 )
@@ -30,18 +57,6 @@ parser.add_argument(
 parser.add_argument(
     "--optimizer", choices=["Adagrad", "Adam", "SparseAdam"], default="Adagrad",
     help="Optimizer"
-)
-parser.add_argument(
-    "--max_epochs", default=50, type=int, help="Maximum number of epochs to train for"
-)
-parser.add_argument(
-    "--patience", default=10, type=int, help="Number of epochs before early stopping"
-)
-parser.add_argument(
-    "--valid", default=3, type=float, help="Number of epochs before validation"
-)
-parser.add_argument(
-    "--rank", default=1000, type=int, help="Embedding dimension"
 )
 parser.add_argument(
     "--batch_size", default=1000, type=int, help="Batch size"
@@ -65,41 +80,13 @@ parser.add_argument(
     "--bias", default="constant", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)"
 )
 parser.add_argument(
-    "--dtype", default="double", type=str, choices=["single", "double"], help="Machine precision"
-)
-parser.add_argument(
     "--double_neg", action="store_true",
     help="Whether to negative sample both head and tail entities"
-)
-parser.add_argument(
-    "--debug", action="store_true",
-    help="Only use 1000 examples for debugging"
 )
 parser.add_argument(
     "--multi_c", action="store_true", help="Multiple curvatures per relation"
 )
 # --- Parameters for ensemble methods ---
-#   - System parameters -
-parser.add_argument(
-    "--no_sampling", action='store_true', help="Turn off sampling, if subgraphs already exist"
-)
-parser.add_argument(
-    "--no_training", action='store_true', help="Turn off training, if only sampling should be done"
-)
-parser.add_argument(
-    "--no_progress_bar", action='store_true', help="Turn off all progress bars"
-)
-parser.add_argument(
-    "--no_time_dependent_file_path", action='store_true', help="Specify current time in file path, when "
-                                                               "creating logs and other files"
-)
-parser.add_argument(
-    "--logging", default="info", help="Determines the level of logging.\n"
-                                      "- \'info\': Contains information about the progress\n"
-                                      "- \'debug\': Also contains information about variables, e.g. tensor sizes\n"
-                                      "- \'data\': Also contains embedding weights and other data from variables, "
-                                      "which is printed directly to the log\'"
-)
 
 #   - Sampling parameters -
 parser.add_argument(
@@ -113,13 +100,13 @@ parser.add_argument(
                                                       "to be reached under normal conditions"
 )
 parser.add_argument(
+    "--sampling_method", default="Entity", choices=["Entity", "Feature"],
+    help="The sampling method, that should be used"
+)
+parser.add_argument(
     "--rho", default=1, type=float,
     help="Factor for Feature sampling, which specifies, how many relation names should be "
          "present in the subgraph, which is calculated by the formula \'rho * √|Relation Names|\'"
-)
-parser.add_argument(
-    "--sampling_method", default="Entity", choices=["Entity", "Feature"],
-    help="The sampling method, that should be used"
 )
 parser.add_argument(
     "--sampling_seed", default="42",
@@ -133,7 +120,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--model_dropout_factor", default=10, type=int,
-    help="The factor, which determines, if a model is considered diverged and therefore removed from the ensemble."
+    help="The factor, which determines, if a model is considered diverged and therefore removed from the ensemble. "
+         "A model is considered diverged, if the current validation loss exceeds the first validation loss times the "
+         "model dropout factor"
 )
 parser.add_argument(
     "--theta_method", default="regular", choices=["no", "regular", "reversed", "relation", "multiplied"],
@@ -149,13 +138,32 @@ parser.add_argument(
          "- \'multiplied\' cv for entities is influenced by entity embeddings as well as relation name embeddings, "
          "cv for relation names is only influenced by relation name embeddings\n"
 )
+
+#   - System parameters -
 parser.add_argument(
-    '--model', type=str, default="{TransE:[\'all\']}",
-    help='JSON string of the mapping from embedding methods to subgraphs.\n'
-         '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
-         '- \'all\' in a mapping sets all subgraphs to this method\n'
-         '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
-         'If nothing was specified, all subgraphs can be embedded by the given embedding method.'
+    "--logging", default="info", choices=['critical', 'error', 'warning', 'info', 'debug', 'data'],
+    help="Determines the level of logging.\n"
+         "- \'info\': Contains information about the progress\n"
+         "- \'debug\': Also contains information about variables, e.g. tensor sizes\n"
+         "- \'data\': Also contains embedding weights and other data from variables, "
+         "which is printed directly to the log\'"
+)
+parser.add_argument(
+    "--wandb_project", default="False",
+    help="Turn on logging of metrics via Weights&Biases and synchronize with the given project name."
+)
+parser.add_argument(
+    "--no_sampling", action='store_true', help="Turn off sampling"
+)
+parser.add_argument(
+    "--no_training", action='store_true', help="Turn off training"
+)
+parser.add_argument(
+    "--no_progress_bar", action='store_true', help="Turn off all progress bars"
+)
+parser.add_argument(
+    "--no_time_dependent_file_path", action='store_true', help="Turn off specifying the current time in file path, "
+                                                               "when creating logs and other files"
 )
 
 
@@ -225,16 +233,17 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
-    subgraph_amount = 5
-    subgraph_size_range = (0.003, 0.01)
+    subgraph_amount = 10
+    subgraph_size_range = (0.3, 0.7)
     rho = -1
     model_dropout_factor = 10
 
-    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False, wandb_log=True,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount,
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
+                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
                               theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
 
@@ -317,7 +326,8 @@ def run_embedding_manual():
         # allowed_kge_models = [{Constants.TRANS_E: [1, "rest"], Constants.DIST_MULT: [10], Constants.ROTAT_E: [20],
         #                        Constants.COMPL_EX: [2, 3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [0]}]
 
-        allowed_kge_models = [{Constants.TRANS_E: [0, 1, 2], Constants.DIST_MULT: [3, 4, 5, 'all'],
+        allowed_kge_models = [{Constants.TRANS_E: [0, 1, 2, 'rest'],
+                               Constants.DIST_MULT: [3, 4, 5, 'all'],
                                Constants.COMPL_EX: ['rest']}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
@@ -341,7 +351,7 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 500
+                    args.max_epochs = 50
                     args.rank = 32
                     args.patience = 15
                     args.valid = 5
