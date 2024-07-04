@@ -1,8 +1,8 @@
-# Ensemble_Embedding_for_Link_Prediction
+# Ensemble Approaches for Link Prediction
 
 ---
 
-This code is the official PyTorch implementation of Ensemble methods for Link Prediction [1].
+This code is the official PyTorch implementation of Ensemble Approaches for Link Prediction [1].
 This implementation lies on the KGEmb framework developed by [2].
 
 ## Datasets
@@ -52,7 +52,7 @@ usage: run_ensemble_embedding.py [-h] [--dataset DATASET] [--max_epochs MAX_EPOC
                                  [--logging {critical,error,warning,info,debug,data}] [--wandb_project WANDB_PROJECT]      
                                  [--no_sampling] [--no_training] [--no_progress_bar] [--no_time_dependent_file_path]       
 
-Ensemble methods for Link Prediction
+Ensemble Approaches for Link Prediction
 
 options:
   -h, --help            show this help message and exit
@@ -171,8 +171,68 @@ and a method wasn't specified, the first entry will be chosen as value.
 
 ---
 
-We provide example scripts with hyper-parameters for WN18RR in the examples/ folder. For dimensions 32 and 500, these
+We provide example scripts with hyperparameters for WN18RR in the examples/ folder. For dimensions 32 and 500, these
 models should achieve the following test MRRs:
+<!-- TODO create example files and put results here -->
+
+## Process
+
+---
+
+The rough outline of the training and score calculation are as described below.
+
+### Training
+<pre>
+# initialize unified model with random embeddings
+unified_model = random_init(models, aggregation_method)
+
+for epoch:
+    for batch:
+        
+        # calculate attention based on single model theta and embedding 
+        attention = calculate_attention(models, unified_model)
+        
+        # do forward pass on single models and combine predictions and factors according to attention
+        combined_predictions, combined_factors = unified_model.forward(batch, models, attention)
+        
+        # calculate loss based on combined predictions
+        unified_loss = calculate_loss(combined_predictions, combined_factors, true_values)
+        
+        # do backward pass on unified embedding 
+        unified_model.backward(unified_loss)
+        
+        # update single model embeddings based on attention and unified embedding
+        for model in models:
+            model[embeddings] = model.update_embeddings(unified_model, attention)
+
+</pre>
+
+### Score calculation
+
+<pre>
+# get which embedding methods are in the ensemble
+methods = get_used_methods(models)
+
+# if only one method is present, skip aggregation 
+if len(methods) is 1:
+    # calculate scores and targets for single method
+    scores, targets = unified_model.calculate_score(method)
+
+    # directly calculate metrics from scores and targets
+    metrics = calculate_metrics(scores, targets)
+
+# do aggregation if multiple different methods are used
+else:
+    # calculate scores based on each methods score function
+    for method in methods:
+        method_score, method_target = unified_model.calculate_score(method)
+    
+    # combine scores from different methods according to the aggregation method
+    aggregated_scores, aggregated_targets = combine_method_scores(method_scores, method_targets, aggregation_method)
+    
+    # calculate metrics from combined scores
+    metrics = calculate_metrics(aggregated_scores, aggregated_targets)
+</pre>
 
 ## New models
 
@@ -211,8 +271,6 @@ If you use this implementation, please cite the following paper [1]:
 
 [2] Chami, Ines, et al. "Low-Dimensional Hyperbolic Knowledge Graph Embeddings." Annual Meeting of the Association for
 Computational Linguistics. 2020.
-
-
 
 
 
