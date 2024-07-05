@@ -1,5 +1,4 @@
 """Hyperbolic Knowledge Graph embedding models where all parameters are defined in tangent spaces."""
-import logging
 
 import numpy as np
 import torch
@@ -18,9 +17,15 @@ class BaseH(KGModel):
 
     def __init__(self, args):
         super(BaseH, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.theta_calculation)
-        self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
-        self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], 2 * self.rank), dtype=self.data_type)
+                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
+                                    relation_names=args.relation_names)
+        # TODO rand for present
+        self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
+        self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], 2 * self.rank), dtype=self.data_type)
+
+        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
+        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), 2 * self.rank))
+
         self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
         self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
         self.multi_c = args.multi_c
@@ -86,6 +91,7 @@ class RefH(BaseH):
 
 class AttH(BaseH):
     """Hyperbolic attention model combining translations, reflections and rotations"""
+
     def __init__(self, args):
         super(AttH, self).__init__(args)
         self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)

@@ -1,5 +1,4 @@
-"""Euclidean Knowledge Graph embedding models where embeddings are in real space."""
-import logging
+"""Euclidean Knowledge Graph embedding embedding_models where embeddings are in real space."""
 
 import numpy as np
 import torch
@@ -12,7 +11,7 @@ EUC_MODELS = ["TransE", "DistMult", "CP", "MurE", "RotE", "RefE", "AttE"]
 
 
 class BaseE(KGModel):
-    """Euclidean Knowledge Graph Embedding models.
+    """Euclidean Knowledge Graph Embedding embedding_models.
 
     Attributes:
         sim: similarity metric to use (dist for distance and dot for dot product)
@@ -20,9 +19,14 @@ class BaseE(KGModel):
 
     def __init__(self, args):
         super(BaseE, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.theta_calculation)
-        self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
-        self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
+                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
+                                    relation_names=args.relation_names)
+
+        self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
+        self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], self.rank), dtype=self.data_type)
+
+        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
+        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank))
         # self.att = []
 
     def get_rhs(self, queries, eval_mode):

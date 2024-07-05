@@ -17,15 +17,26 @@ class BaseC(KGModel):
     def __init__(self, args):
         """Initialize a Complex KGModel."""
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.theta_calculation)
+                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
+                                    relation_names=args.relation_names)
+        # TODO rand for present
         assert self.rank % 2 == 0, "Complex models require even embedding dimension"
         self.rank = self.rank // 2
         self.embeddings = nn.ModuleList([
             nn.Embedding(s, 2 * self.rank, sparse=True)
             for s in self.sizes[:2]
         ])
-        self.embeddings[0].weight.data = self.init_size * self.embeddings[0].weight.to(self.data_type)
-        self.embeddings[1].weight.data = self.init_size * self.embeddings[1].weight.to(self.data_type)
+
+        for embedding in self.embeddings:
+            embedding.weight.data = torch.zeros_like(embedding.weight.data, dtype=self.data_type)
+
+        # self.embeddings[0].weight.data[self.entities] = self.init_size * self.embeddings[0].weight.to(self.data_type)
+        # self.embeddings[1].weight.data[self.relation_names] = self.init_size * self.embeddings[1].weight.to(
+        #     self.data_type)
+
+        self.embeddings[0].weight.data[self.entities] = torch.randn((len(self.entities), self.rank)).to(self.data_type)
+        self.embeddings[1].weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank)).to(
+            self.data_type)
 
     def get_rhs(self, queries, eval_mode):
         """Get embeddings and biases of target entities."""

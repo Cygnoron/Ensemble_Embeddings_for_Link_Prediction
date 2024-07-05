@@ -6,11 +6,9 @@ SAMPLING_METHODS = [DEBUG_SAMPLING, ENTITY_SAMPLING, FEATURE_SAMPLING]
 
 # score aggregation methods
 MAX_SCORE_AGGREGATION = [10, "maximum score", "maximum_score", "max"]
-MIN_SCORE_AGGREGATION = [11, "minimum score", "minimum_score", "min"]
 AVERAGE_SCORE_AGGREGATION = [12, "average score", "average_score", "avg"]
 ATTENTION_SCORE_AGGREGATION = [13, "attention score", "attention_score", "att"]
-AGGREGATION_METHODS = [MAX_SCORE_AGGREGATION, MIN_SCORE_AGGREGATION, AVERAGE_SCORE_AGGREGATION,
-                       ATTENTION_SCORE_AGGREGATION]
+AGGREGATION_METHODS = [MAX_SCORE_AGGREGATION, AVERAGE_SCORE_AGGREGATION, ATTENTION_SCORE_AGGREGATION]
 
 # embedding methods
 COMPL_EX, ROTAT_E = "ComplEx", "RotatE"

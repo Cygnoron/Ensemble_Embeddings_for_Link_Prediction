@@ -109,15 +109,15 @@ def inverse_dict(dictionary):
 
 def assign_model_to_subgraph(kge_models, args):
     """
-    Assign embedding models to subgraphs based on the given dictionary of kge_models.
+    Assign embedding embedding_models to subgraphs based on the given dictionary of kge_models.
 
     Args:
-        kge_models (dict): A dictionary where keys are embedding models (constants) and values are lists of subgraphs
+        kge_models (dict): A dictionary where keys are embedding embedding_models (constants) and values are lists of subgraphs
                            to be embedded using the corresponding model.
         args: Additional arguments containing dataset_directory and other necessary configurations.
 
     Returns:
-        dict: A mapping of subgraphs to their assigned embedding models.
+        dict: A mapping of subgraphs to their assigned embedding embedding_models.
 
     Examples:
         >>> kge_models = {Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [2, 3], Constants.ROTAT_E: [],

@@ -9,7 +9,7 @@ from torch import nn
 
 import models as models
 from datasets.kg_dataset import KGDataset
-from ensemble import Constants, util_files, util, Attention_mechanism, score_combination
+from ensemble import Constants, util_files, util, score_combination, Attention_mechanism
 from ensemble.score_combination import evaluate_ensemble
 from models import hyperbolic
 from optimizers import regularizers as regularizers, KGOptimizer
@@ -21,7 +21,7 @@ DATA_PATH = "data"
 def train(info_directory, args):
     """
     The train function is a wrapper for the general train function in the general run.py file.
-    It allows us to run multiple models at once, and save them all in one folder with
+    It allows us to run multiple embedding_models at once, and save them all in one folder with
     the same name as their respective model type (e.g., TransE). The train function
     takes all the arguments that are passed into the general train, but also takes an additional argument: multi_c.
 
@@ -48,15 +48,15 @@ def train(info_directory, args):
         train_loss_file.write(f"epoch;average train loss{subgraphs_str}\n")
         metrics_file.write(f"epoch;mode;metric_type;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;rank_deviation\n")
 
-    logging.info(f"### Saving .json config files of models in: {model_setup_config_dir} ###")
-    logging.info(f"### Saving .pt files of stored models in: {model_file_dir} ###")
+    logging.info(f"### Saving .json config files of embedding_models in: {model_setup_config_dir} ###")
+    logging.info(f"### Saving .pt files of stored embedding_models in: {model_file_dir} ###")
 
     # set up dataset directory
     dataset_path = os.path.join(DATA_PATH, args.dataset)
 
     # get original dataset name
     dataset_general = util.get_dataset_name(args.dataset)
-    # create model using original dataset and sizes, use returned embeddings in new models as initialization
+    # create model using original dataset and sizes, use returned embeddings in new embedding_models as initialization
     embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape \
         = util.generate_general_embeddings(dataset_general, util.get_args(args, "general_args"))
 
@@ -76,6 +76,7 @@ def train(info_directory, args):
     valid_args = argparse.Namespace(counter=0, best_mrr=None, best_epoch=None, epoch=0, valid=args.valid,
                                     patience=args.patience)
 
+    # TODO rework training loop
     for embedding_model in embedding_models:
         # --- Setting up training ---
 
@@ -98,7 +99,7 @@ def train(info_directory, args):
 
         # initialize dict for train losses
         train_losses[epoch] = {}
-        # Iterate over models
+        # Iterate over embedding_models
         for index, embedding_model in enumerate(embedding_models):
             args = embedding_model['args']
             model = embedding_model['model']
@@ -107,9 +108,8 @@ def train(info_directory, args):
                 train_losses[epoch][embedding_model['args'].subgraph] = "dropout"
                 continue
 
-            logging.info(
-                f"Training subgraph {embedding_model['subgraph']} (ensemble step {index + 1}/{len(embedding_models)}) "
-                f"in epoch {epoch} with model {args.model_name}")
+            logging.info(f"Training subgraph {embedding_model['subgraph']} (ensemble step {index + 1}/"
+                         f"{len(embedding_models)}) in epoch {epoch} with model {args.model_name}")
 
             # Train step
             model.train()
@@ -136,7 +136,7 @@ def train(info_directory, args):
                                                                                    embedding_models,
                                                                                    cands_att_dict,
                                                                                    args.theta_calculation)
-        # print training losses to file
+        # # print training losses to file
         util_files.print_loss_to_file(train_loss_file_path, epoch, train_losses[epoch])
 
         # Valid step
@@ -166,7 +166,7 @@ def train(info_directory, args):
                 valid_args.best_mrr = valid_mrr
                 valid_args.counter = 0
                 valid_args.best_epoch = epoch
-                logging.info(f"Saving models at epoch {epoch} in {model_file_dir}")
+                logging.info(f"Saving embedding_models at epoch {epoch} in {model_file_dir}")
 
                 torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
                 torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
@@ -188,9 +188,6 @@ def train(info_directory, args):
                     for embedding_model in embedding_models:
                         embedding_model['optimizer'].reduce_lr()
 
-        # dict_size = asizeof.asizeof(embedding_models)
-        # logging.debug(f"Memory requirement for embedding models in epoch {epoch} is {dict_size / 1024 / 1024:.3f}MB")
-
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "
                      f"{util.format_time(time_start_training_sub, time_stop_training_sub)}\t/-")
@@ -198,7 +195,7 @@ def train(info_directory, args):
     if run_diverged:
         return "The run diverged and was aborted."
 
-    # load or save best models after completed training
+    # load or save best embedding_models after completed training
     cands_att_dict = util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir, cands_att_dict)
 
     time_stop_training_total = time.time()
@@ -229,8 +226,8 @@ def train(info_directory, args):
 
 def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embedding_general_ent, embedding_general_rel,
                  theta_general_ent, theta_general_rel, general_dataset_shape, model_setup_config_dir, dataset_path):
-    # --- setting up embedding models ---
-    logging.info("-/\tSetting up embedding models\t\\-")
+    # --- setting up embedding embedding_models ---
+    logging.info("-/\tSetting up embedding embedding_models\t\\-")
     time_start_model_creation = time.time()
 
     # create dataset and model objects and save them to list of dictionaries
@@ -271,13 +268,17 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
 
         logging.debug(f"Sizes: old {dataset.get_shape()}\tnew {args_subgraph.sizes}")
 
+        entity_set, relation_name_set = dataset.get_entities_relation_names(args_subgraph.sizes, double_relations=True)
+
+        args_subgraph.entities = entity_set
+        args_subgraph.relation_names = relation_name_set
+
         args_subgraph.model_dropout = False
 
         # create model
         model = getattr(models, args_subgraph.model)(args_subgraph)
         total = count_params(model)
 
-        entity_set, relation_name_set = dataset.get_entities_relation_names(args_subgraph.sizes, double_relations=True)
 
         # set embeddings
         model.entity = nn.Embedding(embedding_general_ent.num_embeddings, embedding_general_ent.embedding_dim,
@@ -306,7 +307,7 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
 
             if args_subgraph.model_name in hyperbolic.HYP_MODELS:
                 # initialize with zeros and set present relation names to one
-                model.rel.weight.data = torch.rand(args_subgraph.sizes[0], args_subgraph.rank * 2).float()
+                model.rel.weight.data = torch.rand(args_subgraph.sizes[1], args_subgraph.rank * 2).float()
                 # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
             else:
                 # initialize with zeros and set present relation names to one
@@ -341,7 +342,7 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, embeddin
             json.dump(vars(args_subgraph), json_file)
 
     time_stop_model_creation = time.time()
-    logging.info(f"-\\\tSuccessfully created all models in "
+    logging.info(f"-\\\tSuccessfully created all embedding_models in "
                  f"{util.format_time(time_start_model_creation, time_stop_model_creation)}\t/-")
 
     return embedding_models

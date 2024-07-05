@@ -12,7 +12,7 @@ class KGOptimizer(object):
     KGOptimizers performs loss computations with negative sampling and gradient descent steps.
 
     Attributes:
-        model: models.base.KGModel
+        model: embedding_models.base.KGModel
         regularizer: regularizers.Regularizer
         optimizer: torch.optim.Optimizer
         batch_size: An integer for the training batch size
@@ -54,16 +54,12 @@ class KGOptimizer(object):
         """
         negative_batch = input_batch.repeat(self.neg_sample_size, 1)
         batch_size = input_batch.shape[0]
-        negsamples = torch.Tensor(np.random.randint(
-            self.n_entities,
-            size=batch_size * self.neg_sample_size)
-        ).to(input_batch.dtype)
+        negsamples = torch.Tensor(np.random.randint(self.n_entities, size=batch_size * self.neg_sample_size)
+                                  ).to(input_batch.dtype)
         negative_batch[:, 2] = negsamples
         if self.double_neg:
-            negsamples = torch.Tensor(np.random.randint(
-                self.n_entities,
-                size=batch_size * self.neg_sample_size)
-            ).to(input_batch.dtype)
+            negsamples = torch.Tensor(np.random.randint(self.n_entities, size=batch_size * self.neg_sample_size)
+                                      ).to(input_batch.dtype)
             negative_batch[:, 0] = negsamples
         return negative_batch
 
@@ -165,20 +161,22 @@ class KGOptimizer(object):
             bar.set_description(f'train loss')
 
         actual_examples = examples[torch.randperm(examples.shape[0]), :]
+        # actual_examples = examples
 
         b_begin = 0
         total_loss = 0.0
         counter = 0
         while b_begin < examples.shape[0]:
-            input_batch = actual_examples[
-                          b_begin:b_begin + self.batch_size
-                          ].cuda()
+            input_batch = actual_examples[b_begin:b_begin + self.batch_size].cuda()
 
             # gradient step
             l = self.calculate_loss(input_batch)
             self.optimizer.zero_grad()
             l.backward()
             self.optimizer.step()
+
+            if self.model.is_unified_model:
+                self.model.update_single_models(input_batch)
 
             b_begin += self.batch_size
             total_loss += l

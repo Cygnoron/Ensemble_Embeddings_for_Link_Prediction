@@ -242,28 +242,28 @@ def copy_test_valid_filter_data(dataset_in: str, dataset_dir: str):
 
 def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, model_file_dir, cands_att_dict):
     """
-    Save or load trained models based on the validation arguments provided.
+    Save or load trained embedding_models based on the validation arguments provided.
 
     Parameters:
-        embedding_models (list): List of dictionaries containing trained embedding models and their arguments.
+        embedding_models (list): List of dictionaries containing trained embedding embedding_models and their arguments.
         valid_args (argparse.Namespace): Validation arguments saved in Namespace object.
-        model_file_dir (str): Directory where the models will be saved or loaded from.
+        model_file_dir (str): Directory where the embedding_models will be saved or loaded from.
     """
     if not valid_args.best_mrr:
-        logging.info(f"Saving new models saved at epoch {valid_args.best_epoch}.")
+        logging.info(f"Saving new embedding_models saved at epoch {valid_args.best_epoch}.")
         torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
         torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
-        # Iterate over models
+        # Iterate over embedding_models
         for embedding_model in embedding_models:
             args = embedding_model["args"]
             # Save the model
             torch.save(embedding_model['model'].cpu().state_dict(),
                        os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
     else:
-        logging.info(f"Loading best models saved at epoch {valid_args.best_epoch}")
+        logging.info(f"Loading best embedding_models saved at epoch {valid_args.best_epoch}")
         cands_att_dict['att_weights_ent'] = torch.load(os.path.join(model_file_dir, "attention_ent.pt"))
         cands_att_dict['att_weights_rel'] = torch.load(os.path.join(model_file_dir, "attention_rel.pt"))
-        # Iterate over models
+        # Iterate over embedding_models
         for embedding_model in embedding_models:
             args = embedding_model["args"]
             # Load the best model
@@ -275,27 +275,29 @@ def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, m
 
 def print_loss_to_file(loss_file_path, epoch, loss_dict):
     with open(loss_file_path, 'a+') as loss_file:
-        keys_sorted = list(loss_dict.keys())
-        logging.debug(f"Output keys unsorted: {keys_sorted}")
-        keys_sorted.sort()
-        logging.debug(f"Output keys sorted: {keys_sorted}")
+        if type(loss_dict) is dict:
+            keys_sorted = list(loss_dict.keys())
+            logging.debug(f"Output keys unsorted: {keys_sorted}")
+            keys_sorted.sort()
+            logging.debug(f"Output keys sorted: {keys_sorted}")
 
-        active_models = len(keys_sorted)
-        average_loss = 0.
-        for subgraph in loss_dict:
-            if loss_dict[subgraph] != "dropout":
-                average_loss += loss_dict[subgraph]
-            else:
-                active_models -= 1
-        try:
-            average_loss /= active_models
-        except ZeroDivisionError:
-            average_loss = "inf"
+            active_models = len(keys_sorted)
+            average_loss = 0.
+            for subgraph in loss_dict:
+                if loss_dict[subgraph] != "dropout":
+                    average_loss += loss_dict[subgraph]
+                else:
+                    active_models -= 1
+            try:
+                average_loss /= active_models
+            except ZeroDivisionError:
+                average_loss = "inf"
 
-        out_str = f"{epoch};{average_loss}"
-        for subgraph in keys_sorted:
-            out_str += f";{loss_dict[subgraph]}"
-
+            out_str = f"{epoch};{average_loss}"
+            for subgraph in keys_sorted:
+                out_str += f";{loss_dict[subgraph]}"
+        else:
+            out_str = f"{epoch};{loss_dict}"
         loss_file.write(out_str)
         loss_file.write("\n")
 

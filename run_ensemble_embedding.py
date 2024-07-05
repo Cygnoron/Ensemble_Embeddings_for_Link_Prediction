@@ -5,16 +5,16 @@ import time
 import traceback
 
 import wandb
-from ensemble import Constants, util_files, util, run, subsampling
+from ensemble import Constants, util_files, util, run, subsampling, run_unified_model
 from run import train
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
 
 parser = argparse.ArgumentParser(
-    description="Ensemble methods for Link Prediction"
+    description="Ensemble Approaches for Link Prediction"
 )
-# --- Arguments for embedding models ---
+# --- Arguments for embedding embedding_models ---
 #   - General hyperparameters -
 parser.add_argument(
     "--dataset", default="WN18RR", help="Knowledge Graph dataset"
@@ -168,10 +168,16 @@ parser.add_argument(
 
 
 def run_baseline(args):
+    try:
+        Constants.get_wandb(args.wandb_project)
+    except:
+        pass
     train(args)
 
 
 def run_embedding(args):
+    Constants.get_wandb(args.wandb_project)
+
     time_process_start = time.time()
 
     args.sampling_method = util.handle_methods(args.sampling_method, "sampling")
@@ -233,23 +239,26 @@ def run_embedding_manual():
     dataset_in = "WN18RR"
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
-    subgraph_amount = 10
-    subgraph_size_range = (0.3, 0.7)
+    subgraph_amount = 4
+    subgraph_size_range = (0.03, 0.25)
     rho = -1
     model_dropout_factor = 10
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
-                              no_progress_bar=False, subgraph_amount=subgraph_amount,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True,
+                              no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
-                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
+                              aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
+                              # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
+                              # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
 
     subgraph_size_range_list = [subgraph_size_range]
     # for i in range(25, 70, 5):
     #     subgraph_size_range_list.append((i / 100, 0.7))
+
+    Constants.get_wandb(args.wandb_project)
 
     for subgraph_size_range in subgraph_size_range_list:
         time_process_start = time.time()
@@ -316,19 +325,9 @@ def run_embedding_manual():
 
         # --- setup for model training ---
 
-        # allowed_kge_models = {Constants.TRANS_E: [1,2], Constants.DIST_MULT: [3, 4], Constants.ROTAT_E: [5, 6],
-        #                       Constants.COMPL_EX: [7, 8], Constants.ATT_E: [9, 0]}
-        # allowed_kge_models = {Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [2], Constants.ROTAT_E: [9],
-        #                       Constants.COMPL_EX: [3, 4], Constants.ATT_E: [5, 6, 7, 8]}
-        # allowed_kge_models = {Constants.TRANS_E: [0, 1], Constants.DIST_MULT: [2, 3], Constants.ROTAT_E: ["rest"],
-        #                       Constants.COMPL_EX: [], Constants.ATT_E: ["rest"], Constants.ATT_H: [5]}
-
-        # allowed_kge_models = [{Constants.TRANS_E: [1, "rest"], Constants.DIST_MULT: [10], Constants.ROTAT_E: [20],
-        #                        Constants.COMPL_EX: [2, 3, "all"], Constants.ATT_E: [4, "rest"], Constants.ATT_H: [0]}]
-
-        allowed_kge_models = [{Constants.TRANS_E: [0, 1, 2, 'rest'],
-                               Constants.DIST_MULT: [3, 4, 5, 'all'],
-                               Constants.COMPL_EX: ['rest']}]
+        allowed_kge_models = [{Constants.DIST_MULT: [0, 'all'],
+                               Constants.TRANS_E: [1, 'rest'],
+                               Constants.ATT_E: [2, 'rest']}]
 
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
@@ -351,11 +350,12 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 50
-                    args.rank = 32
+                    args.max_epochs = 4
+                    args.rank = 2
                     args.patience = 15
-                    args.valid = 5
+                    args.valid = 4
                     args.dtype = "single"
+                    args.batch_size = 10
                     args.debug = False
 
                     # args.batch_size = 1000
@@ -371,7 +371,6 @@ def run_embedding_manual():
                     # args.multi_c = True
                     # args.double_neg = True
 
-                    args.batch_size = {'ComplEx': 450, 'TransE': 450, 'DistMult': 450}
                     args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001, 'DistMult': 0.1}
                     args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05}
                     args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adagrad"}
@@ -389,7 +388,8 @@ def run_embedding_manual():
                         wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
                         wandb.login()
 
-                    run.train(info_directory, args)
+                    # run.train(info_directory, args)
+                    run_unified_model.train(info_directory, args)
 
             except Exception:
                 logging.error(traceback.format_exc())
@@ -407,7 +407,7 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    # run_embedding(parser.parse_args())
 
     # Function to run baseline
     args = parser.parse_args()
@@ -435,4 +435,4 @@ if __name__ == "__main__":
     # run_baseline(args)
 
     # Function to run manual via IDE
-    # run_embedding_manual()
+    run_embedding_manual()

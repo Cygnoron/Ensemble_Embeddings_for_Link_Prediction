@@ -85,9 +85,9 @@ class KGDataset(object):
             relation_name_set = set()
             for triple in self.data['train']:
                 head, relation, tail = triple
-                entity_set.add(head)
-                relation_name_set.add(relation)
-                entity_set.add(tail)
+                entity_set.add(int(head))
+                relation_name_set.add(int(relation))
+                entity_set.add(int(tail))
 
             # return sets of entities and relation names
             if double_relations:

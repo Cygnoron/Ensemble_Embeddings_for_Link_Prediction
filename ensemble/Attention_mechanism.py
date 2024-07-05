@@ -15,6 +15,8 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
     else:
         logging.info(f"Calculating self-attention...")
 
+        # TODO differentiate between EUCLIDIAN, COMPLEX and HYPERBOLIC
+
         activation = nn.Softmax(dim=-1)
         args = embedding_models[0]['args']
 
@@ -86,7 +88,7 @@ def calculate_self_attention(embedding_models, theta_calculation, batch_size=500
                                                   f"{att_weights_rel}")
 
         return {'cands_ent': cands_ent, 'cands_rel': cands_rel, 'att_weights_ent': att_weights_ent,
-                'att_weights_rel': att_weights_rel}
+                'att_weights_rel': att_weights_rel, 'theta_ent': theta_ent, 'theta_rel': theta_rel}
 
 
 def get_cands(embedding_models, batch_size):
@@ -147,7 +149,7 @@ def get_cands(embedding_models, batch_size):
             cands_ent_temp.append(model.entity.weight.data[b_begin:b_begin + batch_size])
             theta_ent_temp.append(model.theta_ent.weight.data[b_begin:b_begin + batch_size])
             model = embedding_model["model"]
-            # handle special case for hyperbolic models
+            # handle special case for hyperbolic embedding_models
             if embedding_model["args"].model_name in hyperbolic.HYP_MODELS:
                 # TODO Fix AttH having nan values
                 logging.debug(f"HYPERBOLIC")
@@ -198,9 +200,10 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
         logging.info(f"Applying general embeddings to all models.")
         sizes = embedding_models[0]['args'].sizes
         dtype = embedding_models[0]['data_type']
+        act = nn.Softmax(dim=-1)
 
-        # write new unified embedding into all models
-        for embedding_model in embedding_models:
+        # write new unified embedding into all embedding_models
+        for index, embedding_model in enumerate(embedding_models):
             if ('entities' not in embedding_model.keys()) or ('relation_names' not in embedding_model.keys()):
                 entities, relation_names = embedding_model['dataset'].get_entities_relation_names(sizes,
                                                                                                   double_relations=True)
@@ -211,10 +214,34 @@ def calculate_and_apply_unified_embedding(general_embedding_ent, general_embeddi
             relation_names = embedding_model['relation_names']
             model = embedding_model['model']
 
-            # TODO change update to e_1 = a_1 * e_1 + a_2 * e_u
-            #  a_1, a_2 = softmax(theta_1 * e_1, theta_u * e_u)
-            model.entity.weight.data[entities] = (general_embedding_ent.weight.data[entities].to(dtype))
-            model.rel.weight.data[relation_names] = (general_embedding_rel.weight.data[relation_names].to(dtype))
+            # TODO differentiate between EUCLIDIAN, COMPLEX and HYPERBOLIC
+
+            # theta_ent = [40943, 32, N], general_emb = [40943, 32]
+            unified_att_ent_uni = torch.sum(cands_att_dict['theta_ent'][:, :, index].cuda() *
+                                            general_embedding_ent.weight.data, dim=-1)
+            unified_att_rel_uni = torch.sum(cands_att_dict['theta_rel'][:, :, index].cuda() *
+                                            general_embedding_rel.weight.data, dim=-1)
+
+            # unified_att_ent_uni = torch.sum(torch.mean(cands_att_dict['theta_ent'], dim=-1).cuda() *
+            #                                 general_embedding_ent.weight.data, dim=-1)
+            # unified_att_rel_uni = torch.sum(torch.mean(cands_att_dict['theta_rel'], dim=-1).cuda() *
+            #                                 general_embedding_rel.weight.data, dim=-1)
+
+            unified_att_ent = act(torch.stack([model.att_ent_single, unified_att_ent_uni], dim=1))
+            unified_att_rel = act(torch.stack([model.att_rel_single, unified_att_rel_uni], dim=1))
+
+            model.entity.weight.data[entities] = (model.entity.weight.data[entities] *
+                                                  unified_att_ent[entities][:, 0].view(-1, 1) +
+                                                  general_embedding_ent.weight.data[entities] *
+                                                  unified_att_ent[entities][:, 1].view(-1, 1))
+
+            model.rel.weight.data[relation_names] = (model.rel.weight.data[relation_names] *
+                                                     unified_att_rel[relation_names][:, 0].view(-1, 1) +
+                                                     general_embedding_rel.weight.data[relation_names] *
+                                                     unified_att_rel[relation_names][:, 1].view(-1, 1))
+
+            # model.entity.weight.data[entities] = (general_embedding_ent.weight.data[entities].to(dtype))
+            # model.rel.weight.data[relation_names] = (general_embedding_rel.weight.data[relation_names].to(dtype))
 
         # sum over ranks for attention based combination
         activation = nn.Softmax(dim=-1)

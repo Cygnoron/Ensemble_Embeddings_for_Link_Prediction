@@ -26,7 +26,7 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
 
     time_eval_start = time.time()
 
-    # calculate scores for all models
+    # calculate scores for all embedding_models
     aggregated_scores, aggregated_targets = calculate_and_combine_scores(embedding_models, examples,
                                                                          aggregation_method, attention, eval_mode=mode,
                                                                          batch_size=batch_size)
@@ -72,13 +72,13 @@ def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_A
 def calculate_and_combine_scores(embedding_models, examples, aggregation_method, attention, eval_mode=None,
                                  batch_size=500):
     """
-        Calculate and combine scores from multiple embedding models for given examples.
+        Calculate and combine scores from multiple embedding embedding_models for given examples.
 
         Args:
-            embedding_models (list): List of embedding models with their parameters and data types.
+            embedding_models (list): List of embedding embedding_models with their parameters and data types.
             examples (Tensor): Tensor containing the examples for which scores need to be calculated.
             aggregation_method (tuple): Method used to aggregate scores (e.g., max, min, average).
-            eval_mode (str, optional): Evaluation mode for the models. Defaults to None.
+            eval_mode (str, optional): Evaluation mode for the embedding_models. Defaults to None.
             batch_size (int, optional): Size of the batches for processing examples. Defaults to 500.
 
         Returns:
@@ -124,7 +124,7 @@ def calculate_and_combine_scores(embedding_models, examples, aggregation_method,
         model_targets_lhs = []
         model_targets_rhs = []
 
-        for step, embedding_model in enumerate(embedding_models):
+        for embedding_model in embedding_models:
             args = embedding_model['args']
             if args.model_dropout:
                 logging.debug(f"Skipping calculation of scores for {args.subgraph}, since the valid scores diverged "
@@ -240,14 +240,14 @@ def calculate_scores(examples, model, dtype, candidate_answers, b_begin, batch_s
 def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs,
                    attention, examples, active_models):
     """
-    Combine scores from multiple models using the specified aggregation method.
+    Combine scores from multiple embedding_models using the specified aggregation method.
 
     Args:
         aggregation_method (tuple): Method used to aggregate scores (e.g., max, min, average).
-        model_scores_lhs (list): List of 'lhs' scores from different models.
-        model_scores_rhs (list): List of 'rhs' scores from different models.
-        model_targets_lhs (list): List of 'lhs' targets from different models.
-        model_targets_rhs (list): List of 'rhs' targets from different models.
+        model_scores_lhs (list): List of 'lhs' scores from different embedding_models.
+        model_scores_rhs (list): List of 'rhs' scores from different embedding_models.
+        model_targets_lhs (list): List of 'lhs' targets from different embedding_models.
+        model_targets_rhs (list): List of 'rhs' targets from different embedding_models.
 
     Returns:
         Tensor: Aggregated scores for 'lhs' direction.
@@ -260,7 +260,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
 
     # Aggregate scores based on the specified method
     if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-        # select maximum score between all models
+        # select maximum score between all embedding_models
         try:
             # Stack model scores, then select max scores
             stacked_tensor = torch.stack(model_scores_lhs, dim=1)
@@ -283,7 +283,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             return
 
     elif aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-        # average the score across all models
+        # average the score across all embedding_models
         try:
             # Stack model scores, then calculate averaged scores
             stacked_tensor = torch.stack(model_scores_lhs, dim=1)
@@ -306,7 +306,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             return
 
     elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
-        # calculate attention between all models and average scores based on the attention of entities and relation names
+        # calculate attention between all embedding_models and average scores based on the attention of entities and relation names
         try:
             # Collect attention values for queries
             att_h = attention['ent'][examples[:, 0].unsqueeze(1)]
@@ -317,7 +317,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             att_lhs = (att_r * att_t).squeeze()
             att_rhs = (att_r * att_h).squeeze()
 
-            # Filter out inactive models and do softmax
+            # Filter out inactive embedding_models and do softmax
             activation = nn.Softmax(dim=-1)
             att_lhs = activation(att_lhs[:, active_models])
             att_rhs = activation(att_rhs[:, active_models])
@@ -352,7 +352,7 @@ def calculate_valid_loss(embedding_models):
     valid_loss_dict = {}
     valid_loss = 0.0
     active_models = len(embedding_models)
-    # Iterate over all embedding models
+    # Iterate over all embedding embedding_models
     for embedding_model in embedding_models:
         # Setup variables
         model = embedding_model["model"]
@@ -373,7 +373,7 @@ def calculate_valid_loss(embedding_models):
         valid_loss += valid_loss_sub
         valid_loss_dict[subgraph] = valid_loss_sub.item()
 
-    # average valid loss over all "len(embedding_models)" models
+    # average valid loss over all "len(embedding_models)" embedding_models
     valid_loss /= active_models
 
     return valid_loss, valid_loss_dict
@@ -384,7 +384,7 @@ def calculate_valid_loss(embedding_models):
 
 def calculate_scores_depreciated(embedding_models, examples, batch_size=500, eval_mode="test"):
     """
-       Calculate scores for all queries and models provided.
+       Calculate scores for all queries and embedding_models provided.
 
        Args:
            embedding_models (list): A list of dictionaries, each containing an embedding model
@@ -393,7 +393,7 @@ def calculate_scores_depreciated(embedding_models, examples, batch_size=500, eva
            batch_size (int, optional): Batch size for processing queries. Defaults to 500.
 
        Returns:
-           - embedding_models (list): The updated list of embedding models, each containing
+           - embedding_models (list): The updated list of embedding embedding_models, each containing
              the calculated scores.
 
     """
@@ -506,7 +506,7 @@ def calculate_scores_depreciated(embedding_models, examples, batch_size=500, eva
 def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, batch_size=500,
                                eval_mode="test"):
     """
-        Combine scores from multiple models using the specified aggregation method.
+        Combine scores from multiple embedding_models using the specified aggregation method.
 
         Args:
             embedding_models (list): A list of dictionaries, each containing an embedding model
@@ -522,7 +522,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
     """
 
-    logging.info(f"Combining scores of all models with {aggregation_method[1]}.")
+    logging.info(f"Combining scores of all embedding_models with {aggregation_method[1]}.")
 
     # Get the size of scores for rhs and lhs directions
     # if embedding_models[0]['size_rhs'] is None or embedding_models[0]['size_lhs'] is None:
@@ -561,7 +561,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
                     progress_bar_combination.n = b_begin
                 progress_bar_combination.refresh()
 
-            # Collect scores from all models
+            # Collect scores from all embedding_models
             model_scores = []
             model_targets = []
             for embedding_model in embedding_models:
@@ -577,7 +577,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
             # Aggregate scores based on the specified method
             if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-                # select maximum score between all models
+                # select maximum score between all embedding_models
                 try:
                     stacked_tensor = torch.stack(model_scores, dim=1)
                     aggregated_scores[mode][b_begin:b_begin + batch_size], _ = torch.max(stacked_tensor, dim=1)
@@ -595,7 +595,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
             # Aggregate scores based on the specified method
             elif aggregation_method[0] == Constants.MIN_SCORE_AGGREGATION[0]:
-                # select maximum score between all models
+                # select maximum score between all embedding_models
                 try:
                     stacked_tensor = torch.stack(model_scores, dim=1)
                     aggregated_scores[mode][b_begin:b_begin + batch_size], _ = torch.min(stacked_tensor, dim=1)
@@ -612,7 +612,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
                     return
 
             elif aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-                # average the score across all models
+                # average the score across all embedding_models
                 try:
                     stacked_tensor = torch.stack(model_scores, dim=1)
                     aggregated_scores[mode][b_begin:b_begin + batch_size] = torch.mean(stacked_tensor, dim=1)
@@ -629,7 +629,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
                     return
 
             elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
-                # calculate attention between all models and average scores based on this attention
+                # calculate attention between all embedding_models and average scores based on this attention
                 logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
                 pass
 

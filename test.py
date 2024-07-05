@@ -15,7 +15,9 @@ parser = argparse.ArgumentParser(description="Test")
 parser.add_argument('--model_dir', help="Model path")
 
 
-def test(model_dir):
+def test(model_dir, mode="test"):
+    # TODO differentiate case for ensemble
+
     # load config
     with open(os.path.join(model_dir, "config.json"), "r") as f:
         config = json.load(f)
@@ -35,11 +37,23 @@ def test(model_dir):
     model.load_state_dict(torch.load(os.path.join(model_dir, 'model.pt')))
 
     # eval
-    test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
-    return test_metrics
+    if mode == "test":
+        metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
+    elif mode == "valid":
+        metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes))
+    else:
+        raise ValueError(f"The given mode {mode} does not exist!")
+    return metrics
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    test_metrics = test(args.model_dir)
+
+    for aggregation in Constants.AGGREGATION_METHODS:
+        args.aggregation_method = aggregation
+
+        valid_metrics = test(args.model_dir, mode="valid")
+        print(format_metrics(valid_metrics, split='valid'))
+
+    test_metrics = test(args.model_dir, mode="test")
     print(format_metrics(test_metrics, split='test'))
