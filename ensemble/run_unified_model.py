@@ -92,7 +92,6 @@ def train(info_directory, args):
     # Iterate over epochs
     for epoch in range(args.max_epochs):
         time_start_training_sub = time.time()
-        print("Epoch:", epoch)
         # logging.info(f"Training subgraph {embedding_model['subgraph']} (ensemble step {index + 1}/"
         #              f"{len(embedding_models)}) in epoch {epoch} with model {args.model_name}")
 
@@ -108,9 +107,6 @@ def train(info_directory, args):
             logging.debug(f"Theta_ent size epoch {epoch}: {unified_model.theta_ent.weight.data.size()}")
         if unified_model.theta_rel is not None:
             logging.debug(f"Theta_rel size epoch {epoch}: {unified_model.theta_rel.weight.data.size()}")
-
-        unified_model.cuda()
-        unified_model.eval()
 
         # Calculate unified embedding
         # cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models, args.theta_calculation)
@@ -157,7 +153,7 @@ def train(info_directory, args):
                 # torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
 
                 torch.save(unified_model.cpu().state_dict(), os.path.join(model_file_dir, f"model_unified.pt"))
-
+                
             else:
                 valid_args.counter += 1
                 if valid_args.counter == valid_args.patience:
@@ -167,6 +163,9 @@ def train(info_directory, args):
                     pass
                     logging.info(f"\t Reducing learning rate")
                     optimizer.reduce_lr()
+
+        unified_model.cuda()
+        unified_model.eval()
 
         time_stop_training_sub = time.time()
         logging.info(f"-\\\tTraining and optimization of epoch {epoch} finished in "

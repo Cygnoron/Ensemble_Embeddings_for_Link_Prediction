@@ -18,12 +18,13 @@ class Unified(KGModel):
 
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
-        self.theta_ent_unified = self.theta_ent_unified.cuda()
-        self.theta_rel_unified = self.theta_rel_unified.cuda()
-        self.cands_ent = self.cands_ent.cuda()
-        self.cands_rel = self.cands_rel.cuda()
+        self.theta_ent_unified = self.theta_ent_unified.to('cuda')
+        self.theta_rel_unified = self.theta_rel_unified.to('cuda')
+        self.cands_ent = self.cands_ent.to('cuda')
+        self.cands_rel = self.cands_rel.to('cuda')
         self.active_models = list(range(self.subgraph_amount))
         self.embedding_methods = set()
+        self.rel_last_epoch = None
         self.collect_embedding_methods()
 
     def get_queries(self, queries):
@@ -72,7 +73,7 @@ class Unified(KGModel):
         else:
             raise ValueError(f"The aggregation method \"{self.aggregation_method[1]}\" does not exist!")
 
-        return aggregated_scores, aggregated_targets
+        return aggregated_scores.to('cuda'), aggregated_targets.to('cuda')
 
     def forward(self, queries, eval_mode=False):
 
@@ -101,8 +102,8 @@ class Unified(KGModel):
                     self.active_models.remove(args.subgraph_num)
                 continue
 
-            embedding_ent = model.entity.weight.data
-            embedding_rel = model.rel.weight.data
+            embedding_ent = model.entity.weight.data.cuda()
+            embedding_rel = model.rel.weight.data.cuda()
             if model_name in COMPLEX_MODELS:
                 embedding_ent = model.embeddings[0].weight.data
                 embedding_rel = model.embeddings[1].weight.data
@@ -128,8 +129,8 @@ class Unified(KGModel):
         self.cands_rel[queries[:, 1]] = torch.stack(cands_rel_temp, dim=-1)
 
         # theta_ent_unified: [40943, 32, N]     theta_rel_unified: [22, 32, N]
-        self.theta_ent_unified.weight.data[queries[:, 0]] = torch.stack(theta_ent_temp, dim=-1)
-        self.theta_rel_unified.weight.data[queries[:, 1]] = torch.stack(theta_rel_temp, dim=-1)
+        self.theta_ent_unified.weight.data[queries[:, 0]] = torch.stack(theta_ent_temp, dim=-1).to('cuda')
+        self.theta_rel_unified.weight.data[queries[:, 1]] = torch.stack(theta_rel_temp, dim=-1).to('cuda')
 
     def calculate_attention(self, queries):
         logging.debug(f"Attention")
@@ -191,6 +192,7 @@ class Unified(KGModel):
         self.att_rel = self.act(self.att_rel)
 
     def single_model_forward(self, queries):
+        from models import COMPLEX_MODELS
         logging.debug("Forward pass")
         # TODO implement forward pass
         predictions = []
@@ -198,27 +200,50 @@ class Unified(KGModel):
         factors_r = []
         factors_t = []
         for embedding_model in self.embedding_models:
-            logging.debug(f"Forward pass model {embedding_model['args'].subgraph}")
-            model = embedding_model["model"]
+            args = embedding_model['args']
+            logging.debug(f"Forward pass model {args.subgraph}")
+
+            # Create masks for entities and relation names
+            entity_mask = torch.isin(queries[:, 0], torch.tensor(args.entities).cuda())
+            relation_mask = torch.isin(queries[:, 1], torch.tensor(args.relation_names).cuda())
+
+            query_mask = entity_mask & relation_mask
+            model_queries = queries[query_mask]
+
+            prediction = torch.zeros(len(queries), self.sizes[0], dtype=self.data_type).cuda()
+
+            factor_h = torch.zeros(len(queries), self.rank, dtype=self.data_type).cuda()
+            factor_r = torch.zeros(len(queries), self.rank, dtype=self.data_type).cuda()
+            factor_t = torch.zeros(len(queries), self.rank, dtype=self.data_type).cuda()
+
+            optimizer = embedding_model["optimizer"]
             # prediction.size() = [batch, 40943]    factor_X.size() = [batch, 32]
-            prediction, factor = model.forward(queries, eval_mode=True)
+            prediction[query_mask], factor = optimizer.model.forward(model_queries, eval_mode=True)
+
+            if embedding_model['model'].model_name in COMPLEX_MODELS:
+                factor_buffer_h, factor_buffer_r, factor_buffer_t = factor
+                # factor_x[:, self.rank // 2:] = factor_x[:, :self.rank // 2]
+                factor_buffer_h = torch.cat([factor_buffer_h, factor_buffer_h], dim=-1)
+                factor_buffer_r = torch.cat([factor_buffer_r, factor_buffer_r], dim=-1)
+                factor_buffer_t = torch.cat([factor_buffer_t, factor_buffer_t], dim=-1)
+                factor = (factor_buffer_h, factor_buffer_r, factor_buffer_t)
+
             predictions += [prediction]
 
-            factor_h, factor_r, factor_t = factor
+            factor_h[query_mask], factor_r[query_mask], factor_t[query_mask] = factor
             factors_h += [factor_h]
             factors_r += [factor_r]
             factors_t += [factor_t]
 
         # predictions.size() = [batch, 40943, N]    factors_X.size() = [batch, 32, N]
         # att_ent.size()     = [40943,    32, N]    att_rel.size() = [22   , 32, N]
-        # buffer_1 = [1, 40943, N]
         # TODO get correct attention
         predictions = torch.stack(predictions, dim=-1)
         factors_h = torch.stack(factors_h, dim=-1)
         factors_r = torch.stack(factors_r, dim=-1)
         factors_t = torch.stack(factors_t, dim=-1)
 
-        use_attention = True
+        use_attention = False
         if use_attention:
             predictions = torch.sum(torch.mean(self.att_ent, dim=1).unsqueeze(0) * predictions, dim=-1)
             factors_h = torch.sum(self.att_ent[queries[:, 0]] * factors_h, dim=-1)
@@ -233,7 +258,7 @@ class Unified(KGModel):
         factors = (factors_h, factors_r, factors_t)
         return predictions, factors
 
-    def update_single_models(self, queries):
+    def update_single_models(self, queries, loss):
         b_begin = 0
         # logging.info(f"Updating single models...")
         # write new unified embedding into all embedding_models
@@ -250,36 +275,35 @@ class Unified(KGModel):
             relation_names = embedding_model['relation_names']
             optimizer = embedding_model['optimizer']
 
-            # model.entity.weight.data[entities] = self.entity.weight.data[entities].cuda()
-            # model.rel.weight.data[relation_names] = self.rel.weight.data[relation_names].cuda()
+            use_attention = True
+            if use_attention:
 
-            # model.entity.weight.data = self.entity.weight.data.cuda()
-            # model.rel.weight.data = self.rel.weight.data.cuda()
+                # self.theta_ent_unified = [40943, 32, N], self.entity = [40943, 32]
+                self.att_ent[queries[:, 0], :, index] = (self.theta_ent_unified.weight.data[queries[:, 0], :, index] *
+                                                         model.entity.weight.data[queries[:, 0]])
 
-            # self.theta_ent_unified = [40943, 32, N], self.entity = [40943, 32]
-            # unified_att_ent_uni = torch.sum(
-            self.att_ent[queries[:, 0], :, index] = (self.theta_ent_unified.weight.data[queries[:, 0], :, index] *
-                                                     model.entity.weight.data[queries[:, 0]])
-            # model.entity.weight.data[queries[:, 0]])
+                # self.theta_rel_unified = [batch, 32, N], self.rel = [22, 32]
+                self.att_rel[queries[:, 1], :, index] = (self.theta_rel_unified.weight.data[queries[:, 1], :, index] *
+                                                         model.rel.weight.data[queries[:, 1]])
 
-            # self.theta_rel_unified = [batch, 32, N], self.rel = [22, 32]
-            # unified_att_rel_uni = torch.sum(
-            self.att_rel[queries[:, 1], :, index] = (self.theta_rel_unified.weight.data[queries[:, 1], :, index] *
-                                                     model.rel.weight.data[queries[:, 1]])
+                unified_att_ent = self.act(torch.stack([model.att_ent_single,
+                                                        torch.mean(self.att_ent[:, :, index], dim=1)], dim=1))
+                unified_att_rel = self.act(torch.stack([model.att_rel_single,
+                                                        torch.mean(self.att_rel[:, :, index], dim=1)], dim=1))
 
-            unified_att_ent = self.act(torch.stack([model.att_ent_single,
-                                                    torch.sum(self.att_ent[:, :, index], dim=1)], dim=1))
-            unified_att_rel = self.act(torch.stack([model.att_rel_single,
-                                                    torch.sum(self.att_rel[:, :, index], dim=1)], dim=1))
-
-            model.rel.weight.data[relation_names] = (model.rel.weight.data[relation_names] *
-                                                     unified_att_rel[relation_names][:, 0].view(-1, 1) +
-                                                     self.rel.weight.data[relation_names] *
-                                                     unified_att_rel[relation_names][:, 1].view(-1, 1))
-            model.entity.weight.data[entities] = (model.entity.weight.data[entities] *
-                                                  unified_att_ent[entities][:, 0].view(-1, 1) +
-                                                  self.entity.weight.data[entities] *
-                                                  unified_att_ent[entities][:, 1].view(-1, 1))
+                optimizer.model.entity.weight.data[entities] = (model.entity.weight.data[entities] *
+                                                                unified_att_ent[entities][:, 0].unsqueeze(-1) +
+                                                                self.entity.weight.data[entities] *
+                                                                unified_att_ent[entities][:, 1].unsqueeze(-1))
+                optimizer.model.rel.weight.data[relation_names] = (model.rel.weight.data[relation_names] *
+                                                                   unified_att_rel[relation_names][:, 0].unsqueeze(-1) +
+                                                                   self.rel.weight.data[relation_names] *
+                                                                   unified_att_rel[relation_names][:, 1].unsqueeze(-1))
+            else:
+                optimizer.model.entity.weight.data[relation_names] = (model.entity.weight.data[relation_names] * 0.1 +
+                                                                      self.entity.weight.data[relation_names] * 0.9)
+                optimizer.model.rel.weight.data[relation_names] = (model.rel.weight.data[relation_names] * 0.1 +
+                                                                   self.rel.weight.data[relation_names] * 0.9)
 
     def collect_embedding_methods(self):
         for index, embedding_model in enumerate(self.embedding_models):
@@ -290,25 +314,42 @@ class Unified(KGModel):
 
         logging.info(f"Found the following embedding methods:\n{self.embedding_methods}")
 
+    def log_rel_emb_change(self, b_begin, total_loss):
+        step = (b_begin // self.batch_size) * self.batch_size
+        model = self.embedding_models[0]['model']
+        if self.rel_last_epoch is None:
+            self.rel_last_epoch = model.rel.weight.data.clone(memory_format=torch.preserve_format)
+            return
+
+        difference = torch.abs(self.rel_last_epoch - model.rel.weight.data)
+        difference_sum = torch.sum(torch.sum(difference, dim=-1), dim=-1)
+        difference_mean = torch.mean(torch.mean(difference, dim=-1), dim=-1)
+
+        logging.info(f"After {step} examples: Total / Average change {difference_sum:.3f} / {difference_mean:.6f} "
+                     f"with loss {total_loss:.3f}")
+
+        self.rel_last_epoch = model.rel.weight.data.clone(memory_format=torch.preserve_format)
+
 
 def append_entries(queries, query_tensor, embedding_tensor):
     # Extract indices from queries[:, 1]
+
     indices = queries[:, 1]
-
     # Initialize buffer_r0 with correct dimensions
-    embedding_tensor = [[] for _ in range(len(embedding_tensor))]
 
+    embedding_tensor = [[] for _ in range(len(embedding_tensor))]
     # Append entries from buffer_r to buffer_r0 at the correct indices
+
     for i, idx in enumerate(indices):
         embedding_tensor[idx].append(query_tensor[i])
-
     # Determine the maximum number of entries at any index in buffer_r0
+
     max_entries = max(len(entries) for entries in embedding_tensor)
-
     # Initialize buffer_r0_final to store concatenated tensors
-    embedding_tensor_final = []
 
+    embedding_tensor_final = []
     # Concatenate tensors along a new dimension (unsqueeze)
+
     for tensors in embedding_tensor:
         if tensors:
             padded_tensors = torch.stack(tensors, dim=0)
@@ -322,7 +363,7 @@ def append_entries(queries, query_tensor, embedding_tensor):
                                          device=query_tensor.device)
 
         embedding_tensor_final.append(padded_tensors)
-
     # Stack all tensors in buffer_r0_final along dim=0
     embedding_tensor_final = torch.stack(embedding_tensor_final, dim=0)
+
     return embedding_tensor_final

@@ -167,8 +167,16 @@ class KGOptimizer(object):
         total_loss = 0.0
         counter = 0
         while b_begin < examples.shape[0]:
-            input_batch = actual_examples[b_begin:b_begin + self.batch_size].cuda()
+            input_batch = actual_examples[b_begin:b_begin + self.batch_size].to('cuda')
 
+            # --- Single embeddings ---
+
+            # TODO aggregate into unified embedding
+            #  calculate loss on unified embedding
+            #  backpropagation on unified embedding
+            #  update single models
+
+            # --- Unified embedding ---
             # gradient step
             l = self.calculate_loss(input_batch)
             self.optimizer.zero_grad()
@@ -176,7 +184,7 @@ class KGOptimizer(object):
             self.optimizer.step()
 
             if self.model.is_unified_model:
-                self.model.update_single_models(input_batch)
+                self.model.update_single_models(input_batch, l)
 
             b_begin += self.batch_size
             total_loss += l

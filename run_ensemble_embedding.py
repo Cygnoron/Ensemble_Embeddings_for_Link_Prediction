@@ -240,7 +240,7 @@ def run_embedding_manual():
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.03, 0.25)
+    subgraph_size_range = (0.3, 0.35)
     rho = -1
     model_dropout_factor = 10
 
@@ -350,12 +350,12 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 4
-                    args.rank = 2
+                    args.max_epochs = 8
+                    args.rank = 32
                     args.patience = 15
-                    args.valid = 4
+                    args.valid = 2
                     args.dtype = "single"
-                    args.batch_size = 10
+                    args.batch_size = 800
                     args.debug = False
 
                     # args.batch_size = 1000
@@ -373,7 +373,7 @@ def run_embedding_manual():
 
                     args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001, 'DistMult': 0.1}
                     args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05}
-                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adagrad"}
+                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adagrad", 'all': "Adam"}
                     args.neg_sample_size = {'ComplEx': -1, "TransE": 250, 'DistMult': -1}
                     args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True}
                     args.bias = {'ComplEx': "learn", 'TransE': "learn", 'DistMult': "none"}

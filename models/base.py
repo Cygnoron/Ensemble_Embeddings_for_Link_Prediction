@@ -210,7 +210,7 @@ class KGModel(nn.Module, ABC):
         """
 
         rank_deviation = 0
-        ranks = torch.ones(len(queries))
+        ranks = torch.ones(len(queries)).to('cuda')
 
         with torch.no_grad():
             b_begin = 0
@@ -222,13 +222,15 @@ class KGModel(nn.Module, ABC):
 
                 if self.is_unified_model:
                     scores, targets = self.aggregated_score(these_queries)
+                    scores = scores.to('cuda')
+                    targets = targets.to('cuda')
                 else:
                     # if ensemble_args is None:
-                    q = self.get_queries(these_queries)
-                    rhs = self.get_rhs(these_queries, eval_mode=False)
+                    q = self.get_queries(these_queries).to('cuda')
+                    rhs = self.get_rhs(these_queries, eval_mode=False).to('cuda')
 
-                    scores = self.score(q, candidates, eval_mode=True)
-                    targets = self.score(q, rhs, eval_mode=False)
+                    scores = self.score(q, candidates, eval_mode=True).to('cuda')
+                    targets = self.score(q, rhs, eval_mode=False).to('cuda')
                 # else:
                 #     scores = ensemble_args[0][b_begin:b_begin + batch_size]  # aggregated_scores
                 #     targets = ensemble_args[1][b_begin:b_begin + batch_size]  # aggregated_targets
@@ -244,7 +246,7 @@ class KGModel(nn.Module, ABC):
                     scores[i, torch.LongTensor(filter_out)] = -1e6
 
                 # Calculate optimistic rank
-                ranks[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1).cpu()
+                ranks[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1)
 
                 # Calculate rank_deviation
                 buffer = scores.to(self.data_type) == targets.to(self.data_type)
@@ -320,16 +322,16 @@ class KGModel(nn.Module, ABC):
                 # self.att_ent = torch.zeros(self.sizes[0], self.subgraph_amount, dtype=self.data_type).cuda()
                 # self.att_rel = torch.zeros(self.sizes[1], self.subgraph_amount, dtype=self.data_type).cuda()
 
-                self.att_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount, dtype=self.data_type).cuda()
-                self.att_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount, dtype=self.data_type).cuda()
+                self.att_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount, dtype=self.data_type).to('cuda')
+                self.att_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount, dtype=self.data_type).to('cuda')
 
                 self.theta_ent_unified = nn.Embedding(self.sizes[0], self.rank, self.subgraph_amount,
-                                                      dtype=self.data_type)
+                                                      dtype=self.data_type).to('cuda')
                 self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank, self.subgraph_amount,
-                                                      dtype=self.data_type)
+                                                      dtype=self.data_type).to('cuda')
 
-                self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount)
-                self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount)
+                self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount).to('cuda')
+                self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount).to('cuda')
 
         elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
             self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
@@ -361,9 +363,7 @@ class KGModel(nn.Module, ABC):
             # INPUT: theta_ent = [batch, 32]             theta_rel = [batch, 32]
             #        ent =       [batch, 32]             rel =       [batch, 32]
 
-            # if self.model_name in COMPLEX_MODELS:
-            #     rank *= 2
-            theta_ent_temp = self.theta_ent(queries[:, 0]).view((-1, self.rank))
+            theta_ent_temp = self.theta_ent(queries[:, 0])
             ent = self.entity(queries[:, 0])
             self.att_ent_single[queries[:, 0]] = torch.sum(theta_ent_temp * ent, dim=-1)
             self.att_ent_single = act_emb(self.att_ent_single)
