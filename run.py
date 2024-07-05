@@ -159,12 +159,12 @@ def train(args):
         model.train()
 
         train_loss = optimizer.epoch(train_examples)
-        logging.critical("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
+        logging.info("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
 
         # Valid step
         model.eval()
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
-        logging.critical("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
+        logging.info("\t Epoch {} | average valid loss: {:.4f}".format(step, valid_loss))
 
         if (step + 1) % args.valid == 0:
             valid_metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes), epoch=step)
