@@ -1,8 +1,13 @@
+import importlib
 import logging
 
 import torch
+from torch import nn
 
 from ensemble import Constants
+from models import COMPLEX_MODELS
+from models import EUC_MODELS
+from models import HYP_MODELS
 from models import KGModel
 
 UNIFIED_MODELS = ["Unified"]
@@ -18,6 +23,9 @@ class Unified(KGModel):
 
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
+        self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
+        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
         self.theta_ent_unified = self.theta_ent_unified.to('cuda')
         self.theta_rel_unified = self.theta_rel_unified.to('cuda')
         self.cands_ent = self.cands_ent.to('cuda')
@@ -25,19 +33,113 @@ class Unified(KGModel):
         self.active_models = list(range(self.subgraph_amount))
         self.embedding_methods = set()
         self.rel_last_epoch = None
+        self.single_train_loss = {}
+        self.sim = None
         self.collect_embedding_methods()
 
+    def get_class(self, class_name, base_method=False):
+        if class_name in EUC_MODELS:
+            euclidean_method = importlib.import_module("models.euclidean")
+            if base_method:
+                class_name = getattr(euclidean_method, "BaseE")
+            else:
+                class_name = getattr(euclidean_method, class_name)
+        elif class_name in COMPLEX_MODELS:
+            complex_method = importlib.import_module("models.complex")
+            if base_method:
+                class_name = getattr(complex_method, "BaseC")
+            else:
+                class_name = getattr(complex_method, class_name)
+        elif class_name in HYP_MODELS:
+            hyperbolic_method = importlib.import_module("models.hyperbolic")
+            if base_method:
+                class_name = getattr(hyperbolic_method, "BaseH")
+            else:
+                class_name = getattr(hyperbolic_method, class_name)
+        else:
+            raise ValueError(f"The method {class_name} is not in the list of knowledge graph embedding "
+                             f"methods. Please add it to the list in the models module.")
+
+        return class_name
+
     def get_queries(self, queries):
-        print("PASS_QUERIES")
-        pass
+        method = None
+        for index, embedding_method in self.embedding_methods:
+            method = self.get_class(embedding_method)
+        lhs_e, lhs_biases = getattr(method, "get_queries")(self, queries)
+
+        # TODO handle multiple methods in forward
+        #  make lhs_e and lhs_biases lists for multiple methods
+
+        return lhs_e, lhs_biases
 
     def get_rhs(self, queries, eval_mode):
-        # print("GET_RHS")
-        pass
+        method = None
+        for index, embedding_method in self.embedding_methods:
+            method = self.get_class(embedding_method, base_method=True)
+
+        rhs_e, rhs_biases = getattr(method, "get_rhs")(self, queries, eval_mode)
+
+        # TODO handle multiple methods in forward
+        #  make rhs_e and rhs_biases lists for multiple methods
+
+        return rhs_e, rhs_biases
 
     def similarity_score(self, lhs_e, rhs_e, eval_mode):
-        print("SIMILARITY_SCORE")
+        method = None
+        for index, embedding_method in self.embedding_methods:
+            method = self.get_class(embedding_method, base_method=True)
+            self.set_sim(embedding_method)
+        score = getattr(method, "similarity_score")(self, lhs_e, rhs_e, eval_mode)
+
+        # TODO handle multiple methods in forward
+        #  make score list for multiple methods
+
+        return score
+
+    def set_sim(self, embedding_method):
+        if embedding_method not in EUC_MODELS:
+            return
+
+        methods_dist = ["TransE", "DistMult", "MurE", "RotE", "RefE", "AttE"]
+        methods_dot = ["CP"]
+
+        if embedding_method in methods_dot:
+            self.sim = "dot"
+        elif embedding_method in methods_dist:
+            self.sim = "dist"
+        else:
+            raise ValueError(f"There was no sim specified for the given embedding method {embedding_method}.")
+
+    def train_single_models(self, queries, epoch_step):
+
+        denominator = epoch_step
+        if epoch_step == 0:
+            denominator = 1
+
+        for embedding_model in self.embedding_models:
+            if embedding_model['args'].subgraph not in self.single_train_loss.keys():
+                self.single_train_loss[embedding_model['args'].subgraph] = 0
+
+            optimizer = embedding_model['optimizer']
+
+            single_model_loss = optimizer.calculate_loss(queries)
+            optimizer.optimizer.zero_grad()
+            single_model_loss.backward()
+            optimizer.optimizer.step()
+
+            self.single_train_loss[embedding_model['args'].subgraph] = (self.single_train_loss[embedding_model['args'].
+                                                                        subgraph] + single_model_loss) / denominator
+
         pass
+
+    def forward_unified(self, queries, eval_mode=False):
+
+        self.stack_theta_cands(queries)
+        self.calculate_attention(queries)
+
+        predictions, factors = self.single_model_forward(queries)
+        return predictions, factors
 
     def aggregated_score(self, queries):
         aggregated_scores = []
@@ -74,13 +176,6 @@ class Unified(KGModel):
             raise ValueError(f"The aggregation method \"{self.aggregation_method[1]}\" does not exist!")
 
         return aggregated_scores.to('cuda'), aggregated_targets.to('cuda')
-
-    def forward(self, queries, eval_mode=False):
-
-        self.stack_theta_cands(queries)
-        self.calculate_attention(queries)
-        predictions, factors = self.single_model_forward(queries)
-        return predictions, factors
 
     def stack_theta_cands(self, queries):
         logging.debug(f"Stacking")

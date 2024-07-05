@@ -23,7 +23,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
     :param dataset_in: str: Specify the dataset that should be sampled
     :param dataset_out_dir: str: Specify the directory where the sampled datasets are to be stored
-    :param sampling_method: The sampling method, which is used to create Delta from the input dataset
+    :param sampling_method: The sampling class_name, which is used to create Delta from the input dataset
     :param info_directory: Directory for saving info, log and config files
     :param subgraph_amount: Determine how many subgraphs should be created
     :param subgraph_size_range: Determine the range for the percentage of triples that will be kept in the subgraph
@@ -160,7 +160,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
         else:
             logging.error(f"File {os.path.join(dataset_out_dir, f'sub_{subgraph_num:03d}', 'train')} was not found!")
     except IndexError:
-        logging.error(f"The selected sampling method {sampling_method[1]} is not yet implemented or doesn't exist!")
+        logging.error(f"The selected sampling class_name {sampling_method[1]} is not yet implemented or doesn't exist!")
         traceback.print_exc()
 
     # stop timer for whole subgraph creation
@@ -185,7 +185,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
     :param relation_name_set: Dictionary containing all relation name ids with corresponding triple indices
     :param entity_ids_unused: List containing all entity ids, which are not yet present in any subgraph
     :param relation_name_ids_unused: List containing all relation name ids, which are not yet present in any subgraph
-    :param sampling_method: The sampling method, which is used to create Delta from the input dataset
+    :param sampling_method: The sampling class_name, which is used to create Delta from the input dataset
     :param relation_name_amount: How many different relation names should be present in the subgraph, only applied in RANDOM_FOREST_SAMPLING
     :param entities_per_step: The amount triples that will be sampled each step.
     :return: Array of indices, which represent the triples, that are to be deleted from the input dataset
@@ -350,8 +350,8 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
         logging.critical(f"{Constants.DEBUG_SAMPLING[1]} wasn't implemented yet!")
         return delta, entity_ids_unused, relation_name_ids_unused, subgraph_relation_names
 
-    # If no legal sampling method was given, return -1
-    logging.error("Given argument for sampling method is not supported")
+    # If no legal sampling class_name was given, return -1
+    logging.error("Given argument for sampling class_name is not supported")
     return -1
 
 
@@ -368,7 +368,7 @@ def sampling(entity_set, relation_name_set, entity_ids_unused, relation_name_ids
         relation_name_ids_unused (set): Set containing IDs of unused relation names.
         dataset (list): Original dataset containing triples.
         delta (set): Set representing the sampled triples.
-        sampling_method (tuple): Tuple representing the sampling method and its description.
+        sampling_method (tuple): Tuple representing the sampling class_name and its description.
         enforce_relation_names (bool): Flag indicating whether to enforce missing relation names.
         enforce_entities (bool): Flag indicating whether to enforce missing entities.
         progress_bar (tqdm.tqdm): Progress bar for sampling progress visualization.

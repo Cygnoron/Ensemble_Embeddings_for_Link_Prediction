@@ -146,7 +146,7 @@ class KGOptimizer(object):
         loss /= counter
         return loss
 
-    def epoch(self, examples):
+    def epoch(self, examples, epoch=""):
         """Runs one epoch of training KG embedding model.
 
         Args:
@@ -155,10 +155,13 @@ class KGOptimizer(object):
         Returns:
             loss: torch.Tensor with loss averaged over all training examples
         """
+        if epoch is not "":
+            epoch = f"Epoch {epoch} "
+
         bar = None
         if not self.no_progress_bar:
             bar = tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose)
-            bar.set_description(f'train loss')
+            bar.set_description(f'{epoch}train loss')
 
         actual_examples = examples[torch.randperm(examples.shape[0]), :]
         # actual_examples = examples
@@ -170,11 +173,10 @@ class KGOptimizer(object):
             input_batch = actual_examples[b_begin:b_begin + self.batch_size].to('cuda')
 
             # --- Single embeddings ---
+            if self.model.is_unified_model:
+                self.model.train_single_models(input_batch, counter)
 
-            # TODO aggregate into unified embedding
-            #  calculate loss on unified embedding
-            #  backpropagation on unified embedding
-            #  update single models
+            # TODO Fix optimizers
 
             # --- Unified embedding ---
             # gradient step
@@ -189,7 +191,7 @@ class KGOptimizer(object):
             b_begin += self.batch_size
             total_loss += l
             counter += 1
-            if not self.no_progress_bar:
+            if not self.no_progress_bar and self.model.is_unified_model:
                 bar.update(input_batch.shape[0])
                 bar.set_postfix(loss=f'{l.item():.4f}')
 

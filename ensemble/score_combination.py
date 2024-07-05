@@ -13,11 +13,11 @@ from utils.train import avg_both, format_metrics
 def evaluate_ensemble(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, mode="test",
                       metrics_file_path="", batch_size=20, epoch=None, attention=None):
     if mode == "test":
-        logging.info(f"-/\tTesting the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
+        logging.info(f"-/\tTesting the ensemble with the score aggregation class_name \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["test_examples"]
         mode_str = "Test"
     elif mode == "valid":
-        logging.info(f"-/\tValidating the ensemble with the score aggregation method \"{aggregation_method[1]}\".\t\\-")
+        logging.info(f"-/\tValidating the ensemble with the score aggregation class_name \"{aggregation_method[1]}\".\t\\-")
         examples = embedding_models[0]["valid_examples"]
         mode_str = "Validat"
     else:
@@ -240,7 +240,7 @@ def calculate_scores(examples, model, dtype, candidate_answers, b_begin, batch_s
 def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model_targets_lhs, model_targets_rhs,
                    attention, examples, active_models):
     """
-    Combine scores from multiple embedding_models using the specified aggregation method.
+    Combine scores from multiple embedding_models using the specified aggregation class_name.
 
     Args:
         aggregation_method (tuple): Method used to aggregate scores (e.g., max, min, average).
@@ -258,7 +258,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
     aggregated_scores_lhs, aggregated_scores_rhs = None, None
     aggregated_targets_lhs, aggregated_targets_rhs = None, None
 
-    # Aggregate scores based on the specified method
+    # Aggregate scores based on the specified class_name
     if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
         # select maximum score between all embedding_models
         try:
@@ -343,7 +343,7 @@ def combine_scores(aggregation_method, model_scores_lhs, model_scores_rhs, model
             return
 
     else:
-        logging.error(f"Selected aggregation method '{aggregation_method}' does not exist!")
+        logging.error(f"Selected aggregation class_name '{aggregation_method}' does not exist!")
 
     return aggregated_scores_lhs, aggregated_scores_rhs, aggregated_targets_lhs, aggregated_targets_rhs
 
@@ -506,14 +506,14 @@ def calculate_scores_depreciated(embedding_models, examples, batch_size=500, eva
 def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MAX_SCORE_AGGREGATION, batch_size=500,
                                eval_mode="test"):
     """
-        Combine scores from multiple embedding_models using the specified aggregation method.
+        Combine scores from multiple embedding_models using the specified aggregation class_name.
 
         Args:
             embedding_models (list): A list of dictionaries, each containing an embedding model
                 and its corresponding arguments. Each dictionary should have the following keys:
                     - 'scores_lhs': Tensor containing scores for lhs direction.
                     - 'scores_rhs': Tensor containing scores for rhs direction.
-            aggregation_method (tuple, optional): A tuple containing the aggregation method and its name.
+            aggregation_method (tuple, optional): A tuple containing the aggregation class_name and its name.
                 Defaults to Constants.MAX_SCORE_AGGREGATION.
             batch_size (int, optional): Batch size for processing queries. Defaults to 500.
 
@@ -575,7 +575,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
                     model_scores += [embedding_model['scores_rhs'][b_begin:b_begin + batch_size]]
                     model_targets += [embedding_model['targets_rhs'][b_begin:b_begin + batch_size]]
 
-            # Aggregate scores based on the specified method
+            # Aggregate scores based on the specified class_name
             if aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
                 # select maximum score between all embedding_models
                 try:
@@ -587,13 +587,13 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
                 except Exception as e:
                     for index, score in enumerate(model_scores):
-                        logging.error(f"Aggregation method: {aggregation_method[1]}\tMode: {mode}\t"
+                        logging.error(f"Aggregation class_name: {aggregation_method[1]}\tMode: {mode}\t"
                                       f"Size of score set {index}: {score.size()}\t"
                                       f"Size of target set {index}: {model_targets[index].size()}")
                     logging.error(traceback.format_exception(e))
                     return
 
-            # Aggregate scores based on the specified method
+            # Aggregate scores based on the specified class_name
             elif aggregation_method[0] == Constants.MIN_SCORE_AGGREGATION[0]:
                 # select maximum score between all embedding_models
                 try:
@@ -605,7 +605,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
                 except Exception as e:
                     for index, score in enumerate(model_scores):
-                        logging.error(f"Aggregation method: {aggregation_method[1]}\tMode: {mode}\t"
+                        logging.error(f"Aggregation class_name: {aggregation_method[1]}\tMode: {mode}\t"
                                       f"Size of score set {index}: {score.size()}\t"
                                       f"Size of target set {index}: {model_targets[index].size()}")
                     logging.error(traceback.format_exception(e))
@@ -622,7 +622,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
                 except Exception as e:
                     for index, score in enumerate(model_scores):
-                        logging.error(f"Aggregation method: {aggregation_method[1]}\tMode: {mode}\t"
+                        logging.error(f"Aggregation class_name: {aggregation_method[1]}\tMode: {mode}\t"
                                       f"Size of score set {index}: {score.size()}\t"
                                       f"Size of target set {index}: {model_targets[index].size()}")
                     logging.error(traceback.format_exception(e))
@@ -630,11 +630,11 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
 
             elif aggregation_method[0] == Constants.ATTENTION_SCORE_AGGREGATION[0]:
                 # calculate attention between all embedding_models and average scores based on this attention
-                logging.error(f"Aggregation method {aggregation_method[1]} isn't implemented yet!")
+                logging.error(f"Aggregation class_name {aggregation_method[1]} isn't implemented yet!")
                 pass
 
             else:
-                logging.error(f"Selected aggregation method '{aggregation_method}' does not exist!")
+                logging.error(f"Selected aggregation class_name '{aggregation_method}' does not exist!")
 
             b_begin += batch_size
 
@@ -644,7 +644,7 @@ def combine_scores_depreciated(embedding_models, aggregation_method=Constants.MA
         progress_bar_combination.refresh()
         progress_bar_combination.close()
 
-    logging.info(f"Successfully aggregated all scores and targets with aggregation method {aggregation_method[1]}.")
+    logging.info(f"Successfully aggregated all scores and targets with aggregation class_name {aggregation_method[1]}.")
 
     return aggregated_scores, aggregated_targets
 

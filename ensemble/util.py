@@ -194,7 +194,7 @@ def assign_model_to_subgraph(kge_models, args):
         for subgraph in kge_models[embedding_model]:
             if subgraph == "rest":
                 continue
-            # Set specific embedding method for the subgraph, if specified
+            # Set specific embedding class_name for the subgraph, if specified
             subgraph_embedding_mapping[subgraph] = embedding_model
     # List containing only specific mappings for subgraphs
     mapped_subgraphs = list(subgraph_embedding_mapping.keys())
@@ -211,12 +211,12 @@ def assign_model_to_subgraph(kge_models, args):
         subgraph_num = int(subgraph.split(sep='_')[1])  # subgraph = sub_XXX
         args.subgraph = subgraph
 
-        # Case: select specified embedding method
+        # Case: select specified embedding class_name
         if subgraph_num in mapped_subgraphs:
             args.model = subgraph_embedding_mapping[subgraph_num]
             logging.info(f"Found mapping, using embedding method {args.model} for subgraph {subgraph}")
 
-        # Case: select random embedding method
+        # Case: select random embedding class_name
         else:
             args.model = random.choice(kge_models_adjusted)
             subgraph_embedding_mapping[subgraph_num] = args.model

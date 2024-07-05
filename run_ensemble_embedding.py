@@ -42,10 +42,10 @@ parser.add_argument(
 parser.add_argument(
     '--model', type=str, default="{TransE:[\'all\']}",
     help='JSON string of the mapping from embedding methods to subgraphs.\n'
-         '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
-         '- \'all\' in a mapping sets all subgraphs to this method. This has the same effect as --model <MODEL_NAME>\n'
-         '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this method. '
-         'If nothing was specified in the mapping, all subgraphs can be embedded by the given embedding method.'
+         '- <subgraph number> in a mapping sets the specified subgraphs to this class_name\n'
+         '- \'all\' in a mapping sets all subgraphs to this class_name. This has the same effect as --model <MODEL_NAME>\n'
+         '- \'rest\' in a mapping allows all unmapped subgraphs to be embedded by this class_name. '
+         'If nothing was specified in the mapping, all subgraphs can be embedded by the given embedding class_name.'
 
 )
 parser.add_argument(
@@ -101,7 +101,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--sampling_method", default="Entity", choices=["Entity", "Feature"],
-    help="The sampling method, that should be used"
+    help="The sampling class_name, that should be used"
 )
 parser.add_argument(
     "--rho", default=1, type=float,
@@ -116,7 +116,7 @@ parser.add_argument(
 #   - Model parameters -
 parser.add_argument(
     "--aggregation_method", default="average", choices=["max", "average", "attention"],
-    help="The method by which all scores from the ensemble are aggregated."
+    help="The class_name by which all scores from the ensemble are aggregated."
 )
 parser.add_argument(
     "--model_dropout_factor", default=10, type=int,
@@ -126,7 +126,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--theta_method", default="regular", choices=["no", "regular", "reversed", "relation", "multiplied"],
-    help="The method by which the context vectors (cv) are used in order to calculate attention values for the unified "
+    help="The class_name by which the context vectors (cv) are used in order to calculate attention values for the unified "
          "embedding:\n"
          "- \'no\' deactivates the calculation of an unified embedding\n"
          "- \'regular\' cv for entities is only influenced by entity embeddings, "
@@ -325,9 +325,26 @@ def run_embedding_manual():
 
         # --- setup for model training ---
 
-        allowed_kge_models = [{Constants.DIST_MULT: [0, 'all'],
-                               Constants.TRANS_E: [1, 'rest'],
-                               Constants.ATT_E: [2, 'rest']}]
+        # current working methodss:
+        # TransE, DistMult, CP, MurE, RotE, RefE
+
+        # TODO fix methods
+        #  AttE -> missing methods and attributes
+        #  ComplEx, RotatE -> optimizer
+        #  AttH, RotH, RefH -> wrong dimensions
+
+        allowed_kge_models = [{Constants.ATT_E: [0, 'all'],
+                               Constants.DIST_MULT: [1, 'rest'],
+                               Constants.COMPL_EX: [2, 'rest']}]
+
+        # allowed_kge_models = [
+        #     {Constants.TRANS_E: []},
+        #     {Constants.DIST_MULT: []},
+        #     {Constants.COMPL_EX: []},
+        #     {Constants.ROTAT_E: []},
+        #     {Constants.ATT_E: []},
+        #     {Constants.ATT_H: []}
+        # ]
 
         # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
         #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
@@ -356,7 +373,7 @@ def run_embedding_manual():
                     args.valid = 2
                     args.dtype = "single"
                     args.batch_size = 800
-                    args.debug = False
+                    args.debug = True
 
                     # args.batch_size = 1000
                     # args.learning_rate = 0.1
@@ -371,10 +388,12 @@ def run_embedding_manual():
                     # args.multi_c = True
                     # args.double_neg = True
 
+                    # TODO Fix optimizers
+
                     args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001, 'DistMult': 0.1}
                     args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05}
-                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adagrad", 'all': "Adam"}
-                    args.neg_sample_size = {'ComplEx': -1, "TransE": 250, 'DistMult': -1}
+                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adam", 'all': "Adam"}
+                    args.neg_sample_size = {'ComplEx': -1, "TransE": -1, 'DistMult': -1}
                     args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True}
                     args.bias = {'ComplEx': "learn", 'TransE': "learn", 'DistMult': "none"}
                     args.multi_c = {'AttH': True, 'rest': False}

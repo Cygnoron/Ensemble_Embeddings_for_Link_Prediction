@@ -48,7 +48,6 @@ class KGModel(nn.Module, ABC):
         self.bh.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
         self.bt = nn.Embedding(sizes[0], 1)
         self.bt.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
-        # logging.debug(self.bt.weight.data.dtype)
 
         # check if model is unified model
         self.embedding_models = embedding_models
@@ -60,11 +59,8 @@ class KGModel(nn.Module, ABC):
             self.cands_ent = None
             self.cands_rel = None
 
-            # query based
             self.att = None
-            # entity based
             self.att_ent = None
-            # relation name based
             self.att_rel = None
 
             self.theta_ent_unified = None
@@ -72,13 +68,9 @@ class KGModel(nn.Module, ABC):
 
         else:
             self.is_unified_model = False
-            # entity based
             self.att_ent_single = None
-            # relation name based
             self.att_rel_single = None
-            # contained entities
             self.entities = entities
-            # contained relation names
             self.relation_names = relation_names
 
         # ensemble attention
@@ -322,16 +314,20 @@ class KGModel(nn.Module, ABC):
                 # self.att_ent = torch.zeros(self.sizes[0], self.subgraph_amount, dtype=self.data_type).cuda()
                 # self.att_rel = torch.zeros(self.sizes[1], self.subgraph_amount, dtype=self.data_type).cuda()
 
-                self.att_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount, dtype=self.data_type).to('cuda')
-                self.att_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount, dtype=self.data_type).to('cuda')
+                self.att_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount, dtype=self.data_type).to(
+                    'cuda')
+                self.att_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount, dtype=self.data_type).to(
+                    'cuda')
 
                 self.theta_ent_unified = nn.Embedding(self.sizes[0], self.rank, self.subgraph_amount,
                                                       dtype=self.data_type).to('cuda')
                 self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank, self.subgraph_amount,
                                                       dtype=self.data_type).to('cuda')
 
-                self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount).to('cuda')
-                self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount).to('cuda')
+                self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount).to(
+                    'cuda')
+                self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount).to(
+                    'cuda')
 
         elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
             self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)

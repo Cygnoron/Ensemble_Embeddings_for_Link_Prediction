@@ -97,7 +97,7 @@ def train(info_directory, args):
 
         # Train step
         unified_model.train()
-        train_loss = optimizer.epoch(train_examples)
+        train_loss = optimizer.epoch(train_examples, epoch=epoch)
         logging.info(f"Training Epoch {epoch} | average train loss: {train_loss:.4f}")
 
         # debugging messages
