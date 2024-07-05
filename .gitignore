@@ -11,3 +11,7 @@ venv/
 /to_discuss/outline_training_testing_process.png
 **.pyc
 **/wandb/**
+
+**/experiments/**
+**/to_discuss/**
+**/logs/**
