@@ -113,9 +113,7 @@ class Unified(KGModel):
 
     def train_single_models(self, queries, epoch_step):
 
-        denominator = epoch_step
-        if epoch_step == 0:
-            denominator = 1
+        denominator = epoch_step + 1
 
         for embedding_model in self.embedding_models:
             if embedding_model['args'].subgraph not in self.single_train_loss.keys():
@@ -128,9 +126,10 @@ class Unified(KGModel):
             single_model_loss.backward()
             optimizer.optimizer.step()
 
-            self.single_train_loss[embedding_model['args'].subgraph] = (self.single_train_loss[embedding_model['args'].
-                                                                        subgraph] + single_model_loss) / denominator
-
+            self.single_train_loss[embedding_model['args'].subgraph] = (
+                    (self.single_train_loss[embedding_model['args'].subgraph] * (denominator - 1) + single_model_loss)
+                    / denominator)
+            pass
         pass
 
     def forward_unified(self, queries, eval_mode=False):
@@ -177,66 +176,18 @@ class Unified(KGModel):
 
         return aggregated_scores.to('cuda'), aggregated_targets.to('cuda')
 
-    def stack_theta_cands(self, queries):
-        logging.debug(f"Stacking")
-        from models.complex import COMPLEX_MODELS
-        from models.hyperbolic import HYP_MODELS
-        cands_ent_temp = []
-        cands_rel_temp = []
-        theta_ent_temp = []
-        theta_rel_temp = []
-
-        for embedding_model in self.embedding_models:
-            model = embedding_model["model"]
-            args = embedding_model["args"]
-            model_name = args.model_name
-
-            if args.model_dropout:
-                logging.debug(f"Ignoring subgraph {args.subgraph_num} in calculation due to model dropout.")
-                if args.subgraph_num in self.active_models:
-                    self.active_models.remove(args.subgraph_num)
-                continue
-
-            embedding_ent = model.entity.weight.data.cuda()
-            embedding_rel = model.rel.weight.data.cuda()
-            if model_name in COMPLEX_MODELS:
-                embedding_ent = model.embeddings[0].weight.data
-                embedding_rel = model.embeddings[1].weight.data
-            elif model_name in HYP_MODELS:
-                # TODO check hyperbolic case
-                embedding_rel = torch.chunk(embedding_rel, 2, dim=1)
-
-            # cands_rel_temp.append(append_entries(queries, embedding_rel[queries[:, 1]],
-            #                                      self.cands_rel.clone(memory_format=torch.preserve_format)))
-            # cands_ent_temp.append(append_entries(queries, embedding_rel[queries[:, 0]],
-            #                                      self.cands_ent.clone(memory_format=torch.preserve_format)))
-
-            # buffer_e0 = torch.zeros(self.sizes[0], self.rank).unsqueeze(-1)
-            # buffer_e = model.theta_ent.weight.data[queries[:, 0]].unsqueeze(-1)
-            # theta_ent_temp.append(buffer_e)
-            theta_ent_temp.append(model.theta_ent.weight.data[queries[:, 0]])
-            cands_ent_temp.append(embedding_ent[queries[:, 0]])
-            theta_rel_temp.append(model.theta_rel.weight.data[queries[:, 1]])
-            cands_rel_temp.append(embedding_rel[queries[:, 1]])
-
-        # cands_ent: [40943, 32, N]     cands_rel: [22, 32, N]
-        self.cands_ent[queries[:, 0]] = torch.stack(cands_ent_temp, dim=-1)
-        self.cands_rel[queries[:, 1]] = torch.stack(cands_rel_temp, dim=-1)
-
-        # theta_ent_unified: [40943, 32, N]     theta_rel_unified: [22, 32, N]
-        self.theta_ent_unified.weight.data[queries[:, 0]] = torch.stack(theta_ent_temp, dim=-1).to('cuda')
-        self.theta_rel_unified.weight.data[queries[:, 1]] = torch.stack(theta_rel_temp, dim=-1).to('cuda')
-
     def calculate_attention(self, queries):
         logging.debug(f"Attention")
         # TODO implement attention
         #  multiple functions for different attentions?
 
+        self.stack_theta_cands(queries)
+
         if self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
             # EXAMPLE WN18RR dimensions (40943 entities, 11*2 relation names, N subgraphs)
-            # GOAL: att_weights_ent.size() = [batch, 32, N]     att_weights_ent.size() = [batch, 32, N]
-            # INPUT: theta_ent_unified = [batch, 32, N]         theta_rel_unified = [batch, 32, N]
-            #        cands_ent = [batch, 32, N]                 cands_rel = [batch, 32, N]
+            # GOAL: att_weights_ent.size() = [batch, rank, N]     att_weights_ent.size() = [batch, rank, N]
+            # INPUT: theta_ent_unified = [batch, rank, N]         theta_rel_unified = [batch, rank, N]
+            #        cands_ent = [batch, rank, N]                 cands_rel = [batch, rank, N]
 
             # self.att_ent[queries[:, 0]] = torch.sum(self.theta_ent_unified * self.cands_ent, dim=1)
             # self.att_rel[queries[:, 1]] = torch.sum(self.theta_rel_unified * self.cands_rel, dim=1)
@@ -286,10 +237,56 @@ class Unified(KGModel):
         self.att_ent = self.act(self.att_ent)
         self.att_rel = self.act(self.att_rel)
 
+    def stack_theta_cands(self, queries):
+        logging.debug(f"Stacking")
+        cands_ent_temp = []
+        cands_rel_temp = []
+        theta_ent_temp = []
+        theta_rel_temp = []
+
+        for embedding_model in self.embedding_models:
+            model = embedding_model["model"]
+            args = embedding_model["args"]
+            model_name = args.model_name
+
+            if args.model_dropout:
+                logging.debug(f"Ignoring subgraph {args.subgraph_num} in calculation due to model dropout.")
+                if args.subgraph_num in self.active_models:
+                    self.active_models.remove(args.subgraph_num)
+                continue
+
+            embedding_ent = model.entity.weight.data
+            embedding_rel = model.rel.weight.data
+            if model_name in COMPLEX_MODELS:
+                embedding_ent = model.embeddings[0].weight.data
+                embedding_rel = model.embeddings[1].weight.data
+            elif model_name in HYP_MODELS:
+                # TODO check hyperbolic case
+                embedding_rel = torch.chunk(embedding_rel, 2, dim=1)
+
+            # cands_rel_temp.append(append_entries(queries, embedding_rel[queries[:, 1]],
+            #                                      self.cands_rel.clone(memory_format=torch.preserve_format)))
+            # cands_ent_temp.append(append_entries(queries, embedding_rel[queries[:, 0]],
+            #                                      self.cands_ent.clone(memory_format=torch.preserve_format)))
+
+            # buffer_e0 = torch.zeros(self.sizes[0], self.rank).unsqueeze(-1)
+            # buffer_e = model.theta_ent.weight.data[queries[:, 0]].unsqueeze(-1)
+            # theta_ent_temp.append(buffer_e)
+            theta_ent_temp.append(model.theta_ent.weight.data[queries[:, 0]])
+            cands_ent_temp.append(embedding_ent[queries[:, 0]])
+            theta_rel_temp.append(model.theta_rel.weight.data[queries[:, 1]])
+            cands_rel_temp.append(embedding_rel[queries[:, 1]])
+
+        # cands_ent: [40943, 32, N]     cands_rel: [22, 32, N]
+        self.cands_ent[queries[:, 0]] = torch.stack(cands_ent_temp, dim=-1)
+        self.cands_rel[queries[:, 1]] = torch.stack(cands_rel_temp, dim=-1)
+
+        # theta_ent_unified: [40943, 32, N]     theta_rel_unified: [22, 32, N]
+        self.theta_ent_unified.weight.data[queries[:, 0]] = torch.stack(theta_ent_temp, dim=-1).to('cuda')
+        self.theta_rel_unified.weight.data[queries[:, 1]] = torch.stack(theta_rel_temp, dim=-1).to('cuda')
+
     def single_model_forward(self, queries):
-        from models import COMPLEX_MODELS
         logging.debug("Forward pass")
-        # TODO implement forward pass
         predictions = []
         factors_h = []
         factors_r = []

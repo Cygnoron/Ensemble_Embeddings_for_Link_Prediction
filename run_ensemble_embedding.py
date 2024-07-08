@@ -240,7 +240,7 @@ def run_embedding_manual():
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.3, 0.35)
+    subgraph_size_range = (0.3, 0.7)
     rho = -1
     model_dropout_factor = 10
 
@@ -333,8 +333,8 @@ def run_embedding_manual():
         #  ComplEx, RotatE -> optimizer
         #  AttH, RotH, RefH -> wrong dimensions
 
-        allowed_kge_models = [{Constants.ATT_E: [0, 'all'],
-                               Constants.DIST_MULT: [1, 'rest'],
+        allowed_kge_models = [{Constants.ATT_E: [0, 'rest'],
+                               Constants.DIST_MULT: [1, 'all'],
                                Constants.COMPL_EX: [2, 'rest']}]
 
         # allowed_kge_models = [
@@ -367,13 +367,13 @@ def run_embedding_manual():
                 if not args.no_training:
                     args.kge_models = models
 
-                    args.max_epochs = 8
+                    args.max_epochs = 15
                     args.rank = 32
                     args.patience = 15
-                    args.valid = 2
+                    args.valid = 5
                     args.dtype = "single"
-                    args.batch_size = 800
-                    args.debug = True
+                    args.batch_size = 450
+                    args.debug = False
 
                     # args.batch_size = 1000
                     # args.learning_rate = 0.1

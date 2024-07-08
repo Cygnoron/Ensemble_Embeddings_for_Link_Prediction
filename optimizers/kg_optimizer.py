@@ -174,6 +174,7 @@ class KGOptimizer(object):
 
             # --- Single embeddings ---
             if self.model.is_unified_model:
+                # self.model.calculate_attention(input_batch)
                 self.model.train_single_models(input_batch, counter)
 
             # TODO Fix optimizers
