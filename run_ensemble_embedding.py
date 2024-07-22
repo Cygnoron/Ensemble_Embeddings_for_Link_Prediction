@@ -5,7 +5,7 @@ import time
 import traceback
 
 import wandb
-from ensemble import Constants, util_files, util, run, subsampling, run_unified_model
+from ensemble import Constants, util_files, util, subsampling, run_unified_model
 from run import train
 
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
@@ -183,6 +183,7 @@ def run_embedding(args):
     args.sampling_method = util.handle_methods(args.sampling_method, "sampling")
     args.aggregation_method = util.handle_methods(args.aggregation_method, "aggregation")
     args.theta_calculation = util.handle_methods(args.theta_method, "theta")
+    args.subgraph_size_range = util.handle_methods(args.subgraph_size_range, "size_range")
 
     dataset_out = ""
     if args.sampling_method == Constants.FEATURE_SAMPLING:
@@ -218,7 +219,8 @@ def run_embedding(args):
 
             wandb.init(project=Constants.PROJECT_NAME, config=args)
 
-            run.train(info_directory, args)
+            # run.train(info_directory, args)
+            run_unified_model.train(info_directory, args)
 
     except Exception:
         logging.error(traceback.format_exc())
@@ -240,188 +242,163 @@ def run_embedding_manual():
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.3, 0.7)
-    rho = -1
+    subgraph_size_range = (0.63, 0.7)
+    rho = 2
     model_dropout_factor = 10
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=True,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
-                              sampling_method=Constants.ENTITY_SAMPLING,
-                              # sampling_method=Constants.FEATURE_SAMPLING,
+                              # sampling_method=Constants.ENTITY_SAMPLING,
+                              sampling_method=Constants.FEATURE_SAMPLING,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
 
-    subgraph_size_range_list = [subgraph_size_range]
-    # for i in range(25, 70, 5):
-    #     subgraph_size_range_list.append((i / 100, 0.7))
-
     Constants.get_wandb(args.wandb_project)
 
-    for subgraph_size_range in subgraph_size_range_list:
-        time_process_start = time.time()
+    time_process_start = time.time()
 
-        dataset_out = ""
-        if args.sampling_method == Constants.FEATURE_SAMPLING:
-            dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}_rho{args.rho}"
-                           f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
-        elif args.sampling_method == Constants.ENTITY_SAMPLING:
-            dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}"
-                           f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
-        dataset_out_dir = os.path.join("data", dataset_out)
+    dataset_out = ""
+    if args.sampling_method == Constants.FEATURE_SAMPLING:
+        dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}_rho{args.rho}"
+                       f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
+    elif args.sampling_method == Constants.ENTITY_SAMPLING:
+        dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}"
+                       f"_min{subgraph_size_range[0]}_max{subgraph_size_range[1]}")
+    dataset_out_dir = os.path.join("data", dataset_out)
 
-        args.dataset = dataset_out
-        args.dataset_dir = dataset_out_dir
+    args.dataset = dataset_out
+    args.dataset_dir = dataset_out_dir
 
-        info_directory = os.path.abspath(f"{dataset_out_dir}")
-        util_files.check_directory(info_directory)
-        info_directory = util_files.get_info_directory_path(dataset_out_dir, args)
+    info_directory = os.path.abspath(f"{dataset_out_dir}")
+    util_files.check_directory(info_directory)
+    info_directory = util_files.get_info_directory_path(dataset_out_dir, args)
 
-        args.info_directory = info_directory
+    args.info_directory = info_directory
 
-        util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
-                           logging_level="info")
+    util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
+                       logging_level="info")
 
-        # --- if a new debugging dataset was created ---
+    # --- if a new debugging dataset was created ---
+    # for split in ["train", "test", "valid"]:
+    #     util_files.csv_to_file(os.path.join("ensemble", "Random_Triples.csv"), os.path.join("data", "Debug", split),
+    #                            only_unique=True)
 
-        # util_files.csv_to_file("D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-        #                        "ensemble\\Random_Triples.csv",
-        #                        "D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-        #                        "data\\Debug\\train", only_unique=True)
-        #
-        # util_files.pickle_to_csv(f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-        #                          f"data\\{dataset_in}\\train.pickle",
-        #                          f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-        #                          f"data\\{dataset_in}\\train_readable.csv", ';')
+    # process_specific_dataset("Debug", "data")
 
-        # --- create files for insights in dataset ---
+    # util_files.pickle_to_csv(f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+    #                          f"data\\{dataset_in}\\train.pickle",
+    #                          f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
+    #                          f"data\\{dataset_in}\\train_readable.csv", ';')
 
-        # util.create_entity_and_relation_name_set_file(f"data\\{dataset_in}")
+    # --- create files for insights in dataset ---
 
-        # for dataset in os.scandir("data"):
-        #     print(dataset.name)
-        #     util.create_entity_and_relation_name_set_file(dataset.name)
+    # util_files.create_entity_and_relation_name_set_file(os.path.join("data",dataset_in))
 
-        # --- sampling process ---
-        if not args.no_sampling:
-            subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
-                                     subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
-                                     rho=args.rho, no_progress_bar=args.no_progress_bar)
+    # for dataset in os.scandir("data"):
+    #     print(dataset.name)
+    #     util.create_entity_and_relation_name_set_file(dataset.name)
 
-        # sampling_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120,
-        #                   150, 200, 300, 400, 500]
-        # for i in sampling_sizes:
-        #     subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, sampling_method,
-        #                              subgraph_amount=subgraph_amount, subgraph_size_range=subgraph_size_range,
-        #                              rho=rho,
-        #                              entities_per_step=i)
+    # --- sampling process ---
+    if not args.no_sampling:
+        subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
+                                 subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
+                                 rho=args.rho, no_progress_bar=args.no_progress_bar)
 
-        # --- create .graphml files for dataset visualization ---
+    # --- create .graphml files for dataset visualization ---
 
-        # create .graphml files for visualizing the subgraphs
-        # plotting.create_graphml(info_directory, os.path.abspath(dataset_out_dir))
+    # create .graphml files for visualizing the subgraphs
+    # plotting.create_graphml(info_directory, os.path.abspath(dataset_out_dir))
 
-        # --- setup for model training ---
+    # --- setup for model training ---
 
-        # current working methodss:
-        # TransE, DistMult, CP, MurE, RotE, RefE
+    allowed_kge_models = [{Constants.REF_E: [0, 1],
+                           Constants.COMPL_EX: [2],
+                           Constants.DIST_MULT: [3, 'all']}]
 
-        # TODO fix methods
-        #  AttE -> missing methods and attributes
-        #  ComplEx, RotatE -> optimizer
-        #  AttH, RotH, RefH -> wrong dimensions
+    # allowed_kge_models = [
+    #     {Constants.TRANS_E: []},
+    #     {Constants.DIST_MULT: []},
+    #     {Constants.COMPL_EX: []},
+    #     {Constants.ROTAT_E: []},
+    #     {Constants.ATT_E: []},
+    #     {Constants.ATT_H: []}
+    # ]
 
-        allowed_kge_models = [{Constants.ATT_E: [0, 'rest'],
-                               Constants.DIST_MULT: [1, 'all'],
-                               Constants.COMPL_EX: [2, 'rest']}]
+    # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
+    #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
 
-        # allowed_kge_models = [
-        #     {Constants.TRANS_E: []},
-        #     {Constants.DIST_MULT: []},
-        #     {Constants.COMPL_EX: []},
-        #     {Constants.ROTAT_E: []},
-        #     {Constants.ATT_E: []},
-        #     {Constants.ATT_H: []}
-        # ]
+    # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
+    #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
 
-        # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
-        #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
+    # --- training process ---
 
-        # --- training process ---
+    error = False
+    for models in allowed_kge_models:
+        try:
+            if not args.no_training:
+                args.kge_models = models
 
-        # for i in range(1):
-        #     run.own_train(info_directory, dataset=dataset_out, dataset_directory=dataset_out_dir,
-        #                     learning_rate=0.01, kge_models=allowed_kge_models, max_epochs=3, batch_size=100,
-        #                     rank=32, debug=False)
+                args.max_epochs = 500
+                args.rank = 32
+                args.patience = 15
+                args.valid = 5
+                args.dtype = "single"
+                args.batch_size = 1000
+                args.debug = True
 
-        # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
-        #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
+                # args.batch_size = 1000
+                # args.learning_rate = 0.1
+                # args.reg = 0.05
+                # args.regularizer = "N3"
+                # args.optimizer = "Adagrad"
+                # args.neg_sample_size = -1
+                # args.dropout = 0
+                # args.init_size = 0.001
+                # args.gamma = 0
+                # args.bias = "learn"
+                # args.multi_c = True
+                # args.double_neg = True
 
-        # allowed_kge_models = [allowed_kge_models[0]]
+                # TODO Fix optimizers
 
-        error = False
-        for models in allowed_kge_models:
-            try:
-                if not args.no_training:
-                    args.kge_models = models
+                args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1, 'ComplEx': 0.1, 'RotatE': 0.001, 'AttE': 0.001,
+                                      'AttH': 0.001}
+                args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05, 'rest': 0.0}
+                args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad", 'ComplEx': "Adagrad", 'RotatE': "Adam",
+                                  'AttE': "Adam", 'AttH': "Adam"}
+                args.neg_sample_size = {"TransE": -1, 'DistMult': -1, 'ComplEx': -1, 'RotatE': 250, 'AttE': -1,
+                                        'AttH': 250}
+                args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
+                args.bias = {'ComplEx': "none", 'TransE': "learn", 'DistMult': "none", 'AttE': "learn", 'rest': "none"}
+                args.multi_c = {'AttE': True, 'AttH': True, 'rest': False}
 
-                    args.max_epochs = 15
-                    args.rank = 32
-                    args.patience = 15
-                    args.valid = 5
-                    args.dtype = "single"
-                    args.batch_size = 450
-                    args.debug = False
+                args.regularizer = {'all': "N3"}
+                args.init_size = {'all': 0.001}
+                args.dropout = {'all': 0}
+                args.gamma = {'all': 0}
 
-                    # args.batch_size = 1000
-                    # args.learning_rate = 0.1
-                    # args.reg = 0.05
-                    # args.regularizer = "N3"
-                    # args.optimizer = "Adagrad"
-                    # args.neg_sample_size = -1
-                    # args.dropout = 0
-                    # args.init_size = 0.001
-                    # args.gamma = 0
-                    # args.bias = "learn"
-                    # args.multi_c = True
-                    # args.double_neg = True
+                if Constants.LOG_WANDB:
+                    wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
+                    wandb.login()
 
-                    # TODO Fix optimizers
+                # run.train(info_directory, args)
+                run_unified_model.train(info_directory, args)
 
-                    args.learning_rate = {'ComplEx': 0.1, 'TransE': 0.001, 'DistMult': 0.1}
-                    args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05}
-                    args.optimizer = {'ComplEx': "Adagrad", "TransE": "Adam", 'DistMult': "Adam", 'all': "Adam"}
-                    args.neg_sample_size = {'ComplEx': -1, "TransE": -1, 'DistMult': -1}
-                    args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True}
-                    args.bias = {'ComplEx': "learn", 'TransE': "learn", 'DistMult': "none"}
-                    args.multi_c = {'AttH': True, 'rest': False}
+        except Exception:
+            logging.error(traceback.format_exc())
+            error = True
 
-                    args.regularizer = {'all': "N3"}
-                    args.init_size = {'all': 0.001}
-                    args.dropout = {'all': 0}
-                    args.gamma = {'all': 0}
+    time_process_end = time.time()
 
-                    if Constants.LOG_WANDB:
-                        wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
-                        wandb.login()
-
-                    # run.train(info_directory, args)
-                    run_unified_model.train(info_directory, args)
-
-            except Exception:
-                logging.error(traceback.format_exc())
-                error = True
-
-        time_process_end = time.time()
-
-        if not error:
-            logging.info(f"The entire process including sampling, training and testing took "
-                         f"{util.format_time(time_process_start, time_process_end)}.")
-        else:
-            logging.info(f"The process ended with an error after "
-                         f"{util.format_time(time_process_start, time_process_end)}")
+    if not error:
+        logging.info(f"The entire process including sampling, training and testing took "
+                     f"{util.format_time(time_process_start, time_process_end)}.")
+    else:
+        logging.info(f"The process ended with an error after "
+                     f"{util.format_time(time_process_start, time_process_end)}")
 
 
 if __name__ == "__main__":
@@ -431,26 +408,26 @@ if __name__ == "__main__":
     # Function to run baseline
     args = parser.parse_args()
 
-    args.model = "DistMult"
+    args.model = "AttE"
     args.dataset = "WN18RR"
     args.rank = 32
     args.regularizer = "N3"
-    args.reg = 0.05
-    args.optimizer = "Adagrad"
+    args.reg = 0.0
+    args.optimizer = "Adam"
     args.max_epochs = 500
     args.patience = 15
     args.valid = 5
-    args.batch_size = 450
+    args.batch_size = 500
     args.neg_sample_size = -1
     args.init_size = 0.001
-    args.learning_rate = 0.1
+    args.learning_rate = 0.001
     args.gamma = 0.0
-    args.bias = "none"
+    args.bias = "learn"
     args.dtype = "single"
     args.debug = False
-    args.double_neg = True
-    args.multi_c = False
-
+    args.double_neg = False
+    args.multi_c = True
+    args.no_progress_bar = False
     # run_baseline(args)
 
     # Function to run manual via IDE

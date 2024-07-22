@@ -172,7 +172,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
 
 def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount, entity_set, relation_name_set,
                     entity_ids_unused, relation_name_ids_unused, sampling_method, relation_name_amount,
-                    entities_per_step, enforcement=2, no_progress_bar=False):
+                    entities_per_step, enforcement=1, no_progress_bar=False):
     """
     The calculate_delta function calculates, which triples will be deleted from the input dataset and returns the
     indices of these triples as array.

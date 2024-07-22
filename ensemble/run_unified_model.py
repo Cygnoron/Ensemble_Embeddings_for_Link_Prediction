@@ -42,8 +42,8 @@ def train(info_directory, args):
         subgraphs_str = ""
         # for sub_num in range(args.subgraph_amount):
         #     subgraphs_str += f";sub_{sub_num:03d}"
-        valid_loss_file.write(f"epoch;valid loss{subgraphs_str}\n")
-        train_loss_file.write(f"epoch;train loss{subgraphs_str}\n")
+        valid_loss_file.write(f"epoch;valid loss;change{subgraphs_str}\n")
+        train_loss_file.write(f"epoch;train loss;change{subgraphs_str}\n")
         metrics_file.write(f"epoch;mode;metric_type;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;rank_deviation\n")
 
     logging.info(f"### Saving .json config files of embedding_models in: {model_setup_config_dir} ###")
@@ -60,16 +60,14 @@ def train(info_directory, args):
     valid_examples = dataset.get_examples("valid")
     test_examples = dataset.get_examples("test")
     filters = dataset.get_filters()
-    general_dataset_shape = dataset.get_shape()
-    # create model using original dataset and sizes, use returned embeddings in new embedding_models as initialization
-    # embedding_general_ent, embedding_general_rel, theta_general_ent, theta_general_rel, general_dataset_shape \
-    #     = util.generate_general_embeddings(dataset_general, util.get_args(args, "general_args"))
 
     subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
-    unified_model, args_unified = setup_models(subgraph_embedding_mapping, args, test_valid_file_dir,
-                                               general_dataset_shape, model_setup_config_dir, dataset_path)
-    cands_att_dict = None
+    unified_model, args_unified = setup_unified_model(args, test_valid_file_dir, model_setup_config_dir,
+                                                      dataset_general, subgraph_embedding_mapping, dataset_path)
+
+    previous_valid_loss = 0
+    previous_train_loss = 0
     run_diverged = False
 
     # --- Training ---
@@ -79,7 +77,6 @@ def train(info_directory, args):
     valid_args = argparse.Namespace(counter=0, best_mrr=None, best_epoch=None, epoch=0, valid=args.valid,
                                     patience=args.patience)
 
-    # TODO rework training loop
     # --- Setting up training ---
 
     # Get optimizer
@@ -92,13 +89,14 @@ def train(info_directory, args):
     # Iterate over epochs
     for epoch in range(args.max_epochs):
         time_start_training_sub = time.time()
-        # logging.info(f"Training subgraph {embedding_model['subgraph']} (ensemble step {index + 1}/"
-        #              f"{len(embedding_models)}) in epoch {epoch} with model {args.model_name}")
-
         # Train step
         unified_model.train()
         train_loss = optimizer.epoch(train_examples, epoch=epoch)
-        logging.info(f"Training Epoch {epoch} | average train loss: {train_loss:.4f}")
+
+        previous_train_loss, train_loss_change = util.get_loss_change(train_loss, previous_train_loss)
+        util_files.print_loss_to_file(train_loss_file_path, epoch, [train_loss, train_loss_change[0]])
+        logging.info(f"Training Epoch {epoch} | average train loss: {train_loss:.4f} | "
+                     f"change to last epoch: {train_loss_change[0]:.4f} ({train_loss_change[1]:.3f}%)")
 
         # debugging messages
         logging.debug(f"Entity size epoch {epoch}: {unified_model.entity.weight.data.size()}")
@@ -108,25 +106,16 @@ def train(info_directory, args):
         if unified_model.theta_rel is not None:
             logging.debug(f"Theta_rel size epoch {epoch}: {unified_model.theta_rel.weight.data.size()}")
 
-        # Calculate unified embedding
-        # cands_att_dict = Attention_mechanism.calculate_self_attention(embedding_models, args.theta_calculation)
-        # cands_att_dict = Attention_mechanism.calculate_and_apply_unified_embedding(embedding_general_ent,
-        #                                                                            embedding_general_rel,
-        #                                                                            embedding_models,
-        #                                                                            cands_att_dict,
-        #                                                                            args.theta_calculation)
-        # # print training losses to file
-        util_files.print_loss_to_file(train_loss_file_path, epoch, train_loss)
-
         # Valid step
-        # valid_loss = score_combination.calculate_valid_loss(embedding_models)
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
 
         # print validation losses
-        # run_diverged = check_model_dropout(unified_model.embedding_models, unified_model.active_models)
-        util_files.print_loss_to_file(valid_loss_file_path, epoch, valid_loss)
+        # TODO run_diverged = check_model_dropout(unified_model.embedding_models, unified_model.active_models)
+        previous_valid_loss, valid_loss_change = util.get_loss_change(valid_loss, previous_valid_loss)
+        util_files.print_loss_to_file(valid_loss_file_path, epoch, [valid_loss, valid_loss_change[0]])
 
-        logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f}")
+        logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f} | "
+                     f"change to last epoch: {valid_loss_change[0]:.4f} ({valid_loss_change[1]:.3f}%)")
 
         if run_diverged:
             logging.critical(f"The run diverged and is now stopped. "
@@ -134,13 +123,9 @@ def train(info_directory, args):
             break
 
         if (epoch + 1) % valid_args.valid == 0:
-            valid_metrics = avg_both(*unified_model.compute_metrics(valid_examples, filters, args.sizes), epoch=epoch,
-                                     active_subgraphs=unified_model.active_models)
+            valid_metrics = avg_both(*unified_model.compute_metrics(valid_examples, filters, args.sizes), epoch=epoch)
             logging.info(format_metrics(valid_metrics, split="valid"))
-            # valid_metrics = evaluate_ensemble(embedding_models, args.aggregation_method, mode="valid",
-            #                                   metrics_file_path=metrics_file_path, epoch=epoch,
-            #                                   attention={'ent': cands_att_dict['att_weights_ent'],
-            #                                              'rel': cands_att_dict['att_weights_rel']})
+            util_files.print_metrics_to_file(metrics_file_path, valid_metrics, epoch=epoch, mode="valid")
 
             valid_mrr = valid_metrics["MRR"]['average']
             if not valid_args.best_mrr or valid_mrr > valid_args.best_mrr:
@@ -149,13 +134,14 @@ def train(info_directory, args):
                 valid_args.best_epoch = epoch
                 logging.info(f"Saving embedding_models at epoch {epoch} in {model_file_dir}")
 
-                # torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
-                # torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
+                torch.save(unified_model.cpu().state_dict(), os.path.join(model_file_dir, f"unified_model.pt"))
+                unified_model.cuda()
 
-                torch.save(unified_model.cpu().state_dict(), os.path.join(model_file_dir, f"model_unified.pt"))
-                
             else:
                 valid_args.counter += 1
+                if not valid_args.counter == valid_args.patience:
+                    logging.info(f"Early stopping in {valid_args.patience - valid_args.counter} validation steps.")
+
                 if valid_args.counter == valid_args.patience:
                     logging.info("\t Early stopping")
                     break
@@ -174,8 +160,13 @@ def train(info_directory, args):
     if run_diverged:
         return "The run diverged and was aborted."
 
-    # load or save best embedding_models after completed training
-    # cands_att_dict = util_files.save_load_trained_models(embedding_models, valid_args, model_file_dir, cands_att_dict)
+    if not valid_args.best_mrr:
+        torch.save(unified_model.cpu().state_dict(), os.path.join(model_file_dir, "unified_model.pt"))
+    else:
+        logging.info(f"\t Loading best model saved at epoch {valid_args.best_epoch}")
+        unified_model.load_state_dict(torch.load(os.path.join(model_file_dir, "unified_model.pt")))
+    unified_model.cuda()
+    unified_model.eval()
 
     time_stop_training_total = time.time()
 
@@ -184,15 +175,46 @@ def train(info_directory, args):
 
     # --- Testing with aggregated scores ---
     valid_metrics = avg_both(*unified_model.compute_metrics(valid_examples, filters, args.sizes),
-                             epoch=args.max_epochs + 10, active_subgraphs=unified_model.active_models)
+                             epoch=args.max_epochs + 10)
     logging.info(format_metrics(valid_metrics, split="valid"))
+    util_files.print_metrics_to_file(metrics_file_path, valid_metrics, epoch=args.max_epochs + 10, mode="valid")
 
-    valid_metrics = avg_both(*unified_model.compute_metrics(test_examples, filters, args.sizes),
-                             epoch=args.max_epochs + 20, active_subgraphs=unified_model.active_models)
-    logging.info(format_metrics(valid_metrics, split="test"))
+    test_metrics = avg_both(*unified_model.compute_metrics(test_examples, filters, args.sizes),
+                            epoch=args.max_epochs + 20)
+    logging.info(format_metrics(test_metrics, split="test"))
+    util_files.print_metrics_to_file(metrics_file_path, test_metrics, epoch=args.max_epochs + 20, mode="test")
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
+
+
+def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, general_dataset,
+                        subgraph_embedding_mapping, dataset_path):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    # create unified model
+    init_args = argparse.Namespace(
+        test_valid_file_dir=test_valid_file_dir,
+        model_setup_config_dir=model_setup_config_dir,
+        no_progress_bar=args.no_progress_bar,
+        subgraph_embedding_mapping=subgraph_embedding_mapping,
+        device=device,
+        subgraph_amount=args.subgraph_amount,
+        general_dataset=general_dataset,  # parent dataset name
+        dataset_path=dataset_path  # direct path
+    )
+
+    # general_dataset
+    dataset_general = KGDataset(os.path.abspath(os.path.join("data", init_args.general_dataset)), args.debug)
+    args.sizes = dataset_general.get_shape()
+
+    unified_model = "Unified"
+    args.model = unified_model
+    args_unified = util.get_args(args, unified_model)
+    unified_model = getattr(models, unified_model)(args_unified, init_args)
+    unified_model.to(init_args.device)
+
+    return unified_model, args_unified
 
 
 def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, general_dataset_shape, model_setup_config_dir,
@@ -249,21 +271,6 @@ def setup_models(subgraph_embedding_mapping, args, test_valid_file_dir, general_
         optimizer = KGOptimizer(model, regularizer, optim_method, args_subgraph.batch_size,
                                 args_subgraph.neg_sample_size, bool(args_subgraph.double_neg),
                                 args_subgraph.no_progress_bar)
-
-        # set embeddings
-        # initialize with zeros and set present entities to random number
-        # model.entity.weight.data = torch.zeros(args.sizes[0], rank).to(dtype)
-        # model.entity.weight.data[entity_set] = torch.rand((len(entity_set), rank)).to(dtype)
-        # logging.debug(f"Entity size: {model.entity.weight.data.size()}")
-        #
-        # if args_subgraph.model_name in hyperbolic.HYP_MODELS:
-        #     # initialize with zeros and set present relation names to one
-        #     model.rel.weight.data = torch.rand(args_subgraph.sizes[1], args_subgraph.rank * 2).to(dtype)
-        #     # model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank * 2))
-        # else:
-        #     # initialize with zeros and set present relation names to one
-        #     model.rel.weight.data = torch.zeros(args.sizes[1], rank).to(dtype)
-        #     model.rel.weight.data[relation_name_set] = torch.rand((len(relation_name_set), rank)).to(dtype)
 
         logging.debug(f"Relation size: {model.rel.weight.data.size()}")
 

@@ -1,4 +1,6 @@
 """Knowledge Graph embedding model optimizer."""
+import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -21,7 +23,7 @@ class KGOptimizer(object):
     """
 
     def __init__(self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, no_progress_bar,
-                 verbose=True):
+                 verbose=True, model_name=""):
         """Inits KGOptimizer."""
         self.model = model
         self.regularizer = regularizer
@@ -33,6 +35,7 @@ class KGOptimizer(object):
         self.neg_sample_size = neg_sample_size
         self.n_entities = model.sizes[0]
         self.no_progress_bar = no_progress_bar
+        self.model_name = model_name
 
     def reduce_lr(self, factor=0.8):
         """Reduce learning rate.
@@ -137,6 +140,8 @@ class KGOptimizer(object):
         b_begin = 0
         loss = 0.0
         counter = 0
+        if self.model.is_unified_model:
+            self.model.validation = True
         with torch.no_grad():
             while b_begin < examples.shape[0]:
                 input_batch = examples[b_begin:b_begin + self.batch_size].cuda()
@@ -144,9 +149,12 @@ class KGOptimizer(object):
                 loss += self.calculate_loss(input_batch)
                 counter += 1
         loss /= counter
+
+        if self.model.is_unified_model:
+            self.model.validation = False
         return loss
 
-    def epoch(self, examples, epoch=""):
+    def epoch(self, examples, epoch=0):
         """Runs one epoch of training KG embedding model.
 
         Args:
@@ -159,7 +167,7 @@ class KGOptimizer(object):
             epoch = f"Epoch {epoch} "
 
         bar = None
-        if not self.no_progress_bar:
+        if not self.no_progress_bar and self.model.is_unified_model:
             bar = tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose)
             bar.set_description(f'{epoch}train loss')
 
@@ -170,24 +178,17 @@ class KGOptimizer(object):
         total_loss = 0.0
         counter = 0
         while b_begin < examples.shape[0]:
+            if self.model.is_unified_model:
+                # print(f"{(b_begin / examples.shape[0]) + epoch:.4f};")
+                # print(f"{torch.cuda.memory_allocated(0) / 1024 / 1024 / 1024:.4f}")
+                pass
             input_batch = actual_examples[b_begin:b_begin + self.batch_size].to('cuda')
 
-            # --- Single embeddings ---
-            if self.model.is_unified_model:
-                # self.model.calculate_attention(input_batch)
-                self.model.train_single_models(input_batch, counter)
-
-            # TODO Fix optimizers
-
-            # --- Unified embedding ---
             # gradient step
             l = self.calculate_loss(input_batch)
             self.optimizer.zero_grad()
             l.backward()
             self.optimizer.step()
-
-            if self.model.is_unified_model:
-                self.model.update_single_models(input_batch, l)
 
             b_begin += self.batch_size
             total_loss += l

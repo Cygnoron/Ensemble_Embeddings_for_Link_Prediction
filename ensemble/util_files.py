@@ -296,6 +296,10 @@ def print_loss_to_file(loss_file_path, epoch, loss_dict):
             out_str = f"{epoch};{average_loss}"
             for subgraph in keys_sorted:
                 out_str += f";{loss_dict[subgraph]}"
+        if type(loss_dict) is list:
+            out_str = f"{epoch}"
+            for entry in loss_dict:
+                out_str += f";{entry}"
         else:
             out_str = f"{epoch};{loss_dict}"
         loss_file.write(out_str)
@@ -305,7 +309,8 @@ def print_loss_to_file(loss_file_path, epoch, loss_dict):
 def print_metrics_to_file(metrics_file_path, metrics, epoch, mode):
     with open(f"{metrics_file_path}", 'a') as metrics_file:
         logging.debug(f"Printing metrics to {metrics_file_path}.")
-        for metric_type in ['average', 'rhs', 'lhs']:
+        # for metric_type in ['average', 'rhs', 'lhs']:
+        for metric_type in ['average']:
             metrics_file.write(f"{epoch};{mode};{metric_type};{metrics['MR'][metric_type]};"
                                f"{metrics['MRR'][metric_type]};{metrics['hits@[1,3,10]'][metric_type][0]};"
                                f"{metrics['hits@[1,3,10]'][metric_type][1]};{metrics['hits@[1,3,10]'][metric_type][2]};"

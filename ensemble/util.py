@@ -1,4 +1,3 @@
-import argparse
 import copy
 import json
 import logging
@@ -169,10 +168,10 @@ def assign_model_to_subgraph(kge_models, args):
                 # Get subgraph number and set mapping and necessary args
                 subgraph_num = int(subgraph.split(sep='_')[1])  # subgraph = sub_XXX
                 subgraph_embedding_mapping[subgraph_num] = embedding_model
-                args.model = embedding_model
-                args.subgraph = subgraph
+                # args.model = embedding_model
+                # args.subgraph = subgraph
 
-                logging.info(f"Setting {args.model} as embedding method for subgraph {args.subgraph}.")
+                # logging.info(f"Setting {args.model} as embedding method for subgraph {args.subgraph}.")
 
             logging.info(f"Mapping from embedding methods to subgraphs:\n"
                          f"{format_dict(inverse_dict(subgraph_embedding_mapping))}")
@@ -209,18 +208,20 @@ def assign_model_to_subgraph(kge_models, args):
 
         # Get subgraph number and set mapping and necessary args
         subgraph_num = int(subgraph.split(sep='_')[1])  # subgraph = sub_XXX
-        args.subgraph = subgraph
+        # args.subgraph = subgraph
 
         # Case: select specified embedding class_name
         if subgraph_num in mapped_subgraphs:
-            args.model = subgraph_embedding_mapping[subgraph_num]
-            logging.info(f"Found mapping, using embedding method {args.model} for subgraph {subgraph}")
+            # args.model = subgraph_embedding_mapping[subgraph_num]
+            logging.info(f"Found mapping, using embedding method {subgraph_embedding_mapping[subgraph_num]} "
+                         f"for subgraph {subgraph}")
 
         # Case: select random embedding class_name
         else:
-            args.model = random.choice(kge_models_adjusted)
-            subgraph_embedding_mapping[subgraph_num] = args.model
-            logging.info(f"Randomly selected embedding method {args.model} for subgraph {subgraph}")
+            # args.model =
+            subgraph_embedding_mapping[subgraph_num] = random.choice(kge_models_adjusted)
+            logging.info(f"Randomly selected embedding method {subgraph_embedding_mapping[subgraph_num]} "
+                         f"for subgraph {subgraph}")
 
     dict(sorted(subgraph_embedding_mapping.items()))
 
@@ -490,10 +491,17 @@ def format_dict(dictionary):
     return out_str.rstrip("\n")
 
 
+def format_set(set_to_format, delimiter=", "):
+    out_str = ""
+    for element in set_to_format:
+        out_str += f"{element}{delimiter}"
+    out_str = out_str.rstrip(delimiter)
+    return out_str
+
+
 def get_embedding_methods(mapping_json_str):
     kge_mapping = None
-
-    # Differenciate between inputs as dict and direct model inputs
+    # Differentiate between inputs as dict and direct model inputs
     try:
         logging.debug(f"Multiple model input: {mapping_json_str}")
         kge_mapping = json.loads(mapping_json_str)
@@ -512,7 +520,7 @@ def get_embedding_methods(mapping_json_str):
     return kge_mapping
 
 
-def handle_methods(method_str, mode):
+def handle_methods(method_str: str, mode):
     method_list = None
     if mode == "sampling":
         method_list = Constants.SAMPLING_METHODS
@@ -520,6 +528,10 @@ def handle_methods(method_str, mode):
         method_list = Constants.AGGREGATION_METHODS
     elif mode == "theta":
         method_list = Constants.THETA_METHODS
+    elif mode == "size_range":
+        method_str = method_str.lstrip("(").rstrip(")").split(",")
+        method_str = (float(method_str[0]), float(method_str[1]))
+        return method_str
 
     for candidate_method in method_list:
         if method_str.lower() in candidate_method[1].lower():
@@ -529,46 +541,45 @@ def handle_methods(method_str, mode):
 
 
 def get_args(args, model):
-    if model == "general_args":
-        general_args = argparse.Namespace()
-        general_args.rank = args.rank
-        general_args.dtype = args.dtype
-        general_args.debug = args.debug
-        general_args.theta_calculation = args.theta_calculation
-        return general_args
+    # if model == "Unified":
+    #     general_args = argparse.Namespace()
+    #     general_args.rank = args.rank
+    #     general_args.dtype = args.dtype
+    #     general_args.debug = args.debug
+    #     general_args.theta_calculation = args.theta_calculation
+    #     return general_args
+    #
+    # else:
+    args_subgraph = copy.copy(args)
+    args_list = ["bias",
+                 "double_neg",
+                 "dropout",
+                 "gamma",
+                 "init_size",
+                 "learning_rate",
+                 "multi_c",
+                 "neg_sample_size",
+                 "optimizer",
+                 "regularizer",
+                 "reg"]
+    counter = 0
+    for key in vars(args):
+        if key in args_list:
+            value = vars(args)[key]
+            if type(value) is dict:
+                if "all" in list(value.keys()):
+                    vars(args_subgraph)[key] = value['all']
+                elif model in list(value.keys()):
+                    vars(args_subgraph)[key] = value[model]
+                elif "rest" in list(value.keys()):
+                    vars(args_subgraph)[key] = value['rest']
+                else:
+                    first_key = next(iter(value.keys()))
+                    vars(args_subgraph)[key] = value[first_key]
+                counter += 1
 
-    else:
-        args_subgraph = copy.copy(args)
-        args_list = ["batch_size",
-                     "bias",
-                     "double_neg",
-                     "dropout",
-                     "gamma",
-                     "init_size",
-                     "learning_rate",
-                     "multi_c",
-                     "neg_sample_size",
-                     "optimizer",
-                     "regularizer",
-                     "reg"]
-        counter = 0
-        for key in vars(args):
-            if key in args_list:
-                value = vars(args)[key]
-                if type(value) is dict:
-                    if "all" in list(value.keys()):
-                        vars(args_subgraph)[key] = value['all']
-                    elif model in list(value.keys()):
-                        vars(args_subgraph)[key] = value[model]
-                    elif "rest" in list(value.keys()):
-                        vars(args_subgraph)[key] = value['rest']
-                    else:
-                        first_key = next(iter(value.keys()))
-                        vars(args_subgraph)[key] = value[first_key]
-                    counter += 1
-
-        logging.debug(f"{counter} parameters were changed due to specific mapping.")
-        return args_subgraph
+    logging.debug(f"{counter} parameters were changed due to specific mapping.")
+    return args_subgraph
 
 
 # --- unused functions ---
@@ -651,3 +662,11 @@ def difference_embeddings(embedding_before, embedding_after, output_path, ent=Fa
 
             # write to output_file
             output_file.write(output_string + "\n")
+
+
+def get_loss_change(valid_loss, previous_valid_loss):
+    valid_loss_change = valid_loss - previous_valid_loss
+    percentage = valid_loss_change / previous_valid_loss
+    valid_loss_change = (valid_loss_change, percentage)
+
+    return valid_loss, valid_loss_change

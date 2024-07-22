@@ -48,13 +48,17 @@ def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None, active_subgrap
                    'AMRI': amris, 'rank_deviation': rank_deviations, 'epoch': epoch,
                    'active_subgraphs': active_subgraphs})
 
-    return {'MR': mrs, 'MRR': mrrs, 'hits@[1,3,10]': hits, 'AMRI': amris, 'rank_deviation': rank_deviations}
+    # return {'MR': mrs, 'MRR': mrrs, 'hits@[1,3,10]': hits, 'AMRI': amris, 'rank_deviation': rank_deviations}
+    return {'MR': {'average': mrs['average']}, 'MRR': {'average': mrrs['average']},
+            'hits@[1,3,10]': {'average': hits['average']}, 'AMRI': {'average': amris['average']},
+            'rank_deviation': {'average': rank_deviations['average']}}
 
 
 def format_metrics(metrics, split):
     """Format metrics for logging."""
     result = "\n"
-    for mode in ['average', 'rhs', 'lhs']:
+    # for mode in ['average', 'rhs', 'lhs']:
+    for mode in ['average']:
         result += f"{mode} {split} metrics:\tMR: {metrics['MR'][mode]:.2f} | "
         result += f"MRR: {metrics['MRR'][mode]:.3f} | "
         result += f"H@1: {metrics['hits@[1,3,10]'][mode][0]:.3f} | "
