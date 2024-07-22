@@ -666,7 +666,7 @@ def difference_embeddings(embedding_before, embedding_after, output_path, ent=Fa
 
 def get_loss_change(valid_loss, previous_valid_loss):
     valid_loss_change = valid_loss - previous_valid_loss
-    percentage = valid_loss_change / previous_valid_loss
+    percentage = (valid_loss_change / previous_valid_loss) * 100
     valid_loss_change = (valid_loss_change, percentage)
 
     return valid_loss, valid_loss_change
