@@ -51,31 +51,6 @@ class Unified(KGModel):
         self.validation = False
         self.collect_embedding_methods()
 
-    # def get_class(self, class_name, base_method=False):
-    #     if class_name in EUC_MODELS:
-    #         euclidean_method = importlib.import_module("models.euclidean")
-    #         if base_method:
-    #             class_name = getattr(euclidean_method, "BaseE")
-    #         else:
-    #             class_name = getattr(euclidean_method, class_name)
-    #     elif class_name in COMPLEX_MODELS:
-    #         complex_method = importlib.import_module("models.complex")
-    #         if base_method:
-    #             class_name = getattr(complex_method, "BaseC")
-    #         else:
-    #             class_name = getattr(complex_method, class_name)
-    #     elif class_name in HYP_MODELS:
-    #         hyperbolic_method = importlib.import_module("models.hyperbolic")
-    #         if base_method:
-    #             class_name = getattr(hyperbolic_method, "BaseH")
-    #         else:
-    #             class_name = getattr(hyperbolic_method, class_name)
-    #     else:
-    #         raise ValueError(f"The method {class_name} is not in the list of knowledge graph embedding "
-    #                          f"methods. Please add it to the list in the models module.")
-    #
-    #     return class_name
-
     def init_single_models(self, args, init_args):
         logging.info("-/\tCreating single embedding models\t\\-")
         time_start_model_creation = time.time()
@@ -162,7 +137,7 @@ class Unified(KGModel):
         # get factors on unified embedding
         factors = self.get_factors(queries)
 
-        self.update_single_thetas(queries)
+        self.update_single_models(queries)
 
         return predictions, factors
 
@@ -171,7 +146,13 @@ class Unified(KGModel):
             pass
         else:
             for single_model in self.single_models:
-                single_model.epoch(queries).cuda()
+                # actual_queries= get_actual_queries(queries, single_model=single_model)
+                actual_queries = queries.cuda()
+
+                l = single_model.calculate_loss(actual_queries).cuda()
+                single_model.optimizer.zero_grad()
+                l.backward()
+                single_model.optimizer.step()
 
     def calculate_cross_model_attention(self, queries):
         theta_ent_temp = []
@@ -189,22 +170,25 @@ class Unified(KGModel):
             #         self.active_models.remove(args.subgraph_num)
             #     continue
 
-            embedding_ent = model.entity.weight.data[queries[:, 0]]
-            embedding_rel = model.rel.weight.data[queries[:, 1]]
+            # TODO try with actual queries
+            actual_queries, query_mask = get_actual_queries(queries, single_model=single_model)
+            embedding_ent = torch.zeros(len(queries), self.rank).cuda()
+            embedding_rel = torch.zeros(len(queries), self.rank).cuda()
+
+            embedding_ent[query_mask] = model.entity.weight.data[actual_queries[:, 0]]
+            embedding_rel[query_mask] = model.rel.weight.data[actual_queries[:, 1]]
             if model.model_name in COMPLEX_MODELS:
-                embedding_ent = model.embeddings[0].weight.data[queries[:, 0]]
-                embedding_rel = model.embeddings[1].weight.data[queries[:, 1]]
+                embedding_ent = model.embeddings[0].weight.data[actual_queries[:, 0]]
+                embedding_rel = model.embeddings[1].weight.data[actual_queries[:, 1]]
             elif model.model_name in HYP_MODELS:
                 # TODO check hyperbolic case
-                embedding_rel = torch.chunk(embedding_rel[queries[:, 1]], 2, dim=1)
+                embedding_rel = torch.chunk(embedding_rel[actual_queries[:, 1]], 2, dim=1)
 
             # Stack cands and theta for cross model attention
             theta_ent_temp.append(model.theta_ent.weight.data[queries[:, 0]])
             cands_ent_temp.append(embedding_ent)
             theta_rel_temp.append(model.theta_rel.weight.data[queries[:, 1]])
             cands_rel_temp.append(embedding_rel)
-
-        del embedding_ent, embedding_rel
 
         # cands_ent: [40943, 32, N]     cands_rel: [22, 32, N]
         self.cands_ent[queries[:, 0]] = torch.stack(cands_ent_temp, dim=-1).cuda()
@@ -222,13 +206,6 @@ class Unified(KGModel):
 
         self.att_rel_cross_model[queries[:, 1]] = self.calculate_attention(
             self.theta_rel_unified.weight.data[queries[:, 1]], self.cands_rel[queries[:, 1]])
-
-        # logging.debug(f"Sum of cross model entity attention "
-        #               f"{torch.sum(self.att_ent_cross_model)} / {self.sizes[0] * self.rank} "
-        #               f"({torch.sum(self.att_ent_cross_model) / (self.sizes[0] * self.rank):.3f})")
-
-        # self.att_queries = (self.combine_ranks(self.att_ent_cross_model[queries[:, 0]]) *
-        #                     self.combine_ranks(self.att_rel_cross_model[queries[:, 1]]))
 
     def calculate_attention(self, theta, cands, dim=-1):
         softmax = self.act
@@ -330,6 +307,7 @@ class Unified(KGModel):
                 score = getattr(method, "similarity_score")(self, lhs_e, rhs_e, eval_mode)
             score_list.append(score)
 
+        # TODO include aggregation method
         score = torch.mean(torch.stack(score_list, dim=-1), dim=-1).to('cuda')
 
         return score
@@ -372,37 +350,35 @@ class Unified(KGModel):
 
         return factors_h, factors_r, factors_t
 
-    def update_single_thetas(self, queries):
+    def update_single_models(self, queries):
         for index, single_model in enumerate(self.single_models):
-            actual_queries, _ = get_actual_queries(queries, entities=self.single_model_args[index].entities,
-                                                   relation_names=self.single_model_args[index].relation_names)
-            single_model.model.theta_ent.weight.data[actual_queries[:, 0]] = torch.mean(
-                self.theta_ent_unified.weight.data[actual_queries[:, 0]], dim=-1)
-            single_model.model.theta_rel.weight.data[actual_queries[:, 1]] = torch.mean(
-                self.theta_rel_unified.weight.data[actual_queries[:, 1]], dim=-1)
+            actual_queries ,_= get_actual_queries(queries, single_model=single_model)
+            single_model.model.entity.weight.data[actual_queries[:, 0]] = self.entity.weight.data[actual_queries[:, 0]]
+            single_model.model.rel.weight.data[actual_queries[:, 1]] = self.rel.weight.data[actual_queries[:, 1]]
+
+            single_model.model.theta_ent.weight.data[actual_queries[:, 0]] = \
+                self.theta_ent_unified.weight.data[actual_queries[:, 0]][:, :, index]
+            single_model.model.theta_rel.weight.data[actual_queries[:, 1]] = \
+                self.theta_rel_unified.weight.data[actual_queries[:, 1]][:, :, index]
 
 
 def get_actual_queries(queries, single_model=None, entities=None, relation_names=None):
     if single_model is not None:
-        entity_set = single_model['args'].entities
-        relation_name_set = single_model['args'].relation_names
+        entity_set = single_model.model.entities
+        relation_name_set = single_model.model.relation_names
     elif entities is not None and relation_names is not None:
         entity_set = entities
         relation_name_set = relation_names
     else:
         raise ValueError(f"There was no filter specified!")
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
     # Create masks for entities and relation names
     entity_mask = torch.isin(queries[:, 0].to('cuda'), torch.tensor(entity_set).to('cuda')).to('cuda')
-    relation_mask = torch.isin(queries[:, 1].to('cuda'), torch.tensor(relation_name_set).to('cuda')).to(
-        'cuda')
+    relation_mask = torch.isin(queries[:, 1].to('cuda'), torch.tensor(relation_name_set).to('cuda')).to('cuda')
 
     query_mask = entity_mask & relation_mask
 
-    del entity_mask, relation_mask
-    return queries[query_mask.cpu()], query_mask
+    return queries[query_mask], query_mask
 
 
 def get_class(class_name, base_method=False):

@@ -54,22 +54,31 @@ def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None, active_subgrap
             'rank_deviation': {'average': rank_deviations['average']}}
 
 
-def format_metrics(metrics, split):
+def format_metrics(metrics, split, metrics_change_absolut=None, metrics_change_percent=None, percent=False,
+                   init_str="metrics"):
     """Format metrics for logging."""
     result = "\n"
+    percent_str = "%" if percent else ""
     # for mode in ['average', 'rhs', 'lhs']:
     for mode in ['average']:
-        result += f"{mode} {split} metrics:\tMR: {metrics['MR'][mode]:.2f} | "
-        result += f"MRR: {metrics['MRR'][mode]:.3f} | "
-        result += f"H@1: {metrics['hits@[1,3,10]'][mode][0]:.3f} | "
-        result += f"H@3: {metrics['hits@[1,3,10]'][mode][1]:.3f} | "
-        result += f"H@10: {metrics['hits@[1,3,10]'][mode][2]:.3f} | "
+        result += f"{mode} {split} {init_str}:\t"
+        result += f"MR: {metrics['MR'][mode]:.3f}{percent_str}\t| "
+        result += f"MRR: {metrics['MRR'][mode]:.3f}{percent_str}\t| "
+        result += f"H@1: {metrics['hits@[1,3,10]'][mode][0]:.3f}{percent_str}\t| "
+        result += f"H@3: {metrics['hits@[1,3,10]'][mode][1]:.3f}{percent_str}\t| "
+        result += f"H@10: {metrics['hits@[1,3,10]'][mode][2]:.3f}{percent_str}\t| "
 
         # added AMRI and rank_deviation
-        result += f"AMRI: {metrics['AMRI'][mode]:.3f} | "
-        result += f"rank_deviation: {metrics['rank_deviation'][mode]:.3f}\n"
+        result += f"AMRI: {metrics['AMRI'][mode]:.3f}{percent_str}\t| "
+        result += f"rank_deviation: {metrics['rank_deviation'][mode]:.3f}{percent_str}"
 
-    return result.rstrip()
+    if metrics_change_absolut is not None:
+        result += f"{format_metrics(metrics_change_absolut, split, init_str='change')}"
+
+    if metrics_change_percent is not None:
+        result += f"{format_metrics(metrics_change_percent, split, percent=True,init_str='change %')}"
+
+    return result.rstrip("\n")
 
 
 def write_metrics(writer, step, metrics, split):

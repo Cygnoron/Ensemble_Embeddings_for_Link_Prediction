@@ -242,19 +242,21 @@ def run_embedding_manual():
     # dataset_in = "FB15K"
     # dataset_in = "NELL-995"
     subgraph_amount = 4
-    subgraph_size_range = (0.63, 0.7)
+    subgraph_size_range = (0.03, 0.7)
     rho = 2
     model_dropout_factor = 10
 
     args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
-                              # sampling_method=Constants.ENTITY_SAMPLING,
-                              sampling_method=Constants.FEATURE_SAMPLING,
+                              sampling_method=Constants.ENTITY_SAMPLING,
+                              # sampling_method=Constants.FEATURE_SAMPLING,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
+
+    args.wandb_project = "Experiments"
 
     Constants.get_wandb(args.wandb_project)
 
@@ -314,9 +316,11 @@ def run_embedding_manual():
 
     # --- setup for model training ---
 
-    allowed_kge_models = [{Constants.REF_E: [0, 1],
-                           Constants.COMPL_EX: [2],
-                           Constants.DIST_MULT: [3, 'all']}]
+    allowed_kge_models = [{Constants.TRANS_E: list(range(0, 5)),
+                           Constants.COMPL_EX: [20],
+                           Constants.DIST_MULT: ['all']
+                           # Constants.DIST_MULT: list(range(5, 10))
+                           }]
 
     # allowed_kge_models = [
     #     {Constants.TRANS_E: []},
@@ -341,13 +345,13 @@ def run_embedding_manual():
             if not args.no_training:
                 args.kge_models = models
 
-                args.max_epochs = 500
+                args.max_epochs = 50
                 args.rank = 32
                 args.patience = 15
                 args.valid = 5
                 args.dtype = "single"
                 args.batch_size = 1000
-                args.debug = True
+                args.debug = False
 
                 # args.batch_size = 1000
                 # args.learning_rate = 0.1
@@ -371,8 +375,8 @@ def run_embedding_manual():
                                   'AttE': "Adam", 'AttH': "Adam"}
                 args.neg_sample_size = {"TransE": -1, 'DistMult': -1, 'ComplEx': -1, 'RotatE': 250, 'AttE': -1,
                                         'AttH': 250}
-                args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
                 args.bias = {'ComplEx': "none", 'TransE': "learn", 'DistMult': "none", 'AttE': "learn", 'rest': "none"}
+                args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
                 args.multi_c = {'AttE': True, 'AttH': True, 'rest': False}
 
                 args.regularizer = {'all': "N3"}
@@ -403,32 +407,40 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    # run_embedding(parser.parse_args())
+    run_embedding(parser.parse_args())
 
     # Function to run baseline
     args = parser.parse_args()
 
-    args.model = "AttE"
+    args.model = "DistMult"
     args.dataset = "WN18RR"
+    args.max_epochs = 50
     args.rank = 32
-    args.regularizer = "N3"
-    args.reg = 0.0
-    args.optimizer = "Adam"
-    args.max_epochs = 500
     args.patience = 15
     args.valid = 5
-    args.batch_size = 500
-    args.neg_sample_size = -1
-    args.init_size = 0.001
-    args.learning_rate = 0.001
-    args.gamma = 0.0
-    args.bias = "learn"
     args.dtype = "single"
+    args.batch_size = 100
     args.debug = False
+
+    args.learning_rate = 0.1
+    args.reg = 0.5
+    args.optimizer = "Adagrad"
+    args.neg_sample_size = -1
+    args.bias = "none"
     args.double_neg = False
-    args.multi_c = True
+    args.multi_c = False
+
+    args.regularizer = "N3"
+    args.init_size = 0.001
+    args.gamma = 0.0
+    args.dropout = 0.0
+
     args.no_progress_bar = False
+    args.entities = None
+    args.relation_names = None
+    args.wandb_project = "Experiments"
+
     # run_baseline(args)
 
     # Function to run manual via IDE
-    run_embedding_manual()
+    # run_embedding_manual()

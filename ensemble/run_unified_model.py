@@ -42,8 +42,8 @@ def train(info_directory, args):
         subgraphs_str = ""
         # for sub_num in range(args.subgraph_amount):
         #     subgraphs_str += f";sub_{sub_num:03d}"
-        valid_loss_file.write(f"epoch;valid loss;change{subgraphs_str}\n")
-        train_loss_file.write(f"epoch;train loss;change{subgraphs_str}\n")
+        valid_loss_file.write(f"epoch;valid loss;change;change in %{subgraphs_str}\n")
+        train_loss_file.write(f"epoch;train loss;change;change in %{subgraphs_str}\n")
         metrics_file.write(f"epoch;mode;metric_type;MR;MRR;Hits@1;Hits@3;Hits@10;AMRI;rank_deviation\n")
 
     logging.info(f"### Saving .json config files of embedding_models in: {model_setup_config_dir} ###")
@@ -68,6 +68,7 @@ def train(info_directory, args):
 
     previous_valid_loss = 0
     previous_train_loss = 0
+    previous_metrics = {}
     run_diverged = False
 
     # --- Training ---
@@ -94,8 +95,9 @@ def train(info_directory, args):
         train_loss = optimizer.epoch(train_examples, epoch=epoch)
 
         previous_train_loss, train_loss_change = util.get_loss_change(train_loss, previous_train_loss)
-        util_files.print_loss_to_file(train_loss_file_path, epoch, [train_loss, train_loss_change[0]])
-        logging.info(f"Training Epoch {epoch} | average train loss: {train_loss:.4f} | "
+        util_files.print_loss_to_file(train_loss_file_path, epoch,
+                                      [train_loss, train_loss_change[0], train_loss_change[1]])
+        logging.info(f"Training\tEpoch {epoch} | average train loss: {train_loss:.4f} | "
                      f"change to last epoch: {train_loss_change[0]:.4f} ({train_loss_change[1]:.3f}%)")
 
         # debugging messages
@@ -110,11 +112,11 @@ def train(info_directory, args):
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
 
         # print validation losses
-        # TODO run_diverged = check_model_dropout(unified_model.embedding_models, unified_model.active_models)
         previous_valid_loss, valid_loss_change = util.get_loss_change(valid_loss, previous_valid_loss)
-        util_files.print_loss_to_file(valid_loss_file_path, epoch, [valid_loss, valid_loss_change[0]])
+        util_files.print_loss_to_file(valid_loss_file_path, epoch,
+                                      [valid_loss, valid_loss_change[0], valid_loss_change[1]])
 
-        logging.info(f"Validation Epoch {epoch} | average valid loss: {valid_loss:.4f} | "
+        logging.info(f"Validation\tEpoch {epoch} | average valid loss: {valid_loss:.4f} | "
                      f"change to last epoch: {valid_loss_change[0]:.4f} ({valid_loss_change[1]:.3f}%)")
 
         if run_diverged:
@@ -124,7 +126,11 @@ def train(info_directory, args):
 
         if (epoch + 1) % valid_args.valid == 0:
             valid_metrics = avg_both(*unified_model.compute_metrics(valid_examples, filters, args.sizes), epoch=epoch)
-            logging.info(format_metrics(valid_metrics, split="valid"))
+            previous_metrics, metrics_change_absolut, metrics_change_percent = (
+                util.get_metrics_change(valid_metrics, previous_metrics))
+
+            logging.info(format_metrics(valid_metrics, split="valid", metrics_change_absolut=metrics_change_absolut,
+                                        metrics_change_percent=metrics_change_percent))
             util_files.print_metrics_to_file(metrics_file_path, valid_metrics, epoch=epoch, mode="valid")
 
             valid_mrr = valid_metrics["MRR"]['average']

@@ -1,5 +1,4 @@
 """Knowledge Graph embedding model optimizer."""
-import logging
 
 import numpy as np
 import torch
@@ -25,7 +24,7 @@ class KGOptimizer(object):
     def __init__(self, model, regularizer, optimizer, batch_size, neg_sample_size, double_neg, no_progress_bar,
                  verbose=True, model_name=""):
         """Inits KGOptimizer."""
-        self.model = model
+        self.model = model.to('cuda')
         self.regularizer = regularizer
         self.optimizer = optimizer
         self.batch_size = batch_size
@@ -163,15 +162,15 @@ class KGOptimizer(object):
         Returns:
             loss: torch.Tensor with loss averaged over all training examples
         """
-        if epoch is not "":
+        if epoch != "":
             epoch = f"Epoch {epoch} "
 
         bar = None
-        if not self.no_progress_bar and self.model.is_unified_model:
+        if not self.no_progress_bar and (self.model.is_unified_model or self.model.entities is None):
             bar = tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose)
             bar.set_description(f'{epoch}train loss')
 
-        actual_examples = examples[torch.randperm(examples.shape[0]), :]
+        actual_examples = examples[torch.randperm(examples.shape[0]), :].cuda()
         # actual_examples = examples
 
         b_begin = 0
@@ -185,7 +184,7 @@ class KGOptimizer(object):
             input_batch = actual_examples[b_begin:b_begin + self.batch_size].to('cuda')
 
             # gradient step
-            l = self.calculate_loss(input_batch)
+            l = self.calculate_loss(input_batch).cuda()
             self.optimizer.zero_grad()
             l.backward()
             self.optimizer.step()
@@ -193,7 +192,7 @@ class KGOptimizer(object):
             b_begin += self.batch_size
             total_loss += l
             counter += 1
-            if not self.no_progress_bar and self.model.is_unified_model:
+            if not self.no_progress_bar and (self.model.is_unified_model or self.model.entities is None):
                 bar.update(input_batch.shape[0])
                 bar.set_postfix(loss=f'{l.item():.4f}')
 

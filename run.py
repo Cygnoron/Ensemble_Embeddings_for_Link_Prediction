@@ -99,7 +99,7 @@ parser.add_argument(
 
 def train(args):
     save_dir = get_savedir(args.model, args.dataset)
-    util.setup_logging(save_dir, "train.log", logging_level="critical")
+    util.setup_logging(save_dir, "train.log", logging_level="info")
 
     # # file logger
     # logging.basicConfig(

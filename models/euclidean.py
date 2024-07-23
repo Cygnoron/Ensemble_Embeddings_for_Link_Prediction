@@ -62,7 +62,7 @@ class TransE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -80,7 +80,7 @@ class DistMult(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -94,7 +94,7 @@ class CP(BaseE):
 
     def get_queries(self, queries: torch.Tensor):
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return self.entity(queries[:, 0]) * self.rel(queries[:, 1]), self.bh(queries[:, 0])
 
@@ -114,7 +114,7 @@ class MurE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -134,7 +134,7 @@ class RotE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -155,7 +155,7 @@ class RefE(BaseE):
         lhs_biases = self.bh(queries[:, 0])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs + rel, lhs_biases
 
@@ -205,6 +205,6 @@ class AttE(BaseE):
         lhs_e = torch.sum(att_weights * cands, dim=1) + self.rel(queries[:, 1])
 
         # update context vector
-        self.update_theta(queries)
+        # self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])

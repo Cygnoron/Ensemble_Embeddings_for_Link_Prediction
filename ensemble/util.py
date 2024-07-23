@@ -670,3 +670,46 @@ def get_loss_change(valid_loss, previous_valid_loss):
     valid_loss_change = (valid_loss_change, percentage)
 
     return valid_loss, valid_loss_change
+
+
+def get_metrics_change(current_metrics, previous_metrics):
+    metrics_change_absolut = {}
+    metrics_change_percent = {}
+    if len(previous_metrics) == 0:
+        for metric in current_metrics:
+            metrics_change_absolut[metric] = {}
+            metrics_change_percent[metric] = {}
+            for mode in current_metrics[metric]:
+                metrics_change_absolut[metric][mode] = current_metrics[metric][mode]
+                metrics_change_percent[metric][mode] = [100, 100, 100] if "hits@" in metric else 100
+    else:
+        for metric in current_metrics:
+            metrics_change_absolut[metric] = {}
+            metrics_change_percent[metric] = {}
+            for mode in current_metrics[metric]:
+                if "hits@" in metric:
+                    metrics_change_absolut[metric][mode] = []
+                    metrics_change_percent[metric][mode] = []
+                    for hits in range(len(current_metrics[metric][mode])):
+                        current_value = current_metrics[metric][mode][hits].item() if isinstance(
+                            current_metrics[metric][mode][hits], torch.Tensor) else current_metrics[metric][mode][hits]
+                        previous_value = previous_metrics[metric][mode][hits].item() if isinstance(
+                            previous_metrics[metric][mode][hits], torch.Tensor) else previous_metrics[metric][mode][
+                            hits]
+                        absolute_change = current_value - previous_value
+                        percent_change = (absolute_change / (previous_value + 1e-6)) * 100
+                        metrics_change_absolut[metric][mode].append(absolute_change)
+                        metrics_change_percent[metric][mode].append(percent_change)
+                else:
+                    current_value = current_metrics[metric][mode].item() if isinstance(current_metrics[metric][mode],
+                                                                                       torch.Tensor) else \
+                        current_metrics[metric][mode]
+                    previous_value = previous_metrics[metric][mode].item() if isinstance(previous_metrics[metric][mode],
+                                                                                         torch.Tensor) else \
+                        previous_metrics[metric][mode]
+                    absolute_change = current_value - previous_value
+                    percent_change = (absolute_change / (previous_value + 1e-6)) * 100
+                    metrics_change_absolut[metric][mode] = absolute_change
+                    metrics_change_percent[metric][mode] = percent_change
+
+    return current_metrics, metrics_change_absolut, metrics_change_percent
