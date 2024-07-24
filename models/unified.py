@@ -4,6 +4,7 @@ import logging
 import os
 import time
 
+import numpy as np
 import torch
 from torch import nn
 from tqdm import tqdm
@@ -16,18 +17,27 @@ from models import EUC_MODELS
 from models import HYP_MODELS
 from models import KGModel
 from optimizers import regularizers, KGOptimizer
+from utils.euclidean import givens_reflection, givens_rotations
 from utils.train import count_params
 
 UNIFIED_MODELS = ["Unified"]
 
 
 class Unified(KGModel):
+
     def __init__(self, args, init_args, unified_args):
+        """
+        Initializes the Unified model with the given arguments and settings.
+
+        Args:
+            args: Arguments for the model.
+            init_args: Initialization arguments.
+            unified_args: Unified model specific arguments.
+        """
         super(Unified, self).__init__(unified_args.sizes, unified_args.rank, unified_args.dropout, unified_args.gamma,
                                       unified_args.dtype, unified_args.bias, unified_args.init_size, unified_args.model,
-                                      unified_args.theta_calculation, subgraph_amount=unified_args.subgraph_amount,
-                                      batch_size=unified_args.batch_size,
-                                      aggregation_method=unified_args.aggregation_method, embedding_models="Unified")
+                                      subgraph_amount=unified_args.subgraph_amount, batch_size=unified_args.batch_size,
+                                      aggregation_method=unified_args.aggregation_method)
 
         self.args = args
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
@@ -53,6 +63,14 @@ class Unified(KGModel):
         self.collect_embedding_methods()
 
     def init_single_models(self, args, init_args):
+        """
+        Initializes single embedding models based on the provided arguments.
+
+        Args:
+            args: General arguments for single models.
+            init_args: Initialization arguments specific to single models.
+        """
+
         logging.info("-/\tCreating single embedding models\t\\-")
         time_start_model_creation = time.time()
 
@@ -61,6 +79,7 @@ class Unified(KGModel):
             init_progress_bar = tqdm(total=init_args.subgraph_amount, desc=f"Creating single embedding models",
                                      unit=" model(s) ", position=0, leave=True)
 
+        counter = 0
         for subgraph_num in list(init_args.subgraph_embedding_mapping.keys()):
             model = init_args.subgraph_embedding_mapping[subgraph_num]
 
@@ -105,7 +124,8 @@ class Unified(KGModel):
 
             if not init_args.no_progress_bar:
                 # Update progress bar
-                init_progress_bar.n = subgraph_num + 1
+                counter += 1
+                init_progress_bar.n = counter
                 init_progress_bar.refresh()
 
         time_stop_model_creation = time.time()
@@ -117,6 +137,10 @@ class Unified(KGModel):
                      f"{util.format_time(time_start_model_creation, time_stop_model_creation)}\t/-")
 
     def collect_embedding_methods(self):
+        """
+        Collects the embedding methods used by the single models.
+        """
+
         for single_model in self.single_models:
             embedding_method = single_model.model.model_name
 
@@ -126,6 +150,18 @@ class Unified(KGModel):
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
 
     def forward(self, queries, eval_mode=False):
+        """
+        Forward pass of the Unified model.
+
+        Args:
+            queries: The input queries.
+            eval_mode: Flag indicating evaluation mode.
+
+        Returns:
+            predictions: Predictions from the model.
+            factors: Factors used in the predictions.
+        """
+
         # run single model
         self.train_single_models(queries)
         # calculate cross model attention
@@ -146,6 +182,13 @@ class Unified(KGModel):
         return predictions, factors
 
     def train_single_models(self, queries):
+        """
+        Trains single models using the provided queries.
+
+        Args:
+            queries: The input queries.
+        """
+
         if self.validation:
             pass
         else:
@@ -153,15 +196,19 @@ class Unified(KGModel):
                 # actual_queries= get_actual_queries(queries, single_model=single_model)
                 actual_queries = queries.cuda()
 
-                # print(single_model.model.entity.weight.device)
-                # print(actual_queries.device)
-
                 l = single_model.calculate_loss(actual_queries.to('cuda')).to('cuda')
                 single_model.optimizer.zero_grad()
                 l.backward()
                 single_model.optimizer.step()
 
     def calculate_cross_model_attention(self, queries):
+        """
+        Calculates cross-model attention for the given queries.
+
+        Args:
+            queries: The input queries.
+        """
+
         theta_ent_temp = []
         cands_ent_temp = []
         theta_rel_temp = []
@@ -169,15 +216,7 @@ class Unified(KGModel):
 
         for single_model in self.single_models:
             model = single_model.model
-            # args =model
-            #
-            # if args.model_dropout:
-            #     logging.debug(f"Ignoring subgraph {args.subgraph_num} in calculation due to model dropout.")
-            #     if args.subgraph_num in self.active_models:
-            #         self.active_models.remove(args.subgraph_num)
-            #     continue
 
-            # TODO try with actual queries
             actual_queries, query_mask = get_actual_queries(queries, single_model=single_model)
             embedding_ent = torch.zeros(len(queries), self.rank).cuda()
             embedding_rel = torch.zeros(len(queries), self.rank).cuda()
@@ -185,8 +224,8 @@ class Unified(KGModel):
             embedding_ent[query_mask] = model.entity.weight.data[actual_queries[:, 0]]
             embedding_rel[query_mask] = model.rel.weight.data[actual_queries[:, 1]]
             if model.model_name in COMPLEX_MODELS:
-                embedding_ent = model.embeddings[0].weight.data[actual_queries[:, 0]]
-                embedding_rel = model.embeddings[1].weight.data[actual_queries[:, 1]]
+                embedding_ent[query_mask] = model.embeddings[0].weight.data[actual_queries[:, 0]]
+                embedding_rel[query_mask] = model.embeddings[1].weight.data[actual_queries[:, 1]]
             elif model.model_name in HYP_MODELS:
                 # TODO check hyperbolic case
                 embedding_rel = torch.chunk(embedding_rel[actual_queries[:, 1]], 2, dim=1)
@@ -215,6 +254,18 @@ class Unified(KGModel):
             self.theta_rel_unified.weight.data[queries[:, 1]], self.cands_rel[queries[:, 1]])
 
     def calculate_attention(self, theta, cands, dim=-1):
+        """
+        Calculates attention scores based on theta and candidate embeddings.
+
+        Args:
+            theta: The theta embeddings.
+            cands: The candidate embeddings.
+            dim: Dimension to apply softmax.
+
+        Returns:
+            attention: Attention scores.
+        """
+
         softmax = self.act
         if not dim == -1:
             softmax = nn.Softmax(dim=dim)
@@ -223,6 +274,18 @@ class Unified(KGModel):
         return softmax(theta * cands)
 
     def combine_ranks(self, attention, dim_softmax=-1, rank_dim=-1):
+        """
+        Combines ranks of different models using attention scores.
+
+        Args:
+            attention: Attention scores.
+            dim_softmax: Dimension for softmax.
+            rank_dim: Dimension for rank.
+
+        Returns:
+            combined: Combined ranks.
+        """
+
         sizes = attention.size()
         softmax = self.act
         if dim_softmax != -1:
@@ -240,6 +303,13 @@ class Unified(KGModel):
         return softmax(torch.mean(attention, dim=rank_dim))
 
     def combine_embeddings(self, queries):
+        """
+        Combines embeddings from different models using attention scores.
+
+        Args:
+            queries: The input queries.
+        """
+
         ent_emb_temp = []
         rel_emb_temp = []
         rel_diag_emb_temp = []
@@ -249,9 +319,12 @@ class Unified(KGModel):
                 ent_emb_temp.append(single_model.model.entity.weight.data[queries[:, 0]])
                 rel_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             elif single_model.model.model_name in COMPLEX_MODELS:
-                ent_emb_temp.append(single_model.embeddings[0].weight.data[queries[:, 0]])
-                rel_emb_temp.append(single_model.embeddings[1].weight.data[queries[:, 1]])
-
+                ent_emb = single_model.model.embeddings[0].weight.data[queries[:, 0]]
+                ent_emb[torch.isnan(ent_emb)] = 0.0
+                ent_emb_temp.append(ent_emb)
+                rel_emb = single_model.model.embeddings[1].weight.data[queries[:, 1]]
+                rel_emb[torch.isnan(rel_emb)] = 0.0
+                rel_emb_temp.append(rel_emb)
             try:
                 rel_diag_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             except ValueError:
@@ -269,6 +342,17 @@ class Unified(KGModel):
             rel_diag_emb_temp * self.att_rel_cross_model[queries[:, 1]], dim=-1).cuda()
 
     def get_queries(self, queries):
+        """
+        Retrieves the query embeddings and biases.
+
+        Args:
+            queries: The input queries.
+
+        Returns:
+            lhs_e: Query embeddings.
+            lhs_biases: Query biases.
+        """
+
         lhs_e_list = []
         lhs_biases_list = []
         for embedding_method in self.embedding_methods:
@@ -280,12 +364,32 @@ class Unified(KGModel):
             lhs_e_list.append(lhs_e)
             lhs_biases_list.append(lhs_biases)
 
-        lhs_e = torch.mean(torch.stack(lhs_e_list, dim=-1), dim=-1).to('cuda')
-        lhs_biases = torch.mean(torch.stack(lhs_biases_list, dim=-1), dim=-1).to('cuda')
+        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+            lhs_e, _ = torch.max(torch.stack(lhs_e_list, dim=-1), dim=-1)
+            lhs_biases, _ = torch.max(torch.stack(lhs_biases_list, dim=-1), dim=-1)
+            lhs_e = lhs_e.to('cuda')
+            lhs_biases = lhs_biases.to('cuda')
+        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+            lhs_e = torch.mean(torch.stack(lhs_e_list, dim=-1), dim=-1).to('cuda')
+            lhs_biases = torch.mean(torch.stack(lhs_biases_list, dim=-1), dim=-1).to('cuda')
+        else:
+            raise ValueError(f'Aggregation method {self.aggregation_method} in get_queries not supported.')
 
         return lhs_e, lhs_biases
 
     def get_rhs(self, queries, eval_mode):
+        """
+        Retrieves the right-hand side embeddings and biases.
+
+        Args:
+            queries: The input queries.
+            eval_mode: Flag indicating evaluation mode.
+
+        Returns:
+            rhs_e: Right-hand side embeddings.
+            rhs_biases: Right-hand side biases.
+        """
+
         rhs_e_list = []
         rhs_biases_list = []
         for embedding_method in self.embedding_methods:
@@ -297,13 +401,32 @@ class Unified(KGModel):
             rhs_e_list.append(rhs_e)
             rhs_biases_list.append(rhs_biases)
 
-        rhs_e = torch.mean(torch.stack(rhs_e_list, dim=-1), dim=-1).to('cuda')
-        rhs_biases = torch.mean(torch.stack(rhs_biases_list, dim=-1), dim=-1).to('cuda')
+        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+            rhs_e, _ = torch.max(torch.stack(rhs_e_list, dim=-1), dim=-1)
+            rhs_biases, _ = torch.max(torch.stack(rhs_biases_list, dim=-1), dim=-1)
+            rhs_e = rhs_e.to('cuda')
+            rhs_biases = rhs_biases.to('cuda')
+        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+            rhs_e = torch.mean(torch.stack(rhs_e_list, dim=-1), dim=-1).to('cuda')
+            rhs_biases = torch.mean(torch.stack(rhs_biases_list, dim=-1), dim=-1).to('cuda')
+        else:
+            raise ValueError(f'Aggregation method {self.aggregation_method} in get_rhs not supported.')
 
         return rhs_e, rhs_biases
 
     def similarity_score(self, lhs_e, rhs_e, eval_mode):
-        """Compute similarity scores or queries against targets in embedding space."""
+        """
+        Compute similarity scores or queries against targets in embedding space.
+
+        Args:
+            lhs_e: Left-hand side embeddings.
+            rhs_e: Right-hand side embeddings.
+            eval_mode: Flag indicating evaluation mode.
+
+        Returns:
+            score: Similarity scores.
+        """
+
         score_list = []
         for embedding_method in self.embedding_methods:
             if embedding_method in COMPLEX_MODELS:
@@ -314,12 +437,24 @@ class Unified(KGModel):
                 score = getattr(method, "similarity_score")(self, lhs_e, rhs_e, eval_mode)
             score_list.append(score)
 
-        # TODO include aggregation method
-        score = torch.mean(torch.stack(score_list, dim=-1), dim=-1).to('cuda')
+        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+            score, _ = torch.max(torch.stack(score_list, dim=-1), dim=-1)
+            score = score.to('cuda')
+        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+            score = torch.mean(torch.stack(score_list, dim=-1), dim=-1).to('cuda')
+        else:
+            raise ValueError(f'Aggregation method {self.aggregation_method} in similarity_score not supported.')
 
         return score
 
     def set_sim(self, embedding_method):
+        """
+        Sets the similarity metric for the embedding method.
+
+        Args:
+            embedding_method: The embedding method to set the similarity metric for.
+        """
+
         if embedding_method not in EUC_MODELS:
             return
 
@@ -334,6 +469,17 @@ class Unified(KGModel):
             raise ValueError(f"There was no sim specified for the given embedding method {embedding_method}.")
 
     def get_factors(self, queries):
+        """
+        Retrieves factors for the given queries.
+
+        Args:
+            queries: The input queries.
+
+        Returns:
+            factors_h: Head entity factors.
+            factors_r: Relation factors.
+            factors_t: Tail entity factors.
+        """
 
         factors_h_list = []
         factors_r_list = []
@@ -351,25 +497,192 @@ class Unified(KGModel):
                 factors_r_list.append(factors_r)
                 factors_t_list.append(factors_t)
 
-        factors_h = torch.mean(torch.stack(factors_h_list, dim=-1), dim=-1).to('cuda')
-        factors_r = torch.mean(torch.stack(factors_r_list, dim=-1), dim=-1).to('cuda')
-        factors_t = torch.mean(torch.stack(factors_t_list, dim=-1), dim=-1).to('cuda')
+        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+            factors_h, _ = torch.max(torch.stack(factors_h_list, dim=-1), dim=-1)
+            factors_r, _ = torch.max(torch.stack(factors_r_list, dim=-1), dim=-1)
+            factors_t, _ = torch.max(torch.stack(factors_t_list, dim=-1), dim=-1)
+
+            factors_h = factors_h.to('cuda')
+            factors_r = factors_r.to('cuda')
+            factors_t = factors_t.to('cuda')
+
+        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+            factors_h = torch.mean(torch.stack(factors_h_list, dim=-1), dim=-1).to('cuda')
+            factors_r = torch.mean(torch.stack(factors_r_list, dim=-1), dim=-1).to('cuda')
+            factors_t = torch.mean(torch.stack(factors_t_list, dim=-1), dim=-1).to('cuda')
+
+        else:
+            raise ValueError(f'Aggregation method {self.aggregation_method} in get_factors not supported.')
 
         return factors_h, factors_r, factors_t
 
     def update_single_models(self, queries):
+        """
+        Updates the single models with the unified embeddings.
+
+        Args:
+            queries: The input queries.
+        """
+
         for index, single_model in enumerate(self.single_models):
             actual_queries, _ = get_actual_queries(queries, single_model=single_model)
-            single_model.model.entity.weight.data[actual_queries[:, 0]] = self.entity.weight.data[actual_queries[:, 0]]
-            single_model.model.rel.weight.data[actual_queries[:, 1]] = self.rel.weight.data[actual_queries[:, 1]]
+
+            if single_model.model.model_name in COMPLEX_MODELS:
+                single_model.model.embeddings[0].weight.data[actual_queries[:, 0]] = self.entity.weight.data[
+                    actual_queries[:, 0]]
+                single_model.model.embeddings[1].weight.data[actual_queries[:, 1]] = self.rel.weight.data[
+                    actual_queries[:, 1]]
+            else:
+                single_model.model.entity.weight.data[actual_queries[:, 0]] = self.entity.weight.data[
+                    actual_queries[:, 0]]
+                single_model.model.rel.weight.data[actual_queries[:, 1]] = self.rel.weight.data[actual_queries[:, 1]]
+
+            try:
+                buffer = single_model.model.rel_diag.weight.data[actual_queries[:, 0]]
+                single_model.model.rel_diag.weight.data[actual_queries[:, 0]] = self.rel_diag.weight.data[
+                    actual_queries[:, 1]]
+            except:
+                pass
 
             single_model.model.theta_ent.weight.data[actual_queries[:, 0]] = \
                 self.theta_ent_unified.weight.data[actual_queries[:, 0]][:, :, index]
             single_model.model.theta_rel.weight.data[actual_queries[:, 1]] = \
                 self.theta_rel_unified.weight.data[actual_queries[:, 1]][:, :, index]
 
+        # --- required functions for the case of complex embeddings ---
+
+    def get_rhs_complex(self, queries, eval_mode):
+        """
+        Get embeddings and biases of target entities for complex models.
+
+        Args:
+            queries: The input queries.
+            eval_mode: Flag indicating evaluation mode.
+
+        Returns:
+            rhs_e: Right-hand side embeddings.
+            rhs_biases: Right-hand side biases.
+        """
+
+        if eval_mode:
+            return self.entity.weight, self.bt.weight
+        else:
+            return self.entity(queries[:, 2]), self.bt(queries[:, 2])
+
+    def get_complex_embeddings(self, queries):
+        """
+        Get complex embeddings of queries.
+
+        Args:
+            queries: The input queries.
+
+        Returns:
+            head_e: Head entity embeddings.
+            rel_e: Relation embeddings.
+            rhs_e: Right-hand side entity embeddings.
+        """
+
+        rank = self.rank // 2
+        head_e = self.entity(queries[:, 0])
+        rel_e = self.rel(queries[:, 1])
+        rhs_e = self.entity(queries[:, 2])
+        head_e = head_e[:, :rank], head_e[:, rank:]
+        rel_e = rel_e[:, :rank], rel_e[:, rank:]
+        rhs_e = rhs_e[:, :rank], rhs_e[:, rank:]
+        return head_e, rel_e, rhs_e
+
+    def similarity_score_complex(self, lhs_e, rhs_e, eval_mode):
+        """
+        Compute similarity scores or queries against targets in embedding space for complex models.
+
+        Args:
+            lhs_e: Left-hand side embeddings.
+            rhs_e: Right-hand side embeddings.
+            eval_mode: Flag indicating evaluation mode.
+
+        Returns:
+            score: Similarity scores.
+        """
+
+        rank = self.rank // 2
+        lhs_e = lhs_e[:, :rank], lhs_e[:, rank:]
+        rhs_e = rhs_e[:, :rank], rhs_e[:, rank:]
+        if eval_mode:
+            return lhs_e[0] @ rhs_e[0].transpose(0, 1) + lhs_e[1] @ rhs_e[1].transpose(0, 1)
+        else:
+            return torch.sum(lhs_e[0] * rhs_e[0] + lhs_e[1] * rhs_e[1], 1, keepdim=True)
+
+        # --- required functions for the case of AttE ---
+
+    def get_queries_AttE(self, queries):
+        """
+        Retrieves query embeddings and biases for AttE models.
+
+        Args:
+            queries: The input queries.
+
+        Returns:
+            lhs_e: Query embeddings.
+            lhs_biases: Query biases.
+        """
+
+        self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
+        lhs_ref_e, lhs_rot_e, context_vec = self.get_reflection_rotation_context(queries)
+
+        # self-attention mechanism
+        cands = torch.cat([lhs_ref_e, lhs_rot_e], dim=1)
+        att_weights = torch.sum(context_vec * cands * self.scale, dim=-1, keepdim=True)
+        att_weights = self.act(att_weights)
+        lhs_e = torch.sum(att_weights * cands, dim=1) + self.rel(queries[:, 1])
+
+        return lhs_e, self.bh(queries[:, 0])
+
+    def get_reflection_rotation_context(self, queries):
+        """
+        Retrieves reflection, rotation, and context vectors for AttE models.
+
+        Args:
+            queries: The input queries.
+
+        Returns:
+            lhs_ref_e: Reflection embeddings.
+            lhs_rot_e: Rotation embeddings.
+            context_vec: Context vectors.
+        """
+
+        reflection = []
+        rotation = []
+        context_vec = []
+        for single_model in self.single_models:
+            if single_model.model.model_name == Constants.ATT_E:
+                reflection.append(single_model.model.ref(queries[:, 1]).view((-1, 1, self.rank)))
+                rotation.append(single_model.model.rot(queries[:, 1]).view((-1, 1, self.rank)))
+                context_vec.append(single_model.model.context_vec(queries[:, 1]).view((-1, 1, self.rank)))
+
+        reflection = torch.mean(torch.stack(reflection, dim=-1), dim=-1).to('cuda')
+        rotation = torch.mean(torch.stack(rotation, dim=-1), dim=-1).to('cuda')
+        context_vec = torch.mean(torch.stack(context_vec, dim=-1), dim=-1).to('cuda')
+
+        lhs_ref_e = givens_reflection(reflection, self.entity(queries[:, 0])).view((-1, 1, self.rank))
+        lhs_rot_e = givens_rotations(rotation, self.entity(queries[:, 0])).view((-1, 1, self.rank))
+        return lhs_ref_e, lhs_rot_e, context_vec
+
 
 def get_actual_queries(queries, single_model=None, entities=None, relation_names=None):
+    """
+    Filters queries based on the provided single model or entity and relation sets.
+
+    Args:
+        queries: The input queries.
+        single_model: Single model to use for filtering.
+        entities: Set of entities to filter.
+        relation_names: Set of relation names to filter.
+
+    Returns:
+        filtered_queries: Filtered queries.
+        query_mask: Mask indicating valid queries.
+    """
+
     if single_model is not None:
         entity_set = single_model.model.entities
         relation_name_set = single_model.model.relation_names
@@ -389,6 +702,17 @@ def get_actual_queries(queries, single_model=None, entities=None, relation_names
 
 
 def get_class(class_name, base_method=False):
+    """
+    Retrieves the class definition for the given class name.
+
+    Args:
+        class_name: Name of the class to retrieve.
+        base_method: Flag indicating if the base method should be returned.
+
+    Returns:
+        class_def: Class definition.
+    """
+
     if class_name in EUC_MODELS:
         euclidean_method = importlib.import_module("models.euclidean")
         if base_method:
