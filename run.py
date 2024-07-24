@@ -101,22 +101,6 @@ def train(args):
     save_dir = get_savedir(args.model, args.dataset)
     util.setup_logging(save_dir, "train.log", logging_level="info")
 
-    # # file logger
-    # logging.basicConfig(
-    #     format="%(asctime)s %(levelname)-8s %(message)s",
-    #     level=logging.INFO,
-    #     datefmt="%Y-%m-%d %H:%M:%S",
-    #     filename=os.path.join(save_dir, "train.log")
-    # )
-    #
-    # # stdout logger
-    # console = logging.StreamHandler()
-    # console.setLevel(logging.INFO)
-    # formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s")
-    # console.setFormatter(formatter)
-    # logging.getLogger("").addHandler(console)
-    # logging.info("Saving logs in: {}".format(save_dir))
-
     # create dataset
     dataset_path = os.path.join(DATA_PATH, args.dataset)
     dataset = KGDataset(dataset_path, args.debug)
@@ -158,7 +142,7 @@ def train(args):
         # Train step
         model.train()
 
-        train_loss = optimizer.epoch(train_examples)
+        train_loss = optimizer.epoch(train_examples, epoch=step)
         logging.info("\t Epoch {} | average train loss: {:.4f}".format(step, train_loss))
 
         # Valid step
