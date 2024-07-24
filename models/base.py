@@ -6,8 +6,6 @@ import numpy as np
 import torch
 from torch import nn
 
-from ensemble import Constants
-
 
 class KGModel(nn.Module, ABC):
     """Base Knowledge Graph Embedding model class.
@@ -26,9 +24,8 @@ class KGModel(nn.Module, ABC):
             bt: torch.nn.Embedding with tail entity bias embeddings
         """
 
-    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size, model, theta_calculation,
-                 entities=None, relation_names=None, subgraph_amount=None, batch_size=None, aggregation_method=None,
-                 embedding_models=None):
+    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size, model,
+                 entities=None, relation_names=None, subgraph_amount=None, batch_size=None, aggregation_method=None):
         """Initialize KGModel."""
         super(KGModel, self).__init__()
         if data_type == 'double':
@@ -50,8 +47,8 @@ class KGModel(nn.Module, ABC):
         self.bt.weight.data = torch.zeros((sizes[0], 1), dtype=self.data_type)
 
         # check if model is unified model
-        self.embedding_models = embedding_models
-        if self.embedding_models is not None:
+        from models.unified import UNIFIED_MODELS
+        if self.model_name in UNIFIED_MODELS:
             self.is_unified_model = True
             self.subgraph_amount = subgraph_amount
             self.batch_size = batch_size
@@ -59,22 +56,24 @@ class KGModel(nn.Module, ABC):
             self.cands_ent = None
             self.cands_rel = None
 
-            self.att = None
-            self.att_ent = None
-            self.att_rel = None
+            self.att_ent_cross_model = None
+            self.att_rel_cross_model = None
 
             self.theta_ent_unified = None
             self.theta_rel_unified = None
 
         else:
             self.is_unified_model = False
-            self.att_ent_single = None
-            self.att_rel_single = None
-            self.entities = entities
-            self.relation_names = relation_names
+            if entities is None or relation_names is None:
+                self.is_in_ensemble = False
+            else:
+                self.is_in_ensemble = True
+                self.att_ent_single = None
+                self.att_rel_single = None
+                self.entities = entities
+                self.relation_names = relation_names
 
         # ensemble attention
-        self.theta_calculation = theta_calculation
         self.theta_ent = None
         self.theta_rel = None
         self.init_theta()
@@ -186,14 +185,12 @@ class KGModel(nn.Module, ABC):
         factors = self.get_factors(queries)
         return predictions, factors
 
-    def get_ranking(self, queries, filters, ensemble_args=None, batch_size=1000):
+    def get_ranking(self, queries, filters, batch_size=1000):
         """Compute filtered ranking of correct entity for evaluation.
 
         Args:
             queries: torch.LongTensor with query triples (head, relation, tail)
             filters: filters[(head, relation)] gives entities to ignore (filtered setting)
-            ensemble_args (tuple): (aggregated_scores[mode], ensemble_targets[mode]).
-                                   Defaults to None if no ensemble is evaluated.
             batch_size: int for evaluation batch size
 
         Returns:
@@ -212,24 +209,11 @@ class KGModel(nn.Module, ABC):
             while b_begin < len(queries):
                 these_queries = queries[b_begin:b_begin + batch_size].cuda()
 
-                #     scores, targets = self.aggregated_score(these_queries)
-                #     scores = scores.to('cuda')
-                #     targets = targets.to('cuda')
-                # else:
-                # if ensemble_args is None:
-
-                # if self.is_unified_model:
-                #     self.att_queries = (self.combine_ranks(self.att_ent_cross_model[these_queries[:, 0]]) *
-                #                         self.combine_ranks(self.att_rel_cross_model[these_queries[:, 1]]))
-
                 q = self.get_queries(these_queries)
                 rhs = self.get_rhs(these_queries, eval_mode=False)
 
                 scores = self.score(q, candidates, eval_mode=True)
                 targets = self.score(q, rhs, eval_mode=False)
-                # else:
-                #     scores = ensemble_args[0][b_begin:b_begin + batch_size]  # aggregated_scores
-                #     targets = ensemble_args[1][b_begin:b_begin + batch_size]  # aggregated_targets
 
                 # set filtered and true scores to -1e6 to be ignored
                 for i, query in enumerate(these_queries):
@@ -257,13 +241,13 @@ class KGModel(nn.Module, ABC):
 
         return ranks, rank_deviation
 
-    def compute_metrics(self, examples, filters, sizes, ensemble_args=None, batch_size=500):
+    def compute_metrics(self, examples, filters, sizes, batch_size=500):
         """Compute ranking-based evaluation metrics.
     
         Args:
             examples: torch.LongTensor of size n_examples x 3 containing triples' indices
             filters: Dict with entities to skip per query for evaluation in the filtered setting
-            ensemble_args (tuple): (aggregated_scores, aggregated_targets).Defaults to None if no ensemble is evaluated.
+            sizes: tuple with the sizes of the embeddings
             batch_size: integer for batch size to use to compute scores
 
         Returns:
@@ -283,12 +267,7 @@ class KGModel(nn.Module, ABC):
                 q[:, 2] = tmp
                 q[:, 1] += self.sizes[1] // 2
 
-            if ensemble_args is None:
-                ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size)
-            else:
-                ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size,
-                                                                ensemble_args=(
-                                                                    ensemble_args[0][m], ensemble_args[1][m]))
+            ranks_opt, rank_deviation[m] = self.get_ranking(q, filters[m], batch_size=batch_size)
 
             mean_rank[m] = torch.mean(ranks_opt).item()
             mean_reciprocal_rank[m] = torch.mean(1. / ranks_opt).item()
@@ -305,76 +284,30 @@ class KGModel(nn.Module, ABC):
         return mean_rank, mean_reciprocal_rank, hits_at, amri, rank_deviation
 
     def init_theta(self):
-        logging.debug(f"{self.theta_calculation[1]} was set for calculating theta.")
-        if self.theta_calculation[0] == Constants.NO_THETA[0]:
-            return
-        elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
-            if self.is_unified_model:
-                self.att_ent_cross_model = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount,
-                                                       dtype=self.data_type).to('cuda')
-                self.att_rel_cross_model = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount,
-                                                       dtype=self.data_type).to('cuda')
-
-                self.theta_ent_unified = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-                self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-
-                self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount,
-                                                                dtype=self.data_type).to('cuda')
-                self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount,
-                                                                dtype=self.data_type).to('cuda')
-            else:
-                self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-                self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-                self.att_ent_single = torch.zeros(self.sizes[0], self.rank, dtype=self.data_type).cuda()
-                self.att_rel_single = torch.zeros(self.sizes[1], self.rank, dtype=self.data_type).cuda()
-
-        elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-            self.theta_rel = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-        elif self.theta_calculation[0] == Constants.RELATION_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-        elif self.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
-            self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
-        else:
-            logging.error(f"The given '{self.theta_calculation}' is not implemented as a way to calculate theta!")
-            assert ValueError
-
+        """
+        Initialize embeddings and tensors for the calculation of attention between all models.
+        """
         if self.is_unified_model:
+            self.att_ent_cross_model = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount,
+                                                   dtype=self.data_type).to('cuda')
+            self.att_rel_cross_model = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount,
+                                                   dtype=self.data_type).to('cuda')
+
+            self.theta_ent_unified = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
+            self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+
+            self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount,
+                                                            dtype=self.data_type).to('cuda')
+            self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount,
+                                                            dtype=self.data_type).to('cuda')
+
             self.cands_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount,
                                          dtype=self.data_type).to('cuda')
             self.cands_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount,
                                          dtype=self.data_type).to('cuda')
 
-    def update_theta(self, queries):
-        if self.is_unified_model:
-            return
-        elif self.theta_calculation[0] == Constants.NO_THETA[0]:
-            return
-        elif self.theta_calculation[0] == Constants.REGULAR_THETA[0]:
-            # act_emb = nn.Softmax(dim=0)
-            # GOAL: att_weights_ent.size() = [40943]     att_weights_ent.size() = [22]
-            # INPUT: theta_ent = [batch, 32]             theta_rel = [batch, 32]
-            #        ent =       [batch, 32]             rel =       [batch, 32]
-
-            # theta_ent_temp = self.theta_ent(queries[:, 0])
-            # ent = self.entity(queries[:, 0])
-            # self.att_ent_single[queries[:, 0]] = theta_ent_temp * ent
-            # self.att_ent_single = act_emb(self.att_ent_single)
-            #
-            # theta_rel_temp = self.theta_rel(queries[:, 1])
-            # rel = self.rel(queries[:, 1])
-            # self.att_rel_single[queries[:, 1]] = theta_rel_temp * rel
-            # self.att_rel_single = act_emb(self.att_rel_single)
-            pass
-
-        elif self.theta_calculation[0] == Constants.REVERSED_THETA[0]:
-            self.theta_ent(queries[:, 1]).view((-1, 1, self.rank))
-            self.theta_rel(queries[:, 0]).view((-1, 1, self.rank))
-        elif self.theta_calculation[0] == Constants.RELATION_THETA[0]:
-            self.theta_ent(queries[:, 1]).view((-1, 1, self.rank))
-            self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
-        elif self.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
-            self.theta_ent(queries[:, 0]).view((-1, 1, self.rank))
-            self.theta_rel(queries[:, 1]).view((-1, 1, self.rank))
+        else:
+            self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
+            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+            self.att_ent_single = torch.zeros(self.sizes[0], self.rank, dtype=self.data_type).cuda()
+            self.att_rel_single = torch.zeros(self.sizes[1], self.rank, dtype=self.data_type).cuda()
