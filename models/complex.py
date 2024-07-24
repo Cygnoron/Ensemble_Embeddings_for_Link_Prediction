@@ -16,8 +16,13 @@ class BaseC(KGModel):
 
     def __init__(self, args):
         """Initialize a Complex KGModel."""
+        # prevent errors when running baseline
+        if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
+            self.entities = None
+            self.relation_names = None
+            
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
+                                    args.init_size, args.model, entities=args.entities,
                                     relation_names=args.relation_names)
 
         assert self.rank % 2 == 0, "Complex models require even embedding dimension"
@@ -28,16 +33,16 @@ class BaseC(KGModel):
         ])
 
         for embedding in self.embeddings:
-            embedding.weight.data = torch.zeros_like(embedding.weight.data, dtype=self.data_type)
+            embedding.weight.data = torch.zeros(embedding.weight.data.size(), dtype=self.data_type)
 
-        # self.embeddings[0].weight.data[self.entities] = self.init_size * self.embeddings[0].weight.to(self.data_type)
-        # self.embeddings[1].weight.data[self.relation_names] = self.init_size * self.embeddings[1].weight.to(
-        #     self.data_type)
-
-        self.embeddings[0].weight.data[self.entities] = self.init_size * torch.randn(
-            (len(self.entities), 2 * self.rank)).to(self.data_type)
-        self.embeddings[1].weight.data[self.relation_names] = self.init_size * torch.randn(
-            (len(self.relation_names), 2 * self.rank)).to(self.data_type)
+        if self.is_in_ensemble:
+            self.embeddings[0].weight.data[self.entities] = self.init_size * torch.randn(
+                (len(self.entities), 2 * self.rank)).to(self.data_type)
+            self.embeddings[1].weight.data[self.relation_names] = self.init_size * torch.randn(
+                (len(self.relation_names), 2 * self.rank)).to(self.data_type)
+        else:
+            self.embeddings[0].weight.data = self.init_size * self.embeddings[0].weight.to(self.data_type)
+            self.embeddings[1].weight.data = self.init_size * self.embeddings[1].weight.to(self.data_type)
 
     def get_rhs(self, queries, eval_mode):
         """Get embeddings and biases of target entities."""
@@ -88,9 +93,6 @@ class ComplEx(BaseC):
             head_e[0] * rel_e[1] + head_e[1] * rel_e[0]
         ], 1)
 
-        # update context vector
-        self.update_theta(queries)
-
         return lhs_e, self.bh(queries[:, 0])
 
 
@@ -107,8 +109,5 @@ class RotatE(BaseC):
             head_e[0] * cos - head_e[1] * sin,
             head_e[0] * sin + head_e[1] * cos
         ], 1)
-
-        # update context vector
-        self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])

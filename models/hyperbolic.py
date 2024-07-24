@@ -16,18 +16,30 @@ class BaseH(KGModel):
     """Trainable curvature for each relationship."""
 
     def __init__(self, args):
-        super(BaseH, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
-                                    relation_names=args.relation_names)
-        # TODO rand for present
-        self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
-        self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], 2 * self.rank), dtype=self.data_type)
+        # prevent errors when running baseline
+        if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
+            self.entities = None
+            self.relation_names = None
 
-        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
-        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), 2 * self.rank))
+        super(BaseH, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
+                                    args.init_size, args.model, entities=args.entities,
+                                    relation_names=args.relation_names)
 
         self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
-        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        if self.is_in_ensemble:
+            self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
+            self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], 2 * self.rank), dtype=self.data_type)
+
+            self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
+            self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), 2 * self.rank))
+            self.rel_diag.weight.data[self.relation_names] = 2 * torch.rand((len(self.relation_names), self.rank),
+                                                                            dtype=self.data_type) - 1.0
+        else:
+            self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
+            self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], 2 * self.rank), dtype=self.data_type)
+            self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
         self.multi_c = args.multi_c
         if self.multi_c:
             c_init = torch.ones((self.sizes[1], 1), dtype=self.data_type)
@@ -65,9 +77,6 @@ class RotH(BaseH):
         res1 = givens_rotations(self.rel_diag(queries[:, 1]), lhs)
         res2 = mobius_add(res1, rel2, c)
 
-        # update context vector
-        self.update_theta(queries)
-
         return (res2, c), self.bh(queries[:, 0])
 
 
@@ -82,9 +91,6 @@ class RefH(BaseH):
         lhs = givens_reflection(self.rel_diag(queries[:, 1]), self.entity(queries[:, 0]))
         lhs = expmap0(lhs, c)
         res = project(mobius_add(lhs, rel, c), c)
-
-        # update context vector
-        self.update_theta(queries)
 
         return (res, c), self.bh(queries[:, 0])
 
@@ -120,8 +126,5 @@ class AttH(BaseH):
         rel, _ = torch.chunk(self.rel(queries[:, 1]), 2, dim=1)
         rel = expmap0(rel, c)
         res = project(mobius_add(lhs, rel, c), c)
-
-        # update context vector
-        self.update_theta(queries)
 
         return (res, c), self.bh(queries[:, 0])

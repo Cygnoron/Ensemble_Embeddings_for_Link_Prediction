@@ -18,17 +18,25 @@ class BaseE(KGModel):
     """
 
     def __init__(self, args):
+        # prevent errors when running baseline
+        if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
+            self.entities = None
+            self.relation_names = None
+
         super(BaseE, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.model, args.theta_calculation, entities=args.entities,
+                                    args.init_size, args.model, entities=args.entities,
                                     relation_names=args.relation_names)
 
-        self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
-        self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], self.rank), dtype=self.data_type)
+        if self.is_in_ensemble:
+            self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
+            self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], self.rank), dtype=self.data_type)
 
-        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank), dtype=self.data_type)
-        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank),
-                                                                dtype=self.data_type)
-        # self.att = []
+            self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank), dtype=self.data_type)
+            self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank),
+                                                                    dtype=self.data_type)
+        else:
+            self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
+            self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
 
     def get_rhs(self, queries, eval_mode):
         """Get embeddings and biases of target entities."""
@@ -62,9 +70,6 @@ class TransE(BaseE):
         lhs_e = head_e + rel_e
         lhs_biases = self.bh(queries[:, 0])
 
-        # update context vector
-        # self.update_theta(queries)
-
         return lhs_e, lhs_biases
 
 
@@ -80,9 +85,6 @@ class DistMult(BaseE):
         lhs_e = head_e * rel_e
         lhs_biases = self.bh(queries[:, 0])
 
-        # update context vector
-        # self.update_theta(queries)
-
         return lhs_e, lhs_biases
 
 
@@ -94,9 +96,6 @@ class CP(BaseE):
         self.sim = "dot"
 
     def get_queries(self, queries: torch.Tensor):
-        # update context vector
-        # self.update_theta(queries)
-
         return self.entity(queries[:, 0]) * self.rel(queries[:, 1]), self.bh(queries[:, 0])
 
 
@@ -113,9 +112,6 @@ class MurE(BaseE):
         """Compute embedding and biases of queries."""
         lhs_e = self.rel_diag(queries[:, 1]) * self.entity(queries[:, 0]) + self.rel(queries[:, 1])
         lhs_biases = self.bh(queries[:, 0])
-
-        # update context vector
-        # self.update_theta(queries)
 
         return lhs_e, lhs_biases
 
@@ -134,9 +130,6 @@ class RotE(BaseE):
         lhs_e = givens_rotations(self.rel_diag(queries[:, 1]), self.entity(queries[:, 0])) + self.rel(queries[:, 1])
         lhs_biases = self.bh(queries[:, 0])
 
-        # update context vector
-        # self.update_theta(queries)
-
         return lhs_e, lhs_biases
 
 
@@ -154,9 +147,6 @@ class RefE(BaseE):
         lhs = givens_reflection(self.rel_diag(queries[:, 1]), self.entity(queries[:, 0]))
         rel = self.rel(queries[:, 1])
         lhs_biases = self.bh(queries[:, 0])
-
-        # update context vector
-        # self.update_theta(queries)
 
         return lhs + rel, lhs_biases
 
@@ -204,8 +194,5 @@ class AttE(BaseE):
         att_weights = torch.sum(context_vec * cands * self.scale, dim=-1, keepdim=True)
         att_weights = self.act(att_weights)
         lhs_e = torch.sum(att_weights * cands, dim=1) + self.rel(queries[:, 1])
-
-        # update context vector
-        # self.update_theta(queries)
 
         return lhs_e, self.bh(queries[:, 0])
