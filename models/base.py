@@ -218,9 +218,9 @@ class KGModel(nn.Module, ABC):
                 # else:
                 # if ensemble_args is None:
 
-                if self.is_unified_model:
-                    self.att_queries = (self.combine_ranks(self.att_ent_cross_model[these_queries[:, 0]]) *
-                                        self.combine_ranks(self.att_rel_cross_model[these_queries[:, 1]]))
+                # if self.is_unified_model:
+                #     self.att_queries = (self.combine_ranks(self.att_ent_cross_model[these_queries[:, 0]]) *
+                #                         self.combine_ranks(self.att_rel_cross_model[these_queries[:, 1]]))
 
                 q = self.get_queries(these_queries)
                 rhs = self.get_rhs(these_queries, eval_mode=False)
@@ -245,8 +245,8 @@ class KGModel(nn.Module, ABC):
                 ranks[b_begin:b_begin + batch_size] += torch.sum((scores >= targets).to(self.data_type), dim=1)
 
                 # Calculate rank_deviation
-                buffer = scores.to(self.data_type) == targets.to(self.data_type)
-                rank_deviation_buffer = torch.sum(buffer, dim=1)
+                rank_deviation_buffer = scores.to(self.data_type) == targets.to(self.data_type)
+                rank_deviation_buffer = torch.sum(rank_deviation_buffer, dim=1)
 
                 rank_deviation += torch.sum(torch.abs(rank_deviation_buffer))
                 logging.debug(f"rank deviation step {b_begin}/{len(queries)}: {rank_deviation}")
@@ -362,7 +362,7 @@ class KGModel(nn.Module, ABC):
             # ent = self.entity(queries[:, 0])
             # self.att_ent_single[queries[:, 0]] = theta_ent_temp * ent
             # self.att_ent_single = act_emb(self.att_ent_single)
-
+            #
             # theta_rel_temp = self.theta_rel(queries[:, 1])
             # rel = self.rel(queries[:, 1])
             # self.att_rel_single[queries[:, 1]] = theta_rel_temp * rel

@@ -25,8 +25,9 @@ class BaseE(KGModel):
         self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], self.rank), dtype=self.data_type)
 
-        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
-        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank))
+        self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank), dtype=self.data_type)
+        self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank),
+                                                                dtype=self.data_type)
         # self.att = []
 
     def get_rhs(self, queries, eval_mode):

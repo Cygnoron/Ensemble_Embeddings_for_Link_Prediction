@@ -22,13 +22,14 @@ UNIFIED_MODELS = ["Unified"]
 
 
 class Unified(KGModel):
-    def __init__(self, args, init_args):
-        super(Unified, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                      args.init_size, args.model, args.theta_calculation,
-                                      subgraph_amount=args.subgraph_amount,
-                                      batch_size=args.batch_size, aggregation_method=args.aggregation_method,
-                                      embedding_models="Unified")
+    def __init__(self, args, init_args, unified_args):
+        super(Unified, self).__init__(unified_args.sizes, unified_args.rank, unified_args.dropout, unified_args.gamma,
+                                      unified_args.dtype, unified_args.bias, unified_args.init_size, unified_args.model,
+                                      unified_args.theta_calculation, subgraph_amount=unified_args.subgraph_amount,
+                                      batch_size=unified_args.batch_size,
+                                      aggregation_method=unified_args.aggregation_method, embedding_models="Unified")
 
+        self.args = args
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
         self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
         self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
@@ -82,6 +83,7 @@ class Unified(KGModel):
             total = count_params(model)
             logging.debug(f"Total number of parameters of {args_subgraph.subgraph}: {total}")
 
+            model.to('cuda')
             # Get optimizer
             regularizer = (getattr(regularizers, args_subgraph.regularizer)(args_subgraph.reg))
             optim_method = (getattr(torch.optim, args_subgraph.optimizer)(model.parameters(),
@@ -89,7 +91,6 @@ class Unified(KGModel):
             optimizer = KGOptimizer(model, regularizer, optim_method, args_subgraph.batch_size,
                                     args_subgraph.neg_sample_size, bool(args_subgraph.double_neg),
                                     args_subgraph.no_progress_bar)
-            model.to('cuda')
             self.single_model_args.append(args_subgraph)
             self.single_models.append(optimizer)
 
@@ -98,6 +99,9 @@ class Unified(KGModel):
                                     f"config_{args_subgraph.subgraph}_{args_subgraph.model_name}.json"),
                        "w") as json_file):
                 json.dump(vars(args_subgraph), json_file)
+
+            args_subgraph.entities = torch.tensor(args_subgraph.entities, dtype=torch.int).cuda()
+            args_subgraph.relation_names = torch.tensor(args_subgraph.relation_names, dtype=torch.int).cuda()
 
             if not init_args.no_progress_bar:
                 # Update progress bar
@@ -149,7 +153,10 @@ class Unified(KGModel):
                 # actual_queries= get_actual_queries(queries, single_model=single_model)
                 actual_queries = queries.cuda()
 
-                l = single_model.calculate_loss(actual_queries).cuda()
+                # print(single_model.model.entity.weight.device)
+                # print(actual_queries.device)
+
+                l = single_model.calculate_loss(actual_queries.to('cuda')).to('cuda')
                 single_model.optimizer.zero_grad()
                 l.backward()
                 single_model.optimizer.step()
@@ -352,7 +359,7 @@ class Unified(KGModel):
 
     def update_single_models(self, queries):
         for index, single_model in enumerate(self.single_models):
-            actual_queries ,_= get_actual_queries(queries, single_model=single_model)
+            actual_queries, _ = get_actual_queries(queries, single_model=single_model)
             single_model.model.entity.weight.data[actual_queries[:, 0]] = self.entity.weight.data[actual_queries[:, 0]]
             single_model.model.rel.weight.data[actual_queries[:, 1]] = self.rel.weight.data[actual_queries[:, 1]]
 

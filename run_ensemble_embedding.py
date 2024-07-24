@@ -309,91 +309,55 @@ def run_embedding_manual():
                                  subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
                                  rho=args.rho, no_progress_bar=args.no_progress_bar)
 
-    # --- create .graphml files for dataset visualization ---
-
-    # create .graphml files for visualizing the subgraphs
-    # plotting.create_graphml(info_directory, os.path.abspath(dataset_out_dir))
-
     # --- setup for model training ---
 
-    allowed_kge_models = [{Constants.TRANS_E: list(range(0, 5)),
-                           Constants.COMPL_EX: [20],
-                           Constants.DIST_MULT: ['all']
-                           # Constants.DIST_MULT: list(range(5, 10))
-                           }]
-
-    # allowed_kge_models = [
-    #     {Constants.TRANS_E: []},
-    #     {Constants.DIST_MULT: []},
-    #     {Constants.COMPL_EX: []},
-    #     {Constants.ROTAT_E: []},
-    #     {Constants.ATT_E: []},
-    #     {Constants.ATT_H: []}
-    # ]
-
-    # allowed_kge_models = [{Constants.TRANS_E: [], Constants.DIST_MULT: [], Constants.ROTAT_E: [],
-    #                        Constants.COMPL_EX: [], Constants.ATT_E: [], Constants.ATT_H: []}]
-
-    # allowed_kge_models = [{Constants.TRANS_E: []}, {Constants.DIST_MULT: []}, {Constants.ROTAT_E: []},
-    #                       {Constants.COMPL_EX: []}, {Constants.ATT_E: []}, {Constants.ATT_H: []}]
+    allowed_kge_models = {Constants.TRANS_E: list(range(0, 5)),
+                          Constants.COMPL_EX: [20],
+                          Constants.DIST_MULT: ['all']
+                          # Constants.DIST_MULT: list(range(5, 10))
+                          }
 
     # --- training process ---
 
     error = False
-    for models in allowed_kge_models:
-        try:
-            if not args.no_training:
-                args.kge_models = models
+    try:
+        if not args.no_training:
+            args.kge_models = allowed_kge_models
 
-                args.max_epochs = 50
-                args.rank = 32
-                args.patience = 15
-                args.valid = 5
-                args.dtype = "single"
-                args.batch_size = 1000
-                args.debug = False
+            args.max_epochs = 50
+            args.rank = 32
+            args.patience = 15
+            args.valid = 5
+            args.dtype = "single"
+            args.batch_size = 1000
+            args.debug = True
 
-                # args.batch_size = 1000
-                # args.learning_rate = 0.1
-                # args.reg = 0.05
-                # args.regularizer = "N3"
-                # args.optimizer = "Adagrad"
-                # args.neg_sample_size = -1
-                # args.dropout = 0
-                # args.init_size = 0.001
-                # args.gamma = 0
-                # args.bias = "learn"
-                # args.multi_c = True
-                # args.double_neg = True
+            args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1, 'ComplEx': 0.1, 'RotatE': 0.001, 'AttE': 0.001,
+                                  'AttH': 0.001}
+            args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05, 'rest': 0.0}
+            args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad", 'ComplEx': "Adagrad", 'RotatE': "Adam",
+                              'AttE': "Adam", 'AttH': "Adam", 'Unified': "Adam"}
+            args.neg_sample_size = {"TransE": -1, 'DistMult': -1, 'ComplEx': -1, 'RotatE': 250, 'AttE': -1,
+                                    'AttH': 250}
+            args.bias = {'ComplEx': "none", 'TransE': "learn", 'DistMult': "none", 'AttE': "learn", 'rest': "none"}
+            args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
+            args.multi_c = {'AttE': True, 'AttH': True, 'rest': False}
 
-                # TODO Fix optimizers
+            args.regularizer = {'all': "N3"}
+            args.init_size = {'all': 0.001}
+            args.dropout = {'all': 0}
+            args.gamma = {'all': 0}
 
-                args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1, 'ComplEx': 0.1, 'RotatE': 0.001, 'AttE': 0.001,
-                                      'AttH': 0.001}
-                args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05, 'rest': 0.0}
-                args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad", 'ComplEx': "Adagrad", 'RotatE': "Adam",
-                                  'AttE': "Adam", 'AttH': "Adam"}
-                args.neg_sample_size = {"TransE": -1, 'DistMult': -1, 'ComplEx': -1, 'RotatE': 250, 'AttE': -1,
-                                        'AttH': 250}
-                args.bias = {'ComplEx': "none", 'TransE': "learn", 'DistMult': "none", 'AttE': "learn", 'rest': "none"}
-                args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
-                args.multi_c = {'AttE': True, 'AttH': True, 'rest': False}
+            if Constants.LOG_WANDB:
+                wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
+                wandb.login()
 
-                args.regularizer = {'all': "N3"}
-                args.init_size = {'all': 0.001}
-                args.dropout = {'all': 0}
-                args.gamma = {'all': 0}
+            # run.train(info_directory, args)
+            run_unified_model.train(info_directory, args)
 
-                if Constants.LOG_WANDB:
-                    wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
-                    wandb.login()
-
-                # run.train(info_directory, args)
-                run_unified_model.train(info_directory, args)
-
-        except Exception:
-            logging.error(traceback.format_exc())
-            error = True
+    except Exception:
+        logging.error(traceback.format_exc())
+        error = True
 
     time_process_end = time.time()
 
@@ -407,7 +371,9 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    # run_embedding(parser.parse_args())
+    # Function to run manual via IDE
+    run_embedding_manual()
 
     # Function to run baseline
     args = parser.parse_args()
@@ -441,6 +407,3 @@ if __name__ == "__main__":
     args.wandb_project = "Experiments"
 
     # run_baseline(args)
-
-    # Function to run manual via IDE
-    # run_embedding_manual()

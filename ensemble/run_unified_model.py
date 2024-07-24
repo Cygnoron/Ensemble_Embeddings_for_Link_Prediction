@@ -196,7 +196,8 @@ def train(info_directory, args):
 
 def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, general_dataset,
                         subgraph_embedding_mapping, dataset_path):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    device = "cuda"
 
     # create unified model
     init_args = argparse.Namespace(
@@ -217,7 +218,7 @@ def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, gener
     unified_model = "Unified"
     args.model = unified_model
     args_unified = util.get_args(args, unified_model)
-    unified_model = getattr(models, unified_model)(args_unified, init_args)
+    unified_model = getattr(models, unified_model)(args, init_args, args_unified)
     unified_model.to(init_args.device)
 
     return unified_model, args_unified
