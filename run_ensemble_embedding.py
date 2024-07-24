@@ -167,18 +167,68 @@ parser.add_argument(
 )
 
 
-def run_baseline(args):
-    try:
-        Constants.get_wandb(args.wandb_project)
-    except:
-        pass
+def run_baseline():
+    """
+    Run the baseline configuration for the knowledge graph embedding model.
+
+    This function sets up the arguments with a predefined baseline configuration and
+    initiates the training process using these arguments.
+    """
+
+    # --- Setup args ---
+    args = parser.parse_args()
+
+    args.model = "DistMult"
+    args.dataset = "WN18RR"
+    args.max_epochs = 50
+    args.rank = 32
+    args.patience = 15
+    args.valid = 5
+    args.dtype = "single"
+    args.batch_size = 100
+    args.debug = False
+
+    args.learning_rate = 0.1
+    args.reg = 0.5
+    args.optimizer = "Adagrad"
+    args.neg_sample_size = -1
+    args.bias = "none"
+    args.double_neg = False
+    args.multi_c = False
+
+    args.regularizer = "N3"
+    args.init_size = 0.001
+    args.gamma = 0.0
+    args.dropout = 0.0
+
+    args.no_progress_bar = False
+    args.entities = None
+    args.relation_names = None
+    args.wandb_project = "Experiments"
+
+    # --- Training ---
+    Constants.get_wandb(args.wandb_project)
     train(args)
 
 
 def run_embedding(args):
-    Constants.get_wandb(args.wandb_project)
+    """
+    Run the embedding model with the specified arguments.
+
+    This function performs the following steps:
+    1. Sets up Weights & Biases (wandb) logging if specified.
+    2. Handles method-specific arguments for sampling, aggregation, and theta calculation.
+    3. Configures the dataset and creates necessary directories.
+    4. Sets up logging.
+    5. Samples the graph if sampling is not turned off.
+    6. Trains the model if training is not turned off.
+    7. Logs the total time taken for the process.
+    """
 
     time_process_start = time.time()
+
+    # Setup wandb logging if needed
+    Constants.get_wandb(args.wandb_project)
 
     args.sampling_method = util.handle_methods(args.sampling_method, "sampling")
     args.aggregation_method = util.handle_methods(args.aggregation_method, "aggregation")
@@ -187,9 +237,8 @@ def run_embedding(args):
 
     dataset_out = ""
     if args.sampling_method == Constants.FEATURE_SAMPLING:
-        dataset_out = (
-            f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}_rho{args.rho}"
-            f"_min{args.subgraph_size_range[0]}_max{args.subgraph_size_range[1]}")
+        dataset_out = (f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}_rho{args.rho}"
+                       f"_min{args.subgraph_size_range[0]}_max{args.subgraph_size_range[1]}")
     elif args.sampling_method == Constants.ENTITY_SAMPLING:
         dataset_out = (f"{args.dataset}_{args.sampling_method[2]}_N{args.subgraph_amount}"
                        f"_min{args.subgraph_size_range[0]}_max{args.subgraph_size_range[1]}")
@@ -237,6 +286,18 @@ def run_embedding(args):
 
 
 def run_embedding_manual():
+    """
+    Run the embedding model with a manual configuration.
+
+    This function sets up the arguments with a predefined manual configuration,
+    performs necessary setups such as directory creation and logging, and initiates
+    the sampling and training processes based on the configuration.
+    """
+
+    time_process_start = time.time()
+
+    # --- Setup parameters and args ---
+
     # dataset_in = "Debug"
     dataset_in = "WN18RR"
     # dataset_in = "FB15K"
@@ -254,14 +315,13 @@ def run_embedding_manual():
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
-                              theta_calculation=Constants.REGULAR_THETA, model_dropout_factor=model_dropout_factor)
+                              model_dropout_factor=model_dropout_factor)
 
+    # --- Setup wandb ---
     args.wandb_project = "Experiments"
-
     Constants.get_wandb(args.wandb_project)
 
-    time_process_start = time.time()
-
+    # --- Setup directories ---
     dataset_out = ""
     if args.sampling_method == Constants.FEATURE_SAMPLING:
         dataset_out = (f"{dataset_in}_{args.sampling_method[2]}_N{subgraph_amount}_rho{args.rho}"
@@ -283,47 +343,25 @@ def run_embedding_manual():
     util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
                        logging_level="info")
 
-    # --- if a new debugging dataset was created ---
-    # for split in ["train", "test", "valid"]:
-    #     util_files.csv_to_file(os.path.join("ensemble", "Random_Triples.csv"), os.path.join("data", "Debug", split),
-    #                            only_unique=True)
-
-    # process_specific_dataset("Debug", "data")
-
-    # util_files.pickle_to_csv(f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-    #                          f"data\\{dataset_in}\\train.pickle",
-    #                          f"D:\\Masterarbeit\\Software\\Ensemble_Embedding_for_Link_Prediction\\"
-    #                          f"data\\{dataset_in}\\train_readable.csv", ';')
-
-    # --- create files for insights in dataset ---
-
-    # util_files.create_entity_and_relation_name_set_file(os.path.join("data",dataset_in))
-
-    # for dataset in os.scandir("data"):
-    #     print(dataset.name)
-    #     util.create_entity_and_relation_name_set_file(dataset.name)
-
-    # --- sampling process ---
+    # --- Sampling process ---
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
                                  rho=args.rho, no_progress_bar=args.no_progress_bar)
 
-    # --- setup for model training ---
-
+    # --- Setup model training ---
     allowed_kge_models = {Constants.TRANS_E: list(range(0, 5)),
                           Constants.COMPL_EX: [20],
                           Constants.DIST_MULT: ['all']
                           # Constants.DIST_MULT: list(range(5, 10))
                           }
 
-    # --- training process ---
-
+    # --- Training process ---
     error = False
     try:
         if not args.no_training:
+            # general parameters
             args.kge_models = allowed_kge_models
-
             args.max_epochs = 50
             args.rank = 32
             args.patience = 15
@@ -332,6 +370,7 @@ def run_embedding_manual():
             args.batch_size = 1000
             args.debug = True
 
+            # individually settable parameters
             args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1, 'ComplEx': 0.1, 'RotatE': 0.001, 'AttE': 0.001,
                                   'AttH': 0.001}
             args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05, 'rest': 0.0}
@@ -352,7 +391,6 @@ def run_embedding_manual():
                 wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
                 wandb.login()
 
-            # run.train(info_directory, args)
             run_unified_model.train(info_directory, args)
 
     except Exception:
@@ -361,6 +399,7 @@ def run_embedding_manual():
 
     time_process_end = time.time()
 
+    # --- Final output regarding process ---
     if not error:
         logging.info(f"The entire process including sampling, training and testing took "
                      f"{util.format_time(time_process_start, time_process_end)}.")
@@ -372,38 +411,9 @@ def run_embedding_manual():
 if __name__ == "__main__":
     # Function to run via command prompt
     # run_embedding(parser.parse_args())
+
     # Function to run manual via IDE
     run_embedding_manual()
 
     # Function to run baseline
-    args = parser.parse_args()
-
-    args.model = "DistMult"
-    args.dataset = "WN18RR"
-    args.max_epochs = 50
-    args.rank = 32
-    args.patience = 15
-    args.valid = 5
-    args.dtype = "single"
-    args.batch_size = 100
-    args.debug = False
-
-    args.learning_rate = 0.1
-    args.reg = 0.5
-    args.optimizer = "Adagrad"
-    args.neg_sample_size = -1
-    args.bias = "none"
-    args.double_neg = False
-    args.multi_c = False
-
-    args.regularizer = "N3"
-    args.init_size = 0.001
-    args.gamma = 0.0
-    args.dropout = 0.0
-
-    args.no_progress_bar = False
-    args.entities = None
-    args.relation_names = None
-    args.wandb_project = "Experiments"
-
-    # run_baseline(args)
+    # run_baseline()
