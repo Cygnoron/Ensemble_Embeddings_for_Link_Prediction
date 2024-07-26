@@ -12,7 +12,7 @@ import torch
 from ensemble import Constants
 from ensemble.util import get_unique_triple_ids
 
-
+# TODO tidy up
 def check_directory(directory):
     """
         Check if the given directory exists, and if not, create it along with its parent directories if necessary.
@@ -365,7 +365,7 @@ def create_entity_and_relation_name_set_file(dataset):
 
 
 def get_info_directory_path(dataset_out_dir, args):
-    hyper_param_str = f"results_{args.aggregation_method[2]}_{args.theta_calculation[2]}"
+    hyper_param_str = f"results_{args.aggregation_method[2]}"
 
     if not args.no_time_dependent_file_path:
         hyper_param_str += datetime.now().strftime('_%m.%d_%H_%M')

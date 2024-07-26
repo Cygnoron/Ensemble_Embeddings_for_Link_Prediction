@@ -12,7 +12,7 @@ from datasets.kg_dataset import KGDataset
 from ensemble import Constants
 from ensemble.Constants import EMBEDDING_METHODS
 
-
+# TODO tidy up
 def get_unique_triple_ids(dataset, h=False, r=False, t=False):
     """
     The get_unique_triple_ids function takes in a dataset and returns a dictionary of unique entities or relations

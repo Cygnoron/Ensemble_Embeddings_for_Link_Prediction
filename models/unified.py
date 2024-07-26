@@ -34,16 +34,20 @@ class Unified(KGModel):
             init_args: Initialization arguments.
             unified_args: Unified model specific arguments.
         """
+
+        self.args = args
+        self.rank_rel = unified_args.rank
+        # change dimensions of relation embeddings if hyperbolic methods are contained
+        self.init_if_hyperbolic(unified_args)
+
         super(Unified, self).__init__(unified_args.sizes, unified_args.rank, unified_args.dropout, unified_args.gamma,
                                       unified_args.dtype, unified_args.bias, unified_args.init_size, unified_args.model,
                                       subgraph_amount=unified_args.subgraph_amount, batch_size=unified_args.batch_size,
                                       aggregation_method=unified_args.aggregation_method)
-
-        self.args = args
         self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
-        self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
-        self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
-        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+        self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank_rel), dtype=self.data_type)
+        self.rel_diag = nn.Embedding(self.sizes[1], self.rank_rel)
+        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank_rel), dtype=self.data_type) - 1.0
 
         self.theta_ent_unified = self.theta_ent_unified.to('cuda')
         self.theta_rel_unified = self.theta_rel_unified.to('cuda')
@@ -55,12 +59,17 @@ class Unified(KGModel):
         self.single_model_args = []
         self.init_single_models(args, init_args)
 
-        # self.active_models = list(range(self.subgraph_amount))
         self.embedding_methods = set()
         self.single_train_loss = {}
         self.sim = None
         self.validation = False
         self.collect_embedding_methods()
+
+    def init_if_hyperbolic(self, unified_args):
+        for method in list(self.args.kge_models.keys()):
+            if method in HYP_MODELS:
+                self.rank_rel = 2 * unified_args.rank
+                break
 
     def init_single_models(self, args, init_args):
         """
@@ -146,6 +155,16 @@ class Unified(KGModel):
 
             if not any(embedding_method == method for method in self.embedding_methods):
                 self.embedding_methods.add(embedding_method)
+                if embedding_method in HYP_MODELS:
+                    self.multi_c = self.args.multi_c
+                    if self.multi_c:
+                        c_init = torch.ones((self.sizes[1], 1), dtype=self.data_type)
+                    else:
+                        c_init = torch.ones((1, 1), dtype=self.data_type)
+                    self.c = nn.Parameter(c_init, requires_grad=True)
+                    self.context_vec = nn.Embedding(self.sizes[1], self.rank)
+                    self.context_vec.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank),
+                                                                                dtype=self.data_type)
 
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
 
@@ -162,8 +181,10 @@ class Unified(KGModel):
             factors: Factors used in the predictions.
         """
 
+        print(f"before single train: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
         # run single model
         self.train_single_models(queries)
+        print(f"after single train: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
         # calculate cross model attention
         self.calculate_cross_model_attention(queries)
         # combine single embeddings into unified embedding
@@ -194,12 +215,18 @@ class Unified(KGModel):
         else:
             for single_model in self.single_models:
                 # actual_queries= get_actual_queries(queries, single_model=single_model)
+                print(f"1: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 actual_queries = queries.cuda()
 
+                print(f"2: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 l = single_model.calculate_loss(actual_queries.to('cuda')).to('cuda')
+                print(f"3: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 single_model.optimizer.zero_grad()
+                print(f"4: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 l.backward()
+                print(f"5: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 single_model.optimizer.step()
+                print(f"6: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
 
     def calculate_cross_model_attention(self, queries):
         """
@@ -219,16 +246,13 @@ class Unified(KGModel):
 
             actual_queries, query_mask = get_actual_queries(queries, single_model=single_model)
             embedding_ent = torch.zeros(len(queries), self.rank).cuda()
-            embedding_rel = torch.zeros(len(queries), self.rank).cuda()
+            embedding_rel = torch.zeros(len(queries), self.rank_rel).cuda()
 
             embedding_ent[query_mask] = model.entity.weight.data[actual_queries[:, 0]]
             embedding_rel[query_mask] = model.rel.weight.data[actual_queries[:, 1]]
             if model.model_name in COMPLEX_MODELS:
                 embedding_ent[query_mask] = model.embeddings[0].weight.data[actual_queries[:, 0]]
                 embedding_rel[query_mask] = model.embeddings[1].weight.data[actual_queries[:, 1]]
-            elif model.model_name in HYP_MODELS:
-                # TODO check hyperbolic case
-                embedding_rel = torch.chunk(embedding_rel[actual_queries[:, 1]], 2, dim=1)
 
             # Stack cands and theta for cross model attention
             theta_ent_temp.append(model.theta_ent.weight.data[queries[:, 0]])
@@ -325,6 +349,13 @@ class Unified(KGModel):
                 rel_emb = single_model.model.embeddings[1].weight.data[queries[:, 1]]
                 rel_emb[torch.isnan(rel_emb)] = 0.0
                 rel_emb_temp.append(rel_emb)
+            elif single_model.model.model_name in HYP_MODELS:
+                ent_emb = single_model.model.entity.weight.data[queries[:, 0]]
+                rel_emb = single_model.model.rel.weight.data[queries[:, 1]]
+                ent_emb[torch.isnan(ent_emb)] = 0.0
+                rel_emb[torch.isnan(rel_emb)] = 0.0
+                ent_emb_temp.append(ent_emb)
+                rel_emb_temp.append(rel_emb)
             try:
                 rel_diag_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             except ValueError:
@@ -364,14 +395,37 @@ class Unified(KGModel):
             lhs_e_list.append(lhs_e)
             lhs_biases_list.append(lhs_biases)
 
+        if type(lhs_e_list[0]) == tuple:
+            # handle hyperbolic case
+            lhs_e_list_buffer = []
+            c_list_buffer = []
+            for query_tuple in lhs_e_list:
+                lhs_e, c = query_tuple
+                lhs_e_list_buffer.append(lhs_e)
+                c_list_buffer.append(c)
+            lhs_e_list_buffer = torch.stack(lhs_e_list_buffer, dim=-1).to('cuda')
+            c_list_buffer = torch.stack(c_list_buffer, dim=-1).to('cuda')
+            lhs_e_list = (lhs_e_list_buffer, c_list_buffer)
+
+        else:
+            lhs_e_list = torch.stack(lhs_e_list, dim=-1).to('cuda')
+
         if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-            lhs_e, _ = torch.max(torch.stack(lhs_e_list, dim=-1), dim=-1)
+            if isinstance(lhs_e_list, tuple):
+                lhs_e = (torch.max(lhs_e_list[0], dim=-1)[0].to('cuda'), torch.max(lhs_e_list[1], dim=-1)[0].to('cuda'))
+            else:
+                lhs_e, _ = torch.max(lhs_e_list, dim=-1)
+                lhs_e = lhs_e.to('cuda')
             lhs_biases, _ = torch.max(torch.stack(lhs_biases_list, dim=-1), dim=-1)
-            lhs_e = lhs_e.to('cuda')
             lhs_biases = lhs_biases.to('cuda')
+
         elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-            lhs_e = torch.mean(torch.stack(lhs_e_list, dim=-1), dim=-1).to('cuda')
+            if type(lhs_e_list[0]) == tuple:
+                lhs_e = (torch.mean(lhs_e_list[0], dim=-1).to('cuda'), torch.mean(lhs_e_list[1], dim=-1).to('cuda'))
+            else:
+                lhs_e = torch.mean(lhs_e_list, dim=-1).to('cuda')
             lhs_biases = torch.mean(torch.stack(lhs_biases_list, dim=-1), dim=-1).to('cuda')
+
         else:
             raise ValueError(f'Aggregation method {self.aggregation_method} in get_queries not supported.')
 
@@ -537,12 +591,9 @@ class Unified(KGModel):
                     actual_queries[:, 0]]
                 single_model.model.rel.weight.data[actual_queries[:, 1]] = self.rel.weight.data[actual_queries[:, 1]]
 
-            try:
-                buffer = single_model.model.rel_diag.weight.data[actual_queries[:, 0]]
-                single_model.model.rel_diag.weight.data[actual_queries[:, 0]] = self.rel_diag.weight.data[
+            if hasattr(single_model.model, "rel_diag"):
+                single_model.model.rel_diag.weight.data[actual_queries[:, 1]] = self.rel_diag.weight.data[
                     actual_queries[:, 1]]
-            except:
-                pass
 
             single_model.model.theta_ent.weight.data[actual_queries[:, 0]] = \
                 self.theta_ent_unified.weight.data[actual_queries[:, 0]][:, :, index]

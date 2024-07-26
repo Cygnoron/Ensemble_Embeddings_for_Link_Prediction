@@ -25,7 +25,7 @@ class BaseH(KGModel):
                                     args.init_size, args.model, entities=args.entities,
                                     relation_names=args.relation_names)
 
-        self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
+        self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)
 
         if self.is_in_ensemble:
             self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
@@ -33,12 +33,12 @@ class BaseH(KGModel):
 
             self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank))
             self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), 2 * self.rank))
-            self.rel_diag.weight.data[self.relation_names] = 2 * torch.rand((len(self.relation_names), self.rank),
+            self.rel_diag.weight.data[self.relation_names] = 2 * torch.rand((len(self.relation_names), 2 * self.rank),
                                                                             dtype=self.data_type) - 1.0
         else:
             self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
             self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], 2 * self.rank), dtype=self.data_type)
-            self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+            self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], 2 * self.rank), dtype=self.data_type) - 1.0
 
         self.multi_c = args.multi_c
         if self.multi_c:

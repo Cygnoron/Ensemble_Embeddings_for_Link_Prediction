@@ -301,9 +301,9 @@ def run_embedding_manual():
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
-                              aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
+                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
-                              # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
+                              aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
 
     # --- Setup wandb ---
@@ -338,20 +338,22 @@ def run_embedding_manual():
                                  subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
                                  rho=args.rho, no_progress_bar=args.no_progress_bar)
 
+    # TODO fix complex models
+    # TODO fix hyperbolic models
     # --- Setup model training ---
-    allowed_kge_models = {Constants.TRANS_E: list(range(0, 5)),
+    allowed_kge_models = {Constants.DIST_MULT: list(range(0, 5)),
                           Constants.COMPL_EX: [20],
-                          Constants.DIST_MULT: ['all']
+                          Constants.ATT_H: ['all']
                           # Constants.DIST_MULT: list(range(5, 10))
                           }
 
-    allowed_kge_models = ({
-        # Constants.TRANS_E: [0],
-        # Constants.DIST_MULT: [1],
-        Constants.COMPL_EX: [2],
-        # Constants.ROTAT_E: [3],
-        # Constants.ATT_E: [4]
-    })
+    # allowed_kge_models = ({
+    #     Constants.TRANS_E: [0],
+    #     Constants.DIST_MULT: [1],
+    #     Constants.COMPL_EX: [2],
+    #     Constants.ROTAT_E: [3],
+    #     Constants.ATT_E: [4]
+    # })
     # ,)
     # Constants.ATT_H: []}
 
@@ -361,7 +363,7 @@ def run_embedding_manual():
         if not args.no_training:
             # general parameters
             args.kge_models = allowed_kge_models
-            args.max_epochs = 50
+            args.max_epochs = 1
             args.rank = 2
             args.patience = 15
             args.valid = 5

@@ -53,6 +53,9 @@ class KGModel(nn.Module, ABC):
             self.subgraph_amount = subgraph_amount
             self.batch_size = batch_size
             self.aggregation_method = aggregation_method
+
+            self.rel = nn.Embedding(sizes[1], self.rank_rel)
+
             self.cands_ent = None
             self.cands_rel = None
 
@@ -290,24 +293,28 @@ class KGModel(nn.Module, ABC):
         if self.is_unified_model:
             self.att_ent_cross_model = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount,
                                                    dtype=self.data_type).to('cuda')
-            self.att_rel_cross_model = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount,
+            self.att_rel_cross_model = torch.zeros(self.sizes[1], self.rank_rel, self.subgraph_amount,
                                                    dtype=self.data_type).to('cuda')
 
             self.theta_ent_unified = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-            self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+            self.theta_rel_unified = nn.Embedding(self.sizes[1], self.rank_rel, dtype=self.data_type)
 
             self.theta_ent_unified.weight.data = torch.rand(self.sizes[0], self.rank, self.subgraph_amount,
                                                             dtype=self.data_type).to('cuda')
-            self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank, self.subgraph_amount,
+            self.theta_rel_unified.weight.data = torch.rand(self.sizes[1], self.rank_rel, self.subgraph_amount,
                                                             dtype=self.data_type).to('cuda')
 
             self.cands_ent = torch.zeros(self.sizes[0], self.rank, self.subgraph_amount,
                                          dtype=self.data_type).to('cuda')
-            self.cands_rel = torch.zeros(self.sizes[1], self.rank, self.subgraph_amount,
+            self.cands_rel = torch.zeros(self.sizes[1], self.rank_rel, self.subgraph_amount,
                                          dtype=self.data_type).to('cuda')
 
         else:
             self.theta_ent = nn.Embedding(self.sizes[0], self.rank, dtype=self.data_type)
-            self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
+            from models import HYP_MODELS
+            if self.model_name in HYP_MODELS:
+                self.theta_rel = nn.Embedding(self.sizes[1], 2 * self.rank, dtype=self.data_type)
+            else:
+                self.theta_rel = nn.Embedding(self.sizes[1], self.rank, dtype=self.data_type)
             self.att_ent_single = torch.zeros(self.sizes[0], self.rank, dtype=self.data_type).cuda()
             self.att_rel_single = torch.zeros(self.sizes[1], self.rank, dtype=self.data_type).cuda()
