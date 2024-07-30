@@ -2,7 +2,6 @@ import importlib
 import json
 import logging
 import os
-import random
 import time
 
 import numpy as np
@@ -219,17 +218,14 @@ class Unified(KGModel):
 
             valid_loss = single_model.calculate_valid_loss(actual_queries.to('cuda')).to('cuda')
             logging.debug(f"Valid loss for {single_model.model.subgraph}: {valid_loss:.2f}")
-            if hasattr(single_model.model, "first_loss"):
-                valid_loss = random.randint(1, 20) * valid_loss
 
-            logging.debug(f"{valid_loss.item()}")
             if not hasattr(single_model.model, "first_loss"):
                 single_model.model.first_loss = valid_loss
             else:
                 if valid_loss > single_model.model.first_loss * self.args.model_dropout_factor:
                     logging.critical(f"Model {single_model.model.subgraph} was excluded, since the current loss "
-                                 f"{valid_loss:.2f} exceeded {self.args.model_dropout_factor} times the first loss "
-                                 f"{single_model.model.first_loss:.2f}.")
+                                     f"{valid_loss:.2f} exceeded {self.args.model_dropout_factor} times the first loss "
+                                     f"{single_model.model.first_loss:.2f}.")
                     single_model.model.model_dropout = True
                     logging.debug(f"Removing {single_model.model.subgraph_num} from {self.active_models}")
                     self.active_models.remove(single_model.model.subgraph_num)
@@ -414,6 +410,25 @@ class Unified(KGModel):
         self.rel_diag.weight.data[queries[:, 1]] = torch.sum(
             rel_diag_emb_temp * self.att_rel_cross_model[queries[:, 1]], dim=-1).cuda()
 
+    def min_max_normalize(self, tensor, dim):
+        """
+        Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
+
+        Args:
+        tensor (torch.Tensor): The input tensor.
+        dim (int): The dimension along which to normalize.
+
+        Returns:
+        torch.Tensor: The normalized tensor.
+        """
+        min_vals, _ = tensor.min(dim=dim, keepdim=True)
+        max_vals, _ = tensor.max(dim=dim, keepdim=True)
+        range_vals = max_vals - min_vals
+
+        # Avoid division by zero
+        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-8)
+        return normalized_tensor
+
     def get_queries(self, queries):
         """
         Retrieves the query embeddings and biases.
@@ -431,13 +446,23 @@ class Unified(KGModel):
         for embedding_method in self.embedding_methods:
             if embedding_method == Constants.ATT_E:
                 lhs_e, lhs_biases = self.get_queries_AttE(queries)
+
             else:
                 method = get_class(embedding_method)
                 lhs_e, lhs_biases = getattr(method, "get_queries")(self, queries)
+
+            if isinstance(lhs_e, tuple):
+                for i in range(len(lhs_e)):
+                    lhs_e[i] = self.min_max_normalize(lhs_e[i], dim=0)
+                    lhs_biases[i] = self.min_max_normalize(lhs_biases[i], dim=0)
+            else:
+                lhs_e = self.min_max_normalize(lhs_e, dim=0)
+                lhs_biases = self.min_max_normalize(lhs_biases, dim=0)
+
             lhs_e_list.append(lhs_e)
             lhs_biases_list.append(lhs_biases)
 
-        if type(lhs_e_list[0]) == tuple:
+        if isinstance(lhs_e_list[0], tuple):
             # handle hyperbolic case
             lhs_e_list_buffer = []
             c_list_buffer = []
@@ -494,6 +519,15 @@ class Unified(KGModel):
             else:
                 method = get_class(embedding_method, base_method=True)
                 rhs_e, rhs_biases = getattr(method, "get_rhs")(self, queries, eval_mode)
+
+            if isinstance(rhs_e, tuple):
+                for i in range(len(rhs_e)):
+                    rhs_e[i] = self.min_max_normalize(rhs_e[i], dim=0)
+                    rhs_biases[i] = self.min_max_normalize(rhs_biases[i], dim=0)
+            else:
+                rhs_e = self.min_max_normalize(rhs_e, dim=0)
+                rhs_biases = self.min_max_normalize(rhs_biases, dim=0)
+
             rhs_e_list.append(rhs_e)
             rhs_biases_list.append(rhs_biases)
 

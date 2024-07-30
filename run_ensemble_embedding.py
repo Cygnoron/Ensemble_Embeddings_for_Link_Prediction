@@ -365,11 +365,11 @@ def run_embedding_manual():
             # general parameters
             args.kge_models = allowed_kge_models
             args.max_epochs = 30
-            args.rank = 2
+            args.rank = 32
             args.patience = 15
             args.valid = 5
             args.dtype = "single"
-            args.batch_size = 500
+            args.batch_size = 1000
             args.debug = True
 
             # individually settable parameters
@@ -424,10 +424,10 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    # run_embedding(parser.parse_args())
 
     # Function to run manual via IDE
-    # run_embedding_manual()
+    run_embedding_manual()
 
     # Function to run baseline
     # run_baseline()

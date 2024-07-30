@@ -526,8 +526,6 @@ def handle_methods(method_str: str, mode):
         method_list = Constants.SAMPLING_METHODS
     elif mode == "aggregation":
         method_list = Constants.AGGREGATION_METHODS
-    elif mode == "theta":
-        method_list = Constants.THETA_METHODS
     elif mode == "size_range":
         method_str = method_str.lstrip("(").rstrip(")").split(",")
         method_str = (float(method_str[0]), float(method_str[1]))
