@@ -24,7 +24,7 @@ class BaseE(KGModel):
             self.relation_names = None
 
         super(BaseE, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.model, entities=args.entities,
+                                    args.init_size, args.model, subgraph=args.subgraph, entities=args.entities,
                                     relation_names=args.relation_names)
 
         if self.is_in_ensemble:

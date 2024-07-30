@@ -150,6 +150,7 @@ class KGOptimizer(object):
         loss /= counter
 
         if self.model.is_unified_model:
+            self.model.check_model_dropout(examples)
             self.model.validation = False
         return loss
 
@@ -177,10 +178,6 @@ class KGOptimizer(object):
         total_loss = 0.0
         counter = 0
         while b_begin < examples.shape[0]:
-            if self.model.is_unified_model:
-                # print(f"{(b_begin / examples.shape[0]) + epoch:.4f};")
-                # print(f"{torch.cuda.memory_allocated(0) / 1024 / 1024 / 1024:.4f}")
-                pass
             input_batch = actual_examples[b_begin:b_begin + self.batch_size].to('cuda')
 
             # gradient step
@@ -192,6 +189,7 @@ class KGOptimizer(object):
             b_begin += self.batch_size
             total_loss += l
             counter += 1
+
             if not self.no_progress_bar and (self.model.is_unified_model or self.model.entities is None):
                 bar.update(input_batch.shape[0])
                 bar.set_postfix(loss=f'{l.item():.4f}')

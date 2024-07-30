@@ -20,15 +20,15 @@ class BaseC(KGModel):
         if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
             self.entities = None
             self.relation_names = None
-            
+
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
-                                    args.init_size, args.model, entities=args.entities,
+                                    args.init_size, args.model, subgraph=args.subgraph, entities=args.entities,
                                     relation_names=args.relation_names)
 
         assert self.rank % 2 == 0, "Complex models require even embedding dimension"
         self.rank = self.rank // 2
         self.embeddings = nn.ModuleList([
-            nn.Embedding(s, 2 * self.rank, sparse=True)
+            nn.Embedding(s, 2 * self.rank, sparse=True, dtype=self.data_type)
             for s in self.sizes[:2]
         ])
 

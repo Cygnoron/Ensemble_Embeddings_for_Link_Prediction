@@ -2,6 +2,7 @@ import importlib
 import json
 import logging
 import os
+import random
 import time
 
 import numpy as np
@@ -12,10 +13,7 @@ from tqdm import tqdm
 import models as models
 from datasets.kg_dataset import KGDataset
 from ensemble import Constants, util
-from models import COMPLEX_MODELS
-from models import EUC_MODELS
-from models import HYP_MODELS
-from models import KGModel
+from models import EUC_MODELS, COMPLEX_MODELS, HYP_MODELS, KGModel
 from optimizers import regularizers, KGOptimizer
 from utils.euclidean import givens_reflection, givens_rotations
 from utils.train import count_params
@@ -57,10 +55,10 @@ class Unified(KGModel):
         # list of single model optimizers
         self.single_models = []
         self.single_model_args = []
+        self.active_models = []
         self.init_single_models(args, init_args)
 
         self.embedding_methods = set()
-        self.single_train_loss = {}
         self.sim = None
         self.validation = False
         self.collect_embedding_methods()
@@ -97,7 +95,6 @@ class Unified(KGModel):
             args_subgraph.model_name = model
             args_subgraph.model = model
             args_subgraph.subgraph = f"sub_{subgraph_num:03d}"
-            args_subgraph.model_dropout = False
 
             # load data
             logging.debug(f"Loading data for subgraph {args_subgraph.subgraph}.")
@@ -119,8 +116,10 @@ class Unified(KGModel):
             optimizer = KGOptimizer(model, regularizer, optim_method, args_subgraph.batch_size,
                                     args_subgraph.neg_sample_size, bool(args_subgraph.double_neg),
                                     args_subgraph.no_progress_bar)
+
             self.single_model_args.append(args_subgraph)
             self.single_models.append(optimizer)
+            self.active_models.append(subgraph_num)
 
             # save config
             with (open(os.path.join(init_args.model_setup_config_dir,
@@ -155,16 +154,25 @@ class Unified(KGModel):
 
             if not any(embedding_method == method for method in self.embedding_methods):
                 self.embedding_methods.add(embedding_method)
-                if embedding_method in HYP_MODELS:
+                if embedding_method in HYP_MODELS and not hasattr(self, "multi_c"):
                     self.multi_c = self.args.multi_c
                     if self.multi_c:
                         c_init = torch.ones((self.sizes[1], 1), dtype=self.data_type)
                     else:
                         c_init = torch.ones((1, 1), dtype=self.data_type)
                     self.c = nn.Parameter(c_init, requires_grad=True)
+
+                    self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)
+                    self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], 2 * self.rank),
+                                                               dtype=self.data_type) - 1.0
                     self.context_vec = nn.Embedding(self.sizes[1], self.rank)
                     self.context_vec.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank),
                                                                                 dtype=self.data_type)
+                    self.act = nn.Softmax(dim=1)
+                    if self.data_type == "double":
+                        self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).double().cuda()
+                    else:
+                        self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
 
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
 
@@ -181,10 +189,8 @@ class Unified(KGModel):
             factors: Factors used in the predictions.
         """
 
-        print(f"before single train: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
         # run single model
         self.train_single_models(queries)
-        print(f"after single train: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
         # calculate cross model attention
         self.calculate_cross_model_attention(queries)
         # combine single embeddings into unified embedding
@@ -202,6 +208,36 @@ class Unified(KGModel):
 
         return predictions, factors
 
+    def check_model_dropout(self, queries):
+        run_diverged = True
+        for single_model in self.single_models:
+            if single_model.model.model_dropout:
+                continue
+
+            run_diverged = False
+            actual_queries, _ = get_actual_queries(queries, single_model=single_model)
+
+            valid_loss = single_model.calculate_valid_loss(actual_queries.to('cuda')).to('cuda')
+            logging.debug(f"Valid loss for {single_model.model.subgraph}: {valid_loss:.2f}")
+            if hasattr(single_model.model, "first_loss"):
+                valid_loss = random.randint(1, 20) * valid_loss
+
+            logging.debug(f"{valid_loss.item()}")
+            if not hasattr(single_model.model, "first_loss"):
+                single_model.model.first_loss = valid_loss
+            else:
+                if valid_loss > single_model.model.first_loss * self.args.model_dropout_factor:
+                    logging.critical(f"Model {single_model.model.subgraph} was excluded, since the current loss "
+                                 f"{valid_loss:.2f} exceeded {self.args.model_dropout_factor} times the first loss "
+                                 f"{single_model.model.first_loss:.2f}.")
+                    single_model.model.model_dropout = True
+                    logging.debug(f"Removing {single_model.model.subgraph_num} from {self.active_models}")
+                    self.active_models.remove(single_model.model.subgraph_num)
+
+        if run_diverged:
+            raise RuntimeError("The run diverged and is now stopped. Please try a other combination of embedding "
+                               "methods, other hyperparameters, or a higher model dropout factor.")
+
     def train_single_models(self, queries):
         """
         Trains single models using the provided queries.
@@ -209,24 +245,22 @@ class Unified(KGModel):
         Args:
             queries: The input queries.
         """
-
         if self.validation:
             pass
         else:
             for single_model in self.single_models:
-                # actual_queries= get_actual_queries(queries, single_model=single_model)
-                print(f"1: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
+                if single_model.model.model_dropout:
+                    logging.debug(f"Ignoring model {single_model.model.subgraph}.")
+                    continue
+
+                # actual_queries, _ = get_actual_queries(queries, single_model=single_model)
                 actual_queries = queries.cuda()
 
-                print(f"2: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 l = single_model.calculate_loss(actual_queries.to('cuda')).to('cuda')
-                print(f"3: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
+
                 single_model.optimizer.zero_grad()
-                print(f"4: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 l.backward()
-                print(f"5: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
                 single_model.optimizer.step()
-                print(f"6: {torch.isnan(self.single_models[0].model.rel.weight.data)}")
 
     def calculate_cross_model_attention(self, queries):
         """
@@ -245,14 +279,16 @@ class Unified(KGModel):
             model = single_model.model
 
             actual_queries, query_mask = get_actual_queries(queries, single_model=single_model)
-            embedding_ent = torch.zeros(len(queries), self.rank).cuda()
-            embedding_rel = torch.zeros(len(queries), self.rank_rel).cuda()
+            embedding_ent = torch.zeros(len(queries), self.rank, dtype=self.data_type).cuda()
+            embedding_rel = torch.zeros(len(queries), self.rank_rel, dtype=self.data_type).cuda()
 
-            embedding_ent[query_mask] = model.entity.weight.data[actual_queries[:, 0]]
-            embedding_rel[query_mask] = model.rel.weight.data[actual_queries[:, 1]]
-            if model.model_name in COMPLEX_MODELS:
-                embedding_ent[query_mask] = model.embeddings[0].weight.data[actual_queries[:, 0]]
-                embedding_rel[query_mask] = model.embeddings[1].weight.data[actual_queries[:, 1]]
+            if not single_model.model.model_dropout:
+                if model.model_name in COMPLEX_MODELS:
+                    embedding_ent[query_mask] = model.embeddings[0].weight.data[actual_queries[:, 0]]
+                    embedding_rel[query_mask] = model.embeddings[1].weight.data[actual_queries[:, 1]]
+                else:
+                    embedding_ent[query_mask] = model.entity.weight.data[actual_queries[:, 0]]
+                    embedding_rel[query_mask] = model.rel.weight.data[actual_queries[:, 1]]
 
             # Stack cands and theta for cross model attention
             theta_ent_temp.append(model.theta_ent.weight.data[queries[:, 0]])
@@ -295,7 +331,9 @@ class Unified(KGModel):
             softmax = nn.Softmax(dim=dim)
 
         logging.debug(f"Sizes for attention:\nTheta\t{theta.size()}\nCands:\t{cands.size()}")
-        return softmax(theta * cands)
+        attention = torch.zeros(theta.size()).to('cuda')
+        attention[:, :, self.active_models] = softmax(theta[:, :, self.active_models] * cands[:, :, self.active_models])
+        return attention
 
     def combine_ranks(self, attention, dim_softmax=-1, rank_dim=-1):
         """
@@ -339,6 +377,10 @@ class Unified(KGModel):
         rel_diag_emb_temp = []
 
         for single_model in self.single_models:
+            # if single_model.model.model_dropout:
+            #     logging.debug(f"Ignoring model {single_model.model.subgraph}.")
+            #     continue
+
             if single_model.model.model_name in EUC_MODELS:
                 ent_emb_temp.append(single_model.model.entity.weight.data[queries[:, 0]])
                 rel_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
@@ -420,7 +462,7 @@ class Unified(KGModel):
             lhs_biases = lhs_biases.to('cuda')
 
         elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-            if type(lhs_e_list[0]) == tuple:
+            if isinstance(lhs_e_list, tuple):
                 lhs_e = (torch.mean(lhs_e_list[0], dim=-1).to('cuda'), torch.mean(lhs_e_list[1], dim=-1).to('cuda'))
             else:
                 lhs_e = torch.mean(lhs_e_list, dim=-1).to('cuda')
@@ -579,6 +621,10 @@ class Unified(KGModel):
         """
 
         for index, single_model in enumerate(self.single_models):
+            if single_model.model.model_dropout:
+                logging.debug(f"Ignoring model {single_model.model.subgraph}.")
+                continue
+
             actual_queries, _ = get_actual_queries(queries, single_model=single_model)
 
             if single_model.model.model_name in COMPLEX_MODELS:
@@ -705,6 +751,10 @@ class Unified(KGModel):
         rotation = []
         context_vec = []
         for single_model in self.single_models:
+            if single_model.model.model_dropout:
+                logging.debug(f"Ignoring model {single_model.model.subgraph}.")
+                continue
+
             if single_model.model.model_name == Constants.ATT_E:
                 reflection.append(single_model.model.ref(queries[:, 1]).view((-1, 1, self.rank)))
                 rotation.append(single_model.model.rot(queries[:, 1]).view((-1, 1, self.rank)))
@@ -749,7 +799,7 @@ def get_actual_queries(queries, single_model=None, entities=None, relation_names
 
     query_mask = entity_mask & relation_mask
 
-    return queries[query_mask], query_mask
+    return queries[query_mask.cpu()], query_mask
 
 
 def get_class(class_name, base_method=False):

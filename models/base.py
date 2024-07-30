@@ -24,7 +24,7 @@ class KGModel(nn.Module, ABC):
             bt: torch.nn.Embedding with tail entity bias embeddings
         """
 
-    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size, model,
+    def __init__(self, sizes, rank, dropout, gamma, data_type, bias, init_size, model, subgraph=None,
                  entities=None, relation_names=None, subgraph_amount=None, batch_size=None, aggregation_method=None):
         """Initialize KGModel."""
         super(KGModel, self).__init__()
@@ -32,6 +32,8 @@ class KGModel(nn.Module, ABC):
             self.data_type = torch.double
         else:
             self.data_type = torch.float
+        self.subgraph = subgraph
+        self.subgraph_num = int(subgraph.split('_')[1]) if subgraph is not None else None
         self.model_name = model
         self.sizes = sizes
         self.rank = rank
@@ -67,6 +69,7 @@ class KGModel(nn.Module, ABC):
 
         else:
             self.is_unified_model = False
+            self.model_dropout = False
             if entities is None or relation_names is None:
                 self.is_in_ensemble = False
             else:
@@ -75,6 +78,7 @@ class KGModel(nn.Module, ABC):
                 self.att_rel_single = None
                 self.entities = entities
                 self.relation_names = relation_names
+
 
         # ensemble attention
         self.theta_ent = None

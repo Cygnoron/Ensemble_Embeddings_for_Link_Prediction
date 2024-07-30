@@ -4,6 +4,8 @@ import os
 import time
 import traceback
 
+import torch
+
 import wandb
 from ensemble import Constants, util_files, util, subsampling, run_unified_model
 from run import train
@@ -221,7 +223,6 @@ def run_embedding(args):
 
     args.sampling_method = util.handle_methods(args.sampling_method, "sampling")
     args.aggregation_method = util.handle_methods(args.aggregation_method, "aggregation")
-    args.theta_calculation = util.handle_methods(args.theta_method, "theta")
     args.subgraph_size_range = util.handle_methods(args.subgraph_size_range, "size_range")
 
     dataset_out = ""
@@ -282,7 +283,7 @@ def run_embedding_manual():
     performs necessary setups such as directory creation and logging, and initiates
     the sampling and training processes based on the configuration.
     """
-
+    # torch.autograd.set_detect_anomaly(True)
     time_process_start = time.time()
 
     # --- Setup parameters and args ---
@@ -343,7 +344,7 @@ def run_embedding_manual():
     # --- Setup model training ---
     allowed_kge_models = {Constants.DIST_MULT: list(range(0, 5)),
                           Constants.COMPL_EX: [20],
-                          Constants.ATT_H: ['all']
+                          Constants.TRANS_E: ['all']
                           # Constants.DIST_MULT: list(range(5, 10))
                           }
 
@@ -363,25 +364,37 @@ def run_embedding_manual():
         if not args.no_training:
             # general parameters
             args.kge_models = allowed_kge_models
-            args.max_epochs = 1
+            args.max_epochs = 30
             args.rank = 2
             args.patience = 15
             args.valid = 5
             args.dtype = "single"
-            args.batch_size = 1000
+            args.batch_size = 500
             args.debug = True
 
             # individually settable parameters
-            args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1, 'ComplEx': 0.1, 'RotatE': 0.001, 'AttE': 0.001,
-                                  'AttH': 0.001}
-            args.reg = {'ComplEx': 0.05, 'TransE': 0.0, 'DistMult': 0.05, 'rest': 0.0}
-            args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad", 'ComplEx': "Adagrad", 'RotatE': "Adagrad",
-                              'AttE': "Adam", 'AttH': "Adam", 'Unified': "Adagrad"}
-            args.neg_sample_size = {"TransE": -1, 'DistMult': -1, 'ComplEx': -1, 'RotatE': 250, 'AttE': -1,
-                                    'AttH': 250}
-            args.bias = {'ComplEx': "none", 'TransE': "learn", 'DistMult': "none", 'AttE': "learn", 'rest': "none"}
-            args.double_neg = {'ComplEx': True, 'TransE': True, 'DistMult': True, 'AttE': False}
-            args.multi_c = {'AttE': True, 'AttH': True, 'rest': False}
+            args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1,
+                                  'ComplEx': 0.1, 'RotatE': 0.001,
+                                  'AttE': 0.001, 'AttH': 0.001}
+            args.reg = {'TransE': 0.0, 'DistMult': 0.05,
+                        'ComplEx': 0.05,
+                        'rest': 0.0}
+            args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad",
+                              'ComplEx': "Adagrad", 'RotatE': "Adagrad",
+                              'AttE': "Adam", 'AttH': "Adam",
+                              'Unified': "Adagrad"}
+            args.neg_sample_size = {"TransE": -1, 'DistMult': -1,
+                                    'ComplEx': -1, 'RotatE': 250,
+                                    'AttE': -1, 'AttH': 250}
+            args.bias = {'TransE': "learn", 'DistMult': "none",
+                         'ComplEx': "none",
+                         'AttE': "learn",
+                         'rest': "none"}
+            args.double_neg = {'TransE': True, 'DistMult': True,
+                               'ComplEx': True,
+                               'AttE': False, 'AttH': False}
+            args.multi_c = {'AttE': True, 'AttH': True,
+                            'rest': False}
 
             args.regularizer = {'all': "N3"}
             args.init_size = {'all': 0.001}
