@@ -1,4 +1,6 @@
 # sampling methods
+import logging
+
 DEBUG_SAMPLING = [0, "Debug sampling", "Debug_sampling"]
 ENTITY_SAMPLING = [1, "Entity sampling", "Entity_sampling"]
 FEATURE_SAMPLING = [2, "Feature sampling", "Feature_sampling"]
@@ -24,10 +26,16 @@ LOG_WANDB = False
 PROJECT_NAME = "Experiments"
 
 
-# TODO tidy up
-def get_wandb(project_name=False):
+def get_wandb(project_name):
+    """
+    If a project name is provided as a string, it will be used as the wandb project name.
+    Otherwise, no wandb logging will take place.
+
+    Args:
+        project_name (str): The project name for the wandb project.
+    """
     global LOG_WANDB, PROJECT_NAME
 
-    if isinstance(project_name, str) and project_name.lower() != "false":
+    if isinstance(project_name, str):
         LOG_WANDB = True
         PROJECT_NAME = project_name

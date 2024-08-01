@@ -564,16 +564,35 @@ def get_args(args, model):
     for key in vars(args):
         if key in args_list:
             value = vars(args)[key]
+            try:
+                value = json.loads(value)
+                logging.debug(f"Dict {value} for key {key}")
+            except Exception:
+                pass
+            logging.debug(f"{key}: {value}, (type: {type(value)})")
+
             if type(value) is dict:
                 if "all" in list(value.keys()):
-                    vars(args_subgraph)[key] = value['all']
+                    try:
+                        vars(args_subgraph)[key] = int(value['all'])
+                    except ValueError:
+                        vars(args_subgraph)[key] = value['all']
                 elif model in list(value.keys()):
-                    vars(args_subgraph)[key] = value[model]
+                    try:
+                        vars(args_subgraph)[key] = int(value[model])
+                    except ValueError:
+                        vars(args_subgraph)[key] = value[model]
                 elif "rest" in list(value.keys()):
-                    vars(args_subgraph)[key] = value['rest']
+                    try:
+                        vars(args_subgraph)[key] = int(value['rest'])
+                    except ValueError:
+                        vars(args_subgraph)[key] = value['rest']
                 else:
                     first_key = next(iter(value.keys()))
-                    vars(args_subgraph)[key] = value[first_key]
+                    try:
+                        vars(args_subgraph)[key] = int(value[first_key])
+                    except ValueError:
+                        vars(args_subgraph)[key] = value[first_key]
                 counter += 1
 
     logging.debug(f"{counter} parameters were changed due to specific mapping.")

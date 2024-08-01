@@ -64,7 +64,7 @@ parser.add_argument(
     "--batch_size", default=1000, type=int, help="Batch size"
 )
 parser.add_argument(
-    "--neg_sample_size", default=50, type=int, help="Negative sample size, -1 to not use negative sampling"
+    "--neg_sample_size", default=50, help="Negative sample size, -1 to not use negative sampling"
 )
 parser.add_argument(
     "--dropout", default=0, type=float, help="Dropout rate"
@@ -129,6 +129,10 @@ parser.add_argument(
     "--aggregation_method", default="average", choices=["max", "average"],
     help="The method by which all scores from the ensemble are aggregated."
 )
+parser.add_argument(
+    "--model_dropout_factor", default=10,
+    help="The multiplier for the first validation loss in order to disregard a model as diverged."
+)
 
 #   - System parameters -
 parser.add_argument(
@@ -140,7 +144,7 @@ parser.add_argument(
          "which is printed directly to the log.\'"
 )
 parser.add_argument(
-    "--wandb_project", default="False",
+    "--wandb_project", default=False,
     help="Turn on logging of metrics via Weights&Biases and synchronize with the given project name."
 )
 parser.add_argument(
@@ -245,6 +249,8 @@ def run_embedding(args):
     util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
                        logging_level=args.logging)
 
+    logging.debug(f"Args: {args}")
+
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
@@ -256,7 +262,9 @@ def run_embedding(args):
         if not args.no_training:
             args.kge_models = util.get_embedding_methods(args.model)
 
-            wandb.init(project=Constants.PROJECT_NAME, config=args)
+            if Constants.LOG_WANDB:
+                wandb.login()
+                wandb.init(project=Constants.PROJECT_NAME, config=args)
 
             # run.train(info_directory, args)
             run_unified_model.train(info_directory, args)
@@ -401,6 +409,8 @@ def run_embedding_manual():
             args.dropout = {'all': 0}
             args.gamma = {'all': 0}
 
+            logging.debug(f"Args: {args}")
+
             if Constants.LOG_WANDB:
                 wandb.init(project=Constants.PROJECT_NAME, config=vars(args))
                 wandb.login()
@@ -424,10 +434,10 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    # run_embedding(parser.parse_args())
+    run_embedding(parser.parse_args())
 
     # Function to run manual via IDE
-    run_embedding_manual()
+    # run_embedding_manual()
 
     # Function to run baseline
     # run_baseline()
