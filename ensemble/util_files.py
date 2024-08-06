@@ -12,7 +12,7 @@ import torch
 from ensemble import Constants
 from ensemble.util import get_unique_triple_ids
 
-# TODO tidy up
+
 def check_directory(directory):
     """
         Check if the given directory exists, and if not, create it along with its parent directories if necessary.
@@ -240,39 +240,6 @@ def copy_test_valid_filter_data(dataset_in: str, dataset_dir: str):
                                     f"or did not exist in \"{source_dir}\"")
 
 
-def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, model_file_dir, cands_att_dict):
-    """
-    Save or load trained embedding_models based on the validation arguments provided.
-
-    Parameters:
-        embedding_models (list): List of dictionaries containing trained embedding embedding_models and their arguments.
-        valid_args (argparse.Namespace): Validation arguments saved in Namespace object.
-        model_file_dir (str): Directory where the embedding_models will be saved or loaded from.
-    """
-    if not valid_args.best_mrr:
-        logging.info(f"Saving new embedding_models saved at epoch {valid_args.best_epoch}.")
-        torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
-        torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
-        # Iterate over embedding_models
-        for embedding_model in embedding_models:
-            args = embedding_model["args"]
-            # Save the model
-            torch.save(embedding_model['model'].cpu().state_dict(),
-                       os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
-    else:
-        logging.info(f"Loading best embedding_models saved at epoch {valid_args.best_epoch}")
-        cands_att_dict['att_weights_ent'] = torch.load(os.path.join(model_file_dir, "attention_ent.pt"))
-        cands_att_dict['att_weights_rel'] = torch.load(os.path.join(model_file_dir, "attention_rel.pt"))
-        # Iterate over embedding_models
-        for embedding_model in embedding_models:
-            args = embedding_model["args"]
-            # Load the best model
-            embedding_model["model"].load_state_dict(
-                torch.load(os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt")))
-
-    return cands_att_dict
-
-
 def print_loss_to_file(loss_file_path, epoch, loss_dict):
     with open(loss_file_path, 'a+') as loss_file:
         if type(loss_dict) is dict:
@@ -373,3 +340,38 @@ def get_info_directory_path(dataset_out_dir, args):
     info_directory = os.path.join(dataset_out_dir, hyper_param_str)
     check_directory(info_directory)
     return info_directory
+
+
+# --- Unused functions ---
+
+def save_load_trained_models(embedding_models, valid_args: argparse.Namespace, model_file_dir, cands_att_dict):
+    """
+    Save or load trained embedding_models based on the validation arguments provided.
+
+    Parameters:
+        embedding_models (list): List of dictionaries containing trained embedding embedding_models and their arguments.
+        valid_args (argparse.Namespace): Validation arguments saved in Namespace object.
+        model_file_dir (str): Directory where the embedding_models will be saved or loaded from.
+    """
+    if not valid_args.best_mrr:
+        logging.info(f"Saving new embedding_models saved at epoch {valid_args.best_epoch}.")
+        torch.save(cands_att_dict['att_weights_ent'], os.path.join(model_file_dir, "attention_ent.pt"))
+        torch.save(cands_att_dict['att_weights_rel'], os.path.join(model_file_dir, "attention_rel.pt"))
+        # Iterate over embedding_models
+        for embedding_model in embedding_models:
+            args = embedding_model["args"]
+            # Save the model
+            torch.save(embedding_model['model'].cpu().state_dict(),
+                       os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt"))
+    else:
+        logging.info(f"Loading best embedding_models saved at epoch {valid_args.best_epoch}")
+        cands_att_dict['att_weights_ent'] = torch.load(os.path.join(model_file_dir, "attention_ent.pt"))
+        cands_att_dict['att_weights_rel'] = torch.load(os.path.join(model_file_dir, "attention_rel.pt"))
+        # Iterate over embedding_models
+        for embedding_model in embedding_models:
+            args = embedding_model["args"]
+            # Load the best model
+            embedding_model["model"].load_state_dict(
+                torch.load(os.path.join(model_file_dir, f"model_{args.subgraph}_{args.model_name}.pt")))
+
+    return cands_att_dict

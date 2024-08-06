@@ -16,13 +16,10 @@ parser.add_argument('--model_dir', help="Model path")
 
 
 def test(model_dir, mode="test"):
-    # TODO differentiate case for ensemble
-
     # load config
     with open(os.path.join(model_dir, "config.json"), "r") as f:
         config = json.load(f)
     args = argparse.Namespace(**config)
-    args.theta_calculation = Constants.NO_THETA
 
     # create dataset
     dataset_path = os.path.join("data", args.dataset)

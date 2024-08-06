@@ -6,13 +6,11 @@ import random
 from collections import defaultdict
 
 import torch
-from torch import nn
 
-from datasets.kg_dataset import KGDataset
 from ensemble import Constants
 from ensemble.Constants import EMBEDDING_METHODS
 
-# TODO tidy up
+
 def get_unique_triple_ids(dataset, h=False, r=False, t=False):
     """
     The get_unique_triple_ids function takes in a dataset and returns a dictionary of unique entities or relations
@@ -310,51 +308,6 @@ def get_dataset_name(dataset: str):
         return dataset
 
 
-def generate_general_embeddings(general_dataset: str, args):
-    logging.debug("Creating general embeddings and context vectors.")
-
-    # load data
-    dataset = KGDataset(os.path.abspath(os.path.join("data", general_dataset)), args.debug)
-    sizes_ent, sizes_rel, _ = dataset.get_shape()
-
-    if args.dtype == "double":
-        dtype = torch.double
-    else:
-        dtype = torch.float
-
-    # embeddings
-    embedding_general_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
-    embedding_general_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-    logging.debug(f"general embedding datatype: {type(embedding_general_ent.weight.data.dtype)}, "
-                  f"{embedding_general_ent.weight.data.dtype}")
-    # context vectors
-    theta_ent = None
-    theta_rel = None
-    if args.theta_calculation[0] == Constants.NO_THETA[0]:
-        pass
-    elif args.theta_calculation[0] == Constants.REGULAR_THETA[0]:
-        theta_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
-        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-    elif args.theta_calculation[0] == Constants.REVERSED_THETA[0]:
-        theta_ent = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-        theta_rel = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
-    elif args.theta_calculation[0] == Constants.RELATION_THETA[0]:
-        theta_ent = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-    elif args.theta_calculation[0] == Constants.MULTIPLIED_THETA[0]:
-        theta_ent = nn.Embedding(sizes_ent, args.rank, dtype=dtype)
-        theta_rel = nn.Embedding(sizes_rel, args.rank, dtype=dtype)
-
-    # set to "cuda"
-    embedding_general_ent.to("cuda")
-    embedding_general_rel.to("cuda")
-    if args.theta_calculation[0] != Constants.NO_THETA[0]:
-        theta_ent.to("cuda")
-        theta_rel.to("cuda")
-
-    return embedding_general_ent, embedding_general_rel, theta_ent, theta_rel, dataset.get_shape()
-
-
 def format_time(time_total_start, time_total_end, divisor=1, multiplier=1, precision=2):
     """
     Format the total time elapsed between two given time points into hours, minutes, and seconds.
@@ -492,14 +445,39 @@ def format_dict(dictionary):
 
 
 def format_set(set_to_format, delimiter=", "):
+    """
+    Formats a set of elements into a string, with elements separated by a specified delimiter.
+
+    Args:
+        set_to_format (set): The set of elements to format.
+        delimiter (str): The string to use as a delimiter between elements.
+
+    Returns:
+        str: A formatted string with elements separated by the delimiter.
+    """
     out_str = ""
+    # Iterate through the set and append each element followed by the delimiter
     for element in set_to_format:
         out_str += f"{element}{delimiter}"
+    # Remove the trailing delimiter
     out_str = out_str.rstrip(delimiter)
     return out_str
 
 
 def get_embedding_methods(mapping_json_str):
+    """
+    Parses a JSON string to extract embedding methods. Handles both single and multiple model inputs.
+
+    Args:
+        mapping_json_str (str): JSON string containing embedding methods or a single method string.
+
+    Returns:
+        dict: A dictionary with embedding methods and their associated parameters.
+
+    Raises:
+        ValueError: If the provided embedding method does not exist in EMBEDDING_METHODS.
+    """
+
     kge_mapping = None
     # Differentiate between inputs as dict and direct model inputs
     try:
@@ -512,6 +490,7 @@ def get_embedding_methods(mapping_json_str):
                              f"Please check if your spelling was correct, if the method should exist.")
         return {mapping_json_str: []}
 
+    # Validate each embedding model in the parsed JSON
     for embedding_model in list(kge_mapping.keys()):
         if embedding_model not in EMBEDDING_METHODS:
             raise ValueError(f"The given embedding method \'{embedding_model}\' does not exist!\n"
@@ -521,16 +500,32 @@ def get_embedding_methods(mapping_json_str):
 
 
 def handle_methods(method_str: str, mode):
+    """
+    Handles different methods based on the provided mode. Supports sampling, aggregation, and size range methods.
+
+    Args:
+        method_str (str): The method string to handle.
+        mode (str): The mode to determine the method list to use. Options: 'sampling', 'aggregation', 'size_range'.
+
+    Returns:
+        Union[tuple, str]: A tuple of floats for size range, or a method string for sampling/aggregation.
+
+    Raises:
+        ValueError: If the provided method does not exist in the corresponding method list.
+    """
     method_list = None
+    # Select the appropriate method list based on the mode
     if mode == "sampling":
         method_list = Constants.SAMPLING_METHODS
     elif mode == "aggregation":
         method_list = Constants.AGGREGATION_METHODS
     elif mode == "size_range":
+        # Parse the size range method string into a tuple of floats
         method_str = method_str.lstrip("(").rstrip(")").split(",")
         method_str = (float(method_str[0]), float(method_str[1]))
         return method_str
 
+    # Check if the method string exists in the selected method list
     for candidate_method in method_list:
         if method_str.lower() in candidate_method[1].lower():
             return candidate_method
@@ -539,16 +534,20 @@ def handle_methods(method_str: str, mode):
 
 
 def get_args(args, model):
-    # if model == "Unified":
-    #     general_args = argparse.Namespace()
-    #     general_args.rank = args.rank
-    #     general_args.dtype = args.dtype
-    #     general_args.debug = args.debug
-    #     general_args.theta_calculation = args.theta_calculation
-    #     return general_args
-    #
-    # else:
+    """
+    Processes and modifies arguments for a specific model. Handles conversion of string arguments to integers and
+    applies model-specific mappings.
+
+    Args:
+        args (argparse.Namespace): The arguments to process.
+        model (str): The model name to use for specific mappings.
+
+    Returns:
+        argparse.Namespace: The modified arguments.
+    """
+
     args_subgraph = copy.copy(args)
+    # List of argument keys to process
     args_list = ["bias",
                  "double_neg",
                  "dropout",
@@ -562,6 +561,7 @@ def get_args(args, model):
                  "reg"]
     counter = 0
 
+    # Convert string arguments to integers if possible
     for key in vars(args):
         try:
             if isinstance(vars(args)[key], str):
@@ -570,6 +570,7 @@ def get_args(args, model):
             logging.debug("Couldn't parse to int")
         logging.debug(f"{key}: {vars(args)[key]} ({type(vars(args)[key])})")
 
+    # Apply model-specific mappings to the arguments
     for key in vars(args):
         if key in args_list:
             value = vars(args)[key]
@@ -617,89 +618,18 @@ def get_args(args, model):
     return args_subgraph
 
 
-# --- unused functions ---
-
-def difference_embeddings(embedding_before, embedding_after, output_path, ent=False, rel=False, file_identifier=""):
+def get_loss_change(valid_loss, previous_valid_loss):
     """
-    Compute the difference between two embeddings and write the results to a CSV file.
+    Calculates the change in validation loss and the percentage change.
 
     Args:
-        embedding_before (torch.tensor): The embedding before some transformation.
-        embedding_after (torch.tensor): The embedding after the same transformation.
-        output_path (str): The path to save the output CSV file.
-        ent (bool): Set True if embedding is from entities, affects output filename
-        rel (bool): Set True if embedding is from relation names, affects output filename
-        file_identifier (str): Additional string, that is attached to the output filename
+        valid_loss (float): The current validation loss.
+        previous_valid_loss (float): The previous validation loss.
 
     Returns:
-        None
-
+        tuple: A tuple containing the current validation loss and a tuple with the absolute and percentage change.
     """
-    output_path = os.path.abspath(output_path)
-    if ent:
-        output_file_name = "difference_embeddings_ent"
-    elif rel:
-        output_file_name = "difference_embeddings_rel"
-    else:
-        output_file_name = "difference_embeddings"
 
-    if file_identifier != "":
-        file_identifier = f"_{file_identifier}"
-
-    logging.debug(f"Calculating difference between embeddings an saving it to {output_path}.")
-
-    embedding_difference = embedding_before - embedding_after
-
-    with open(os.path.join(output_path, f"{output_file_name}{file_identifier}.csv"), "w") as output_file:
-        logging.debug("Write embeddings before some transformation")
-        # iterate through all embeddings
-        for embedding_before_id in embedding_before:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_before_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
-        output_file.write("\n")
-
-        logging.debug("Write embeddings after some transformation")
-        # iterate through all embeddings
-        for embedding_after_id in embedding_after:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_after_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
-        output_file.write("\n")
-
-        logging.debug("Write difference between embeddings after some transformation")
-        # iterate through all embeddings
-        for embedding_difference_id in embedding_difference:
-            output_string = ""
-            # iterate through all dimensions
-            for entry in embedding_difference_id:
-                output_string += f"{entry};"
-
-            # delete last semicolon
-            if output_string.endswith(";"):
-                output_string = output_string[:-1]
-
-            # write to output_file
-            output_file.write(output_string + "\n")
-
-
-def get_loss_change(valid_loss, previous_valid_loss):
     valid_loss_change = valid_loss - previous_valid_loss
     percentage = (valid_loss_change / previous_valid_loss) * 100
     valid_loss_change = (valid_loss_change, percentage)
@@ -708,8 +638,21 @@ def get_loss_change(valid_loss, previous_valid_loss):
 
 
 def get_metrics_change(current_metrics, previous_metrics):
+    """
+    Calculates the absolute and percentage change in metrics from previous to current.
+
+    Args:
+        current_metrics (dict): The current metrics.
+        previous_metrics (dict): The previous metrics.
+
+    Returns:
+        tuple: A tuple containing the current metrics, absolute change in metrics, and percentage change in metrics.
+    """
+
     metrics_change_absolut = {}
     metrics_change_percent = {}
+
+    # If there are no previous metrics, initialize changes to current metrics
     if len(previous_metrics) == 0:
         for metric in current_metrics:
             metrics_change_absolut[metric] = {}

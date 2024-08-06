@@ -13,8 +13,15 @@ from utils.train import avg_both, format_metrics
 
 DATA_PATH = "data"
 
-# TODO tidy up
+
 def train(info_directory, args):
+    """
+    Train the knowledge graph embedding models and save results.
+
+    Parameters:
+    - info_directory (str): Directory to store model configurations and results.
+    - args (Namespace): Arguments for training configuration.
+    """
 
     time_total_start = time.time()
 
@@ -44,14 +51,17 @@ def train(info_directory, args):
     # get original dataset name
     dataset_general = util.get_dataset_name(args.dataset)
 
+    # load dataset
     dataset = KGDataset(os.path.join("data", dataset_general), args.debug, test_valid_file_dir=test_valid_file_dir)
     train_examples = dataset.get_examples("train")
     valid_examples = dataset.get_examples("valid")
     test_examples = dataset.get_examples("test")
     filters = dataset.get_filters()
 
+    # Assign models to subgraphs
     subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
+    # Set up unified model
     unified_model, args_unified = setup_unified_model(args, test_valid_file_dir, model_setup_config_dir,
                                                       dataset_general, subgraph_embedding_mapping, dataset_path)
 
@@ -67,7 +77,7 @@ def train(info_directory, args):
     valid_args = argparse.Namespace(counter=0, best_mrr=None, best_epoch=None, epoch=0, valid=args.valid,
                                     patience=args.patience)
 
-    # --- Setting up training ---
+    # --- Set up training ---
 
     # Get optimizer
     regularizer = (getattr(regularizers, args_unified.regularizer)(args_unified.reg))
@@ -79,6 +89,7 @@ def train(info_directory, args):
     # Iterate over epochs
     for epoch in range(args.max_epochs):
         time_start_training_sub = time.time()
+
         # Train step
         unified_model.train()
         train_loss = optimizer.epoch(train_examples, epoch=epoch)
@@ -89,7 +100,7 @@ def train(info_directory, args):
         logging.info(f"Training\tEpoch {epoch} | average train loss: {train_loss:.4f} | "
                      f"change to last epoch: {train_loss_change[0]:.4f} ({train_loss_change[1]:.3f}%)")
 
-        # debugging messages
+        # Debugging messages
         logging.debug(f"Entity size epoch {epoch}: {unified_model.entity.weight.data.size()}")
         logging.debug(f"Relation size epoch {epoch}: {unified_model.rel.weight.data.size()}")
         if unified_model.theta_ent is not None:
@@ -100,7 +111,7 @@ def train(info_directory, args):
         # Valid step
         valid_loss = optimizer.calculate_valid_loss(valid_examples)
 
-        # print validation losses
+        # Print validation losses
         previous_valid_loss, valid_loss_change = util.get_loss_change(valid_loss, previous_valid_loss)
         util_files.print_loss_to_file(valid_loss_file_path, epoch,
                                       [valid_loss, valid_loss_change[0], valid_loss_change[1]])
@@ -108,6 +119,7 @@ def train(info_directory, args):
         logging.info(f"Validation\tEpoch {epoch} | average valid loss: {valid_loss:.4f} | "
                      f"change to last epoch: {valid_loss_change[0]:.4f} ({valid_loss_change[1]:.3f}%)")
 
+        # Check validation metrics
         if (epoch + 1) % valid_args.valid == 0:
             valid_metrics = avg_both(*unified_model.compute_metrics(valid_examples, filters, args.sizes), epoch=epoch)
             previous_metrics, metrics_change_absolut, metrics_change_percent = (
@@ -178,9 +190,25 @@ def train(info_directory, args):
 
 def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, general_dataset,
                         subgraph_embedding_mapping, dataset_path):
+    """
+    Set up the unified model for training.
+
+    Parameters:
+    - args (Namespace): Arguments for training configuration.
+    - test_valid_file_dir (str): Directory for test and validation files.
+    - model_setup_config_dir (str): Directory for model setup configurations.
+    - general_dataset (str): Name of the general dataset.
+    - subgraph_embedding_mapping (dict): Mapping of models to subgraphs.
+    - dataset_path (str): Path to the dataset.
+
+    Returns:
+    - unified_model (Model): The unified model for training.
+    - args_unified (Namespace): Unified arguments for the model.
+    """
+
     device = "cuda"
 
-    # create unified model
+    # Create unified model
     init_args = argparse.Namespace(
         test_valid_file_dir=test_valid_file_dir,
         model_setup_config_dir=model_setup_config_dir,
