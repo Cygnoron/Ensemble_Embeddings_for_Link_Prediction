@@ -166,10 +166,11 @@ def train(info_directory, args):
     logging.info(format_metrics(valid_metrics, split="valid"))
     util_files.print_metrics_to_file(metrics_file_path, valid_metrics, epoch=args.max_epochs + 10, mode="valid")
 
-    test_metrics = avg_both(*unified_model.compute_metrics(test_examples, filters, args.sizes),
-                            epoch=args.max_epochs + 20)
-    logging.info(format_metrics(test_metrics, split="test"))
-    util_files.print_metrics_to_file(metrics_file_path, test_metrics, epoch=args.max_epochs + 20, mode="test")
+    if not args.only_valid:
+        test_metrics = avg_both(*unified_model.compute_metrics(test_examples, filters, args.sizes),
+                                epoch=args.max_epochs + 20)
+        logging.info(format_metrics(test_metrics, split="test"))
+        util_files.print_metrics_to_file(metrics_file_path, test_metrics, epoch=args.max_epochs + 20, mode="test")
 
     time_total_end = time.time()
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")

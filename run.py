@@ -105,7 +105,7 @@ def train(args):
     dataset_path = os.path.join(DATA_PATH, args.dataset)
     dataset = KGDataset(dataset_path, args.debug)
     args.sizes = dataset.get_shape()
-    args.theta_calculation = Constants.NO_THETA
+    args.subgraph = None
 
     if Constants.LOG_WANDB:
         wandb.init(project=Constants.PROJECT_NAME, config=args)
