@@ -4,8 +4,6 @@ import os
 import time
 import traceback
 
-import torch
-
 import wandb
 from ensemble import Constants, util_files, util, subsampling, run_unified_model
 from run import train
@@ -57,7 +55,7 @@ parser.add_argument(
     "--reg", default=0, type=float, help="Regularization weight"
 )
 parser.add_argument(
-    "--optimizer", choices=["Adagrad", "Adam", "SparseAdam"], default="Adagrad",
+    "--optimizer", default="Adagrad",  # , choices=["Adagrad", "Adam", "SparseAdam"]
     help="Optimizer"
 )
 parser.add_argument(
@@ -146,6 +144,9 @@ parser.add_argument(
 parser.add_argument(
     "--wandb_project", default=False,
     help="Turn on logging of metrics via Weights&Biases and synchronize with the given project name."
+)
+parser.add_argument(
+    "--only_valid", action='store_true', help="Only calculate metrics on the validation set."
 )
 parser.add_argument(
     "--no_sampling", action='store_true', help="Turn off sampling."
@@ -297,22 +298,21 @@ def run_embedding_manual():
     # --- Setup parameters and args ---
 
     # dataset_in = "Debug"
-    dataset_in = "WN18RR"
-    # dataset_in = "FB15K"
+    # dataset_in = "WN18RR"
+    dataset_in = "FB15K-237"
     # dataset_in = "NELL-995"
     subgraph_amount = 5
     subgraph_size_range = (0.03, 0.7)
     rho = 2
     model_dropout_factor = 10
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=True, no_training=True, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
-                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
-                              # aggregation_method=Constants.ATTENTION_SCORE_AGGREGATION,
                               aggregation_method=Constants.MAX_SCORE_AGGREGATION,
+                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
 
     # --- Setup wandb ---
@@ -341,14 +341,14 @@ def run_embedding_manual():
     util.setup_logging(info_directory, "Ensemble_Embedding_for_Link_Prediction.log",
                        logging_level="info")
 
+    # util_files.create_entity_and_relation_name_set_file(f"data\\{dataset_in}")
+
     # --- Sampling process ---
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
                                  rho=args.rho, no_progress_bar=args.no_progress_bar)
 
-    # TODO fix complex models
-    # TODO fix hyperbolic models
     # --- Setup model training ---
     allowed_kge_models = {Constants.DIST_MULT: list(range(0, 5)),
                           Constants.COMPL_EX: [20],
