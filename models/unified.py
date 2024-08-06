@@ -95,6 +95,8 @@ class Unified(KGModel):
             args_subgraph.model = model
             args_subgraph.subgraph = f"sub_{subgraph_num:03d}"
 
+            logging.debug(f"Args for {args_subgraph.subgraph}:\n{args_subgraph}")
+
             # load data
             logging.debug(f"Loading data for subgraph {args_subgraph.subgraph}.")
             dataset_subgraph = KGDataset(os.path.join(init_args.dataset_path, args_subgraph.subgraph),
@@ -258,6 +260,8 @@ class Unified(KGModel):
                 l.backward()
                 single_model.optimizer.step()
 
+                logging.debug(f"{single_model.model.subgraph}: {l:.2f}")
+
     def calculate_cross_model_attention(self, queries):
         """
         Calculates cross-model attention for the given queries.
@@ -327,7 +331,7 @@ class Unified(KGModel):
             softmax = nn.Softmax(dim=dim)
 
         logging.debug(f"Sizes for attention:\nTheta\t{theta.size()}\nCands:\t{cands.size()}")
-        attention = torch.zeros(theta.size()).to('cuda')
+        attention = torch.zeros(theta.size(), dtype=self.data_type).to('cuda')
         attention[:, :, self.active_models] = softmax(theta[:, :, self.active_models] * cands[:, :, self.active_models])
         return attention
 
@@ -381,19 +385,11 @@ class Unified(KGModel):
                 ent_emb_temp.append(single_model.model.entity.weight.data[queries[:, 0]])
                 rel_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             elif single_model.model.model_name in COMPLEX_MODELS:
-                ent_emb = single_model.model.embeddings[0].weight.data[queries[:, 0]]
-                ent_emb[torch.isnan(ent_emb)] = 0.0
-                ent_emb_temp.append(ent_emb)
-                rel_emb = single_model.model.embeddings[1].weight.data[queries[:, 1]]
-                rel_emb[torch.isnan(rel_emb)] = 0.0
-                rel_emb_temp.append(rel_emb)
+                ent_emb_temp.append(single_model.model.embeddings[0].weight.data[queries[:, 0]])
+                rel_emb_temp.append(single_model.model.embeddings[1].weight.data[queries[:, 1]])
             elif single_model.model.model_name in HYP_MODELS:
-                ent_emb = single_model.model.entity.weight.data[queries[:, 0]]
-                rel_emb = single_model.model.rel.weight.data[queries[:, 1]]
-                ent_emb[torch.isnan(ent_emb)] = 0.0
-                rel_emb[torch.isnan(rel_emb)] = 0.0
-                ent_emb_temp.append(ent_emb)
-                rel_emb_temp.append(rel_emb)
+                ent_emb_temp.append(single_model.model.entity.weight.data[queries[:, 0]])
+                rel_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             try:
                 rel_diag_emb_temp.append(single_model.model.rel.weight.data[queries[:, 1]])
             except ValueError:
@@ -426,7 +422,7 @@ class Unified(KGModel):
         range_vals = max_vals - min_vals
 
         # Avoid division by zero
-        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-8)
+        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-6)
         return normalized_tensor
 
     def get_queries(self, queries):
@@ -452,9 +448,10 @@ class Unified(KGModel):
                 lhs_e, lhs_biases = getattr(method, "get_queries")(self, queries)
 
             if isinstance(lhs_e, tuple):
-                for i in range(len(lhs_e)):
-                    lhs_e[i] = self.min_max_normalize(lhs_e[i], dim=0)
-                    lhs_biases[i] = self.min_max_normalize(lhs_biases[i], dim=0)
+                lhs_e = list(lhs_e)
+                lhs_e[0] = self.min_max_normalize(lhs_e[0], dim=0)
+                lhs_e = tuple(lhs_e)
+                lhs_biases = self.min_max_normalize(lhs_biases, dim=0)
             else:
                 lhs_e = self.min_max_normalize(lhs_e, dim=0)
                 lhs_biases = self.min_max_normalize(lhs_biases, dim=0)
@@ -521,9 +518,10 @@ class Unified(KGModel):
                 rhs_e, rhs_biases = getattr(method, "get_rhs")(self, queries, eval_mode)
 
             if isinstance(rhs_e, tuple):
-                for i in range(len(rhs_e)):
-                    rhs_e[i] = self.min_max_normalize(rhs_e[i], dim=0)
-                    rhs_biases[i] = self.min_max_normalize(rhs_biases[i], dim=0)
+                rhs_e = list(rhs_e)
+                rhs_e[0] = self.min_max_normalize(rhs_e[0], dim=0)
+                rhs_e = tuple(rhs_e)
+                rhs_biases = self.min_max_normalize(rhs_biases, dim=0)
             else:
                 rhs_e = self.min_max_normalize(rhs_e, dim=0)
                 rhs_biases = self.min_max_normalize(rhs_biases, dim=0)

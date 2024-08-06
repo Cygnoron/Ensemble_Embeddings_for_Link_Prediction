@@ -1,4 +1,5 @@
 """Knowledge Graph embedding model optimizer."""
+import logging
 
 import numpy as np
 import torch
@@ -154,11 +155,12 @@ class KGOptimizer(object):
             self.model.validation = False
         return loss
 
-    def epoch(self, examples, epoch=0):
+    def epoch(self, examples, epoch=""):
         """Runs one epoch of training KG embedding model.
 
         Args:
             examples: torch.LongTensor of shape (N_train x 3) with training triples
+            epoch (int): The current epoch as integer.
 
         Returns:
             loss: torch.Tensor with loss averaged over all training examples
