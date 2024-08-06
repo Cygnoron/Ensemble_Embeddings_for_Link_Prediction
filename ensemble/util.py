@@ -561,17 +561,32 @@ def get_args(args, model):
                  "regularizer",
                  "reg"]
     counter = 0
+
+    for key in vars(args):
+        try:
+            if isinstance(vars(args)[key], str):
+                vars(args)[key] = int(vars(args)[key])
+        except ValueError:
+            logging.debug("Couldn't parse to int")
+        logging.debug(f"{key}: {vars(args)[key]} ({type(vars(args)[key])})")
+
     for key in vars(args):
         if key in args_list:
             value = vars(args)[key]
             try:
-                value = json.loads(value)
-                logging.debug(f"Dict {value} for key {key}")
+                try:
+                    if isinstance(value, str):
+                        vars(args)[key] = int(vars(args)[key])
+                        value = vars(args)[key]
+
+                except ValueError:
+                    value = json.loads(value)
+                    logging.debug(f"Dict {value} for key {key}")
             except Exception:
                 pass
             logging.debug(f"{key}: {value}, (type: {type(value)})")
 
-            if type(value) is dict:
+            if isinstance(value, dict):
                 if "all" in list(value.keys()):
                     try:
                         vars(args_subgraph)[key] = int(value['all'])
@@ -594,6 +609,9 @@ def get_args(args, model):
                     except ValueError:
                         vars(args_subgraph)[key] = value[first_key]
                 counter += 1
+
+        else:
+            args_subgraph = args
 
     logging.debug(f"{counter} parameters were changed due to specific mapping.")
     return args_subgraph
