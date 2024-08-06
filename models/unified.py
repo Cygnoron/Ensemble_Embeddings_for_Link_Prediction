@@ -411,11 +411,11 @@ class Unified(KGModel):
         Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
 
         Args:
-        tensor (torch.Tensor): The input tensor.
-        dim (int): The dimension along which to normalize.
+            tensor (torch.Tensor): The input tensor.
+            dim (int): The dimension along which to normalize.
 
         Returns:
-        torch.Tensor: The normalized tensor.
+            torch.Tensor: The normalized tensor.
         """
         min_vals, _ = tensor.min(dim=dim, keepdim=True)
         max_vals, _ = tensor.max(dim=dim, keepdim=True)
