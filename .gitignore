@@ -12,6 +12,6 @@ venv/
 **.pyc
 **/wandb/**
 
-**/experiments/**
+#**/experiments/**
 **/to_discuss/**
 **/logs/**
