@@ -93,11 +93,12 @@ parser.add_argument(
     "--subgraph_amount", default=10, type=int, help="The amount of subgraphs, that will be present in the ensemble."
 )
 parser.add_argument(
-    "--subgraph_size_range", default=(0.3, 0.7), help="A tuple (min, normal) with the relative subgraph sizes, where \n"
-                                                      "- \'min\' is the minimal relative subgraph size that will be "
-                                                      "used with Feature sampling.\n"
-                                                      "- \'normal\' is the normal relative subgraph size, that needs "
-                                                      "to be reached under normal conditions."
+    "--subgraph_size_range", default="(0.6, 0.7)",
+    help="A tuple (min, normal) with the relative subgraph sizes, where \n"
+         "- \'min\' is the minimal relative subgraph size that will be "
+         "used with Feature sampling.\n"
+         "- \'normal\' is the normal relative subgraph size, that needs "
+         "to be reached under normal conditions."
 )
 parser.add_argument(
     "--sampling_method", default="Entity", choices=["Entity", "Feature"],
@@ -114,11 +115,11 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--entities_per_step", default=1,
+    "--entities_per_step", default=1, type=int,
     help="The amount of entities, that will be selected per sampling step."
 )
 parser.add_argument(
-    "--enforcement", default=1,
+    "--enforcement", default=1, type=int,
     help="Enforcement level for ensuring the inclusion of all entities and relation names."
 )
 
@@ -128,7 +129,7 @@ parser.add_argument(
     help="The method by which all scores from the ensemble are aggregated."
 )
 parser.add_argument(
-    "--model_dropout_factor", default=10,
+    "--model_dropout_factor", default=10, type=int,
     help="The multiplier for the first validation loss in order to disregard a model as diverged."
 )
 
@@ -255,7 +256,7 @@ def run_embedding(args):
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
-                                 subgraph_size_range=args.subgraph_size_range,
+                                 subgraph_size_range=args.subgraph_size_range, entities_per_step=args.entities_per_step,
                                  rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
 
     error = False
@@ -301,18 +302,20 @@ def run_embedding_manual():
     # dataset_in = "WN18RR"
     dataset_in = "FB15K-237"
     # dataset_in = "NELL-995"
-    subgraph_amount = 5
-    subgraph_size_range = (0.03, 0.7)
-    rho = 2
+    subgraph_amount = 30
+    subgraph_size_range = (0.6, 0.7)
+    rho = 0.5
     model_dropout_factor = 10
+    entities_per_step = 1
 
-    args = argparse.Namespace(no_sampling=True, no_training=True, no_time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
+                              entities_per_step=entities_per_step,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
-                              aggregation_method=Constants.MAX_SCORE_AGGREGATION,
-                              # aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
+                              # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
+                              aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
 
     # --- Setup wandb ---
@@ -347,7 +350,8 @@ def run_embedding_manual():
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount, subgraph_size_range=args.subgraph_size_range,
-                                 rho=args.rho, no_progress_bar=args.no_progress_bar)
+                                 entities_per_step=args.entities_per_step, rho=args.rho,
+                                 no_progress_bar=args.no_progress_bar)
 
     # --- Setup model training ---
     allowed_kge_models = {Constants.DIST_MULT: list(range(0, 5)),

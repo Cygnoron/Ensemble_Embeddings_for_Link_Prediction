@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 import time
@@ -62,7 +63,7 @@ def train(info_directory, args):
     subgraph_embedding_mapping = util.assign_model_to_subgraph(args.kge_models, args)
 
     # Set up unified model
-    unified_model, args_unified = setup_unified_model(args, test_valid_file_dir, model_setup_config_dir,
+    unified_model, args_unified = setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, model_file_dir,
                                                       dataset_general, subgraph_embedding_mapping, dataset_path)
 
     previous_valid_loss = 0
@@ -188,7 +189,7 @@ def train(info_directory, args):
     logging.info(f"Finished ensemble training and testing in {util.format_time(time_total_start, time_total_end)}.")
 
 
-def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, general_dataset,
+def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, model_file_dir, general_dataset,
                         subgraph_embedding_mapping, dataset_path):
     """
     Set up the unified model for training.
@@ -212,6 +213,7 @@ def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, gener
     init_args = argparse.Namespace(
         test_valid_file_dir=test_valid_file_dir,
         model_setup_config_dir=model_setup_config_dir,
+        model_file_dir=model_file_dir,
         no_progress_bar=args.no_progress_bar,
         subgraph_embedding_mapping=subgraph_embedding_mapping,
         device=device,
@@ -229,5 +231,20 @@ def setup_unified_model(args, test_valid_file_dir, model_setup_config_dir, gener
     args_unified = util.get_args(args, unified_model)
     unified_model = getattr(models, unified_model)(args, init_args, args_unified)
     unified_model.to(init_args.device)
+
+    # convert tensors into lists for json storage
+    for arg in vars(args_unified):
+        if isinstance(vars(args_unified)[arg], torch.Tensor):
+            vars(args_unified)[arg] = vars(args_unified)[arg].tolist()
+        if arg == "model" or arg == "model_name":
+            vars(args_unified)[arg] = "Unified"
+
+    logging.debug(f"Unified args:\n{args_unified}")
+
+    # save config
+    with (open(os.path.join(init_args.model_file_dir, f"config_unified.json"), "w") as unified_config_file,
+          open(os.path.join(init_args.model_file_dir, f"config_init.json"), "w") as init_config_file):
+        json.dump(vars(args_unified), unified_config_file)
+        json.dump(vars(init_args), init_config_file)
 
     return unified_model, args_unified

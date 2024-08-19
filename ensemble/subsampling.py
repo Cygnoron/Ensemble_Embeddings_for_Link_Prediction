@@ -39,7 +39,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
     dataset_in_train = os.path.join("data", dataset_in, "train")
 
     logging.info(f"Sampling {subgraph_amount} subgraphs with a relative size {subgraph_size_range} from "
-                 f"{dataset_in} with {sampling_method[1]}")
+                 f"{dataset_in} with {sampling_method[1]} and {entities_per_step} entities per step.")
 
     # check if input file exist
     util_files.check_file(dataset_in_train)

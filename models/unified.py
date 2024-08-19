@@ -93,7 +93,7 @@ class Unified(KGModel):
             args_subgraph = util.get_args(args, model)
             args_subgraph.model_name = model
             args_subgraph.model = model
-            args_subgraph.subgraph = f"sub_{subgraph_num:03d}"
+            args_subgraph.subgraph = f"sub_{int(subgraph_num):03d}"
 
             logging.debug(f"Args for {args_subgraph.subgraph}:\n{args_subgraph}")
 
@@ -123,10 +123,11 @@ class Unified(KGModel):
             self.active_models.append(subgraph_num)
 
             # save config
-            with (open(os.path.join(init_args.model_setup_config_dir,
-                                    f"config_{args_subgraph.subgraph}_{args_subgraph.model_name}.json"),
-                       "w") as json_file):
-                json.dump(vars(args_subgraph), json_file)
+            if not hasattr(args, "test_mode"):
+                with (open(os.path.join(init_args.model_setup_config_dir,
+                                        f"config_{args_subgraph.subgraph}_{args_subgraph.model_name}.json"),
+                           "w") as json_file):
+                    json.dump(vars(args_subgraph), json_file)
 
             args_subgraph.entities = torch.tensor(args_subgraph.entities, dtype=torch.int).cuda()
             args_subgraph.relation_names = torch.tensor(args_subgraph.relation_names, dtype=torch.int).cuda()
