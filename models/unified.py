@@ -418,6 +418,8 @@ class Unified(KGModel):
         Returns:
             torch.Tensor: The normalized tensor.
         """
+        return tensor
+
         min_vals, _ = tensor.min(dim=dim, keepdim=True)
         max_vals, _ = tensor.max(dim=dim, keepdim=True)
         range_vals = max_vals - min_vals
