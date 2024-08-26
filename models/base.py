@@ -83,7 +83,7 @@ class KGModel(nn.Module, ABC):
             self.is_in_ensemble = False
 
         # ensemble attention
-        if self.is_in_ensemble or self.is_unified_model or True:
+        if self.is_in_ensemble or self.is_unified_model :
             self.theta_ent = None
             self.theta_rel = None
             self.init_theta()

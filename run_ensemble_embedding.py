@@ -314,7 +314,7 @@ def run_embedding_manual():
     model_dropout_factor = 10
     entities_per_step = 1
 
-    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               entities_per_step=entities_per_step,
