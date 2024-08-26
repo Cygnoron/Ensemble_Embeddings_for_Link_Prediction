@@ -79,11 +79,14 @@ class KGModel(nn.Module, ABC):
                 self.entities = entities
                 self.relation_names = relation_names
 
+        if not hasattr(self, "is_in_ensemble"):
+            self.is_in_ensemble = False
 
         # ensemble attention
-        self.theta_ent = None
-        self.theta_rel = None
-        self.init_theta()
+        if self.is_in_ensemble or self.is_unified_model or True:
+            self.theta_ent = None
+            self.theta_rel = None
+            self.init_theta()
         self.act = nn.Softmax(dim=-1)
         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
 

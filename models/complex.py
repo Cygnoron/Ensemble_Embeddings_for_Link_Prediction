@@ -20,8 +20,8 @@ class BaseC(KGModel):
         """Initialize a Complex KGModel."""
         # prevent errors when running baseline
         if not hasattr(args, 'entities') or not hasattr(args, 'relation_names'):
-            self.entities = None
-            self.relation_names = None
+            args.entities = None
+            args.relation_names = None
 
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
                                     args.init_size, args.model, subgraph=args.subgraph, entities=args.entities,

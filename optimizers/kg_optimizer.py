@@ -169,6 +169,7 @@ class KGOptimizer(object):
             epoch = f"Epoch {epoch} "
 
         bar = None
+        # self.model.entities = None
         if not self.no_progress_bar and (self.model.is_unified_model or self.model.entities is None):
             bar = tqdm.tqdm(total=examples.shape[0], unit='ex', disable=not self.verbose)
             bar.set_description(f'{epoch}train loss')

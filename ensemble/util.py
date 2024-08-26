@@ -444,7 +444,7 @@ def format_dict(dictionary):
     return out_str.rstrip("\n")
 
 
-def format_set(set_to_format, delimiter=", "):
+def format_set(set_to_format, delimiter=", ", first_char="", last_char=""):
     """
     Formats a set of elements into a string, with elements separated by a specified delimiter.
 
@@ -455,12 +455,12 @@ def format_set(set_to_format, delimiter=", "):
     Returns:
         str: A formatted string with elements separated by the delimiter.
     """
-    out_str = ""
+    out_str = first_char
     # Iterate through the set and append each element followed by the delimiter
     for element in set_to_format:
         out_str += f"{element}{delimiter}"
-    # Remove the trailing delimiter
-    out_str = out_str.rstrip(delimiter)
+    # Remove the trailing delimiter and add last char
+    out_str = out_str.rstrip(delimiter) + last_char
     return out_str
 
 

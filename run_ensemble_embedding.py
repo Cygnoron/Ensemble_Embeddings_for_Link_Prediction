@@ -40,7 +40,7 @@ parser.add_argument(
 )
 #   - Individually specifiable hyperparameters -
 parser.add_argument(
-    '--model', type=str, default="{TransE:[\'all\']}",
+    '--model', type=str, default="{\"TransE\":[\"all\"]}",
     help='JSON string of the mapping from embedding methods to subgraphs.\n'
          '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
          '- \'all\' in a mapping sets all subgraphs to this method. This has the same effect as --model <MODEL_NAME>\n'
@@ -176,13 +176,13 @@ def run_baseline():
     args = parser.parse_args()
 
     args.model = "DistMult"
-    args.dataset = "WN18RR"
+    args.dataset = "NELL-995-h100"
     args.max_epochs = 500
     args.rank = 32
     args.patience = 15
     args.valid = 5
     args.dtype = "single"
-    args.batch_size = 450
+    args.batch_size = 500
     args.debug = False
 
     args.learning_rate = 0.1
@@ -190,7 +190,7 @@ def run_baseline():
     args.optimizer = "Adagrad"
     args.neg_sample_size = -1
     args.bias = "none"
-    args.double_neg = True
+    args.double_neg = False
     args.multi_c = False
 
     args.regularizer = "N3"
@@ -201,7 +201,8 @@ def run_baseline():
     args.no_progress_bar = False
     args.entities = None
     args.relation_names = None
-    args.wandb_project = "Experiments"
+    args.model_name = args.model
+    # args.wandb_project = "Experiments"
 
     # --- Training ---
     Constants.get_wandb(args.wandb_project)
@@ -300,15 +301,20 @@ def run_embedding_manual():
 
     # dataset_in = "Debug"
     # dataset_in = "WN18RR"
-    dataset_in = "FB15K-237"
-    # dataset_in = "NELL-995"
-    subgraph_amount = 30
-    subgraph_size_range = (0.6, 0.7)
+    # dataset_in = "FB15K-237"
+    dataset_in = "NELL-995-h100"
+    # subgraph_amount = 30
+    # subgraph_amount = 10
+    subgraph_amount = 5
+    # subgraph_size_range = (0.6, 0.7)
+    subgraph_size_range = (0.2, 0.3)
+    # rho = 2.0
+    # rho = 1.0
     rho = 0.5
     model_dropout_factor = 10
     entities_per_step = 1
 
-    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               entities_per_step=entities_per_step,
@@ -317,6 +323,9 @@ def run_embedding_manual():
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
+
+    # --- Setup model training ---
+    args.kge_models = {Constants.DIST_MULT: []}
 
     # --- Setup wandb ---
     # args.wandb_project = "Experiments"
@@ -353,13 +362,6 @@ def run_embedding_manual():
                                  entities_per_step=args.entities_per_step, rho=args.rho,
                                  no_progress_bar=args.no_progress_bar)
 
-    # --- Setup model training ---
-    allowed_kge_models = {Constants.DIST_MULT: list(range(0, 5)),
-                          Constants.COMPL_EX: [20],
-                          Constants.TRANS_E: ['all']
-                          # Constants.DIST_MULT: list(range(5, 10))
-                          }
-
     # allowed_kge_models = ({
     #     Constants.TRANS_E: [0],
     #     Constants.DIST_MULT: [1],
@@ -375,17 +377,16 @@ def run_embedding_manual():
     try:
         if not args.no_training:
             # general parameters
-            args.kge_models = allowed_kge_models
-            args.max_epochs = 30
+            args.max_epochs = 500
             args.rank = 32
             args.patience = 15
             args.valid = 5
             args.dtype = "single"
             args.batch_size = 1000
-            args.debug = True
+            args.debug = False
 
             # individually settable parameters
-            args.learning_rate = {'TransE': 0.001, 'DistMult': 0.1,
+            args.learning_rate = {'TransE': 0.1, 'DistMult': 0.1,
                                   'ComplEx': 0.1, 'RotatE': 0.001,
                                   'AttE': 0.001, 'AttH': 0.001}
             args.reg = {'TransE': 0.0, 'DistMult': 0.05,
@@ -402,7 +403,7 @@ def run_embedding_manual():
                          'ComplEx': "none",
                          'AttE': "learn",
                          'rest': "none"}
-            args.double_neg = {'TransE': True, 'DistMult': True,
+            args.double_neg = {'TransE': True, 'DistMult': False,
                                'ComplEx': True,
                                'AttE': False, 'AttH': False}
             args.multi_c = {'AttE': True, 'AttH': True,

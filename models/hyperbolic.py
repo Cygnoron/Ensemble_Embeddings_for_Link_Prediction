@@ -17,9 +17,9 @@ class BaseH(KGModel):
 
     def __init__(self, args):
         # prevent errors when running baseline
-        if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
-            self.entities = None
-            self.relation_names = None
+        if not hasattr(args, 'entities') or not hasattr(args, 'relation_names'):
+            args.entities = None
+            args.relation_names = None
 
         super(BaseH, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
                                     args.init_size, args.model, subgraph=args.subgraph, entities=args.entities,

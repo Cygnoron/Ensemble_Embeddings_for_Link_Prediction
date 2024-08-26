@@ -19,7 +19,7 @@ class BaseE(KGModel):
 
     def __init__(self, args):
         # prevent errors when running baseline
-        if hasattr(args, 'entities') or hasattr(args, 'relation_names'):
+        if not hasattr(args, 'entities') or not hasattr(args, 'relation_names'):
             self.entities = None
             self.relation_names = None
 
@@ -28,12 +28,15 @@ class BaseE(KGModel):
                                     relation_names=args.relation_names)
 
         if self.is_in_ensemble:
+
             self.entity.weight.data = self.init_size * torch.zeros((self.sizes[0], self.rank), dtype=self.data_type)
             self.rel.weight.data = self.init_size * torch.zeros((self.sizes[1], self.rank), dtype=self.data_type)
 
-            self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank), dtype=self.data_type)
+            self.entity.weight.data[self.entities] = torch.randn((len(self.entities), self.rank),
+                                                                 dtype=self.data_type)
             self.rel.weight.data[self.relation_names] = torch.randn((len(self.relation_names), self.rank),
                                                                     dtype=self.data_type)
+
         else:
             self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
             self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)

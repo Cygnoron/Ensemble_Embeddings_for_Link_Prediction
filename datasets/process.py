@@ -141,5 +141,7 @@ def process_dataset_main(data_dir):
 
 
 if __name__ == "__main__":
-    process_specific_dataset("NELL-995", "D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\"
-                                         "Ensemble_Embedding_for_Link_Prediction\\KGEmb\\data")
+    # process_specific_dataset("NELL-995-h100", "D:\\OneDrive - bwedu\\MASTER\\Masterarbeit\\Software\\"
+    #                                      "Ensemble_Embedding_for_Link_Prediction\\KGEmb\\data")
+    process_specific_dataset("NELL-995-h100", "C:\\Users\\Tim\\Documents\\Masterarbeit\\Software\\"
+                                              "Ensemble_Embedding_for_Link_Prediction\\data")

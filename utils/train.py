@@ -70,7 +70,7 @@ def format_metrics(metrics, split, metrics_change_absolut=None, metrics_change_p
 
         # added AMRI and rank_deviation
         result += f"AMRI: {metrics['AMRI'][mode]:.3f}{percent_str}\t| "
-        result += f"rank_deviation: {metrics['rank_deviation'][mode]:.3f}{percent_str}"
+        result += f"rank_deviation: {metrics['rank_deviation'][mode]:.5f}{percent_str}"
 
     if metrics_change_absolut is not None:
         result += f"{format_metrics(metrics_change_absolut, split, init_str='change')}"

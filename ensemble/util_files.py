@@ -9,7 +9,7 @@ from datetime import datetime
 import numpy as np
 import torch
 
-from ensemble import Constants
+from ensemble import Constants, util
 from ensemble.util import get_unique_triple_ids
 
 
@@ -332,7 +332,9 @@ def create_entity_and_relation_name_set_file(dataset):
 
 
 def get_info_directory_path(dataset_out_dir, args):
-    hyper_param_str = f"results_{args.aggregation_method[2]}"
+    # included_models = util.format_set(set(args.kge_models.keys()), "_")
+    included_models=""
+    hyper_param_str = f"results_{args.aggregation_method[2]}{included_models}"
 
     if not args.no_time_dependent_file_path:
         hyper_param_str += datetime.now().strftime('_%m.%d_%H_%M')

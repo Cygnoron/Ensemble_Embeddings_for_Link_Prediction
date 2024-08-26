@@ -147,7 +147,7 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
                     config_file.write(f"\n{dataset_in};{sampling_method[1]};{rho};"
                                       f"{os.path.join(dataset_out_dir, f'sub_{subgraph_num:03d}')};"
                                       f"{round(time_stop_sub - time_start_sub, 3)};{subgraph_size_range};"
-                                      f"{round(len(delta_triples) / len(data), 3)};{subgraph_num};"
+                                      f"{len(delta_triples) / len(data):.4f};{subgraph_num};"
                                       f"{len(delta_triples)};{triples_deviation};{len(used_entity_set)};"
                                       f"{entities_per_step};{len(used_relation_name_set)};{subgraph_relation_names}")
                     logging.info(f"Length of delta: {len(delta_triples)}\t\t"
@@ -232,7 +232,7 @@ def calculate_delta(subgraph_size_range, dataset, subgraph_num, subgraph_amount,
                     enforce_entities = False
 
             # if relation names are missing, enforce missing relation names and set flag
-            if (len(relation_name_ids_unused) > 0) and (len(delta) / len(dataset) >= (subgraph_size * 0.9)):
+            if (len(relation_name_ids_unused) > 0) and (len(delta) / len(dataset) >= (subgraph_size * 0.8)):
                 enforce_relation_names = True
 
             # if all relation names are selected, reset flag

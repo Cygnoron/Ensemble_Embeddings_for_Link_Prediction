@@ -37,5 +37,8 @@ def get_wandb(project_name):
     global LOG_WANDB, PROJECT_NAME
 
     if isinstance(project_name, str):
-        LOG_WANDB = True
-        PROJECT_NAME = project_name
+        if project_name.lower() == "false":
+            LOG_WANDB = False
+        else:
+            LOG_WANDB = True
+            PROJECT_NAME = project_name
