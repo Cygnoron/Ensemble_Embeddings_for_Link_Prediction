@@ -1,0 +1,748 @@
+2024-08-23 10:43:19 INFO     ### Saving logs in: data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43 ###
+2024-08-23 10:43:21 INFO     ### Saving .json config files of embedding_models in: data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_setup_configs ###
+2024-08-23 10:43:21 INFO     ### Saving .pt files of stored embedding_models in: data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files ###
+2024-08-23 10:43:21 INFO     Subgraphs with fixed embedding:
+
+		Remaining subgraphs will be embedded by random embedding methods ['DistMult']
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_003
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_004
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_008
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_009
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_000
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_001
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_005
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_002
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_006
+2024-08-23 10:43:21 INFO     Randomly selected embedding method DistMult for subgraph sub_007
+2024-08-23 10:43:21 INFO     Mapping from embedding methods to subgraphs: {'DistMult': [3, 4, 8, 9, 0, 1, 5, 2, 6, 7]}
+2024-08-23 10:43:26 INFO     -/	Creating single embedding models	\-
+2024-08-23 10:43:36 INFO     -\	Successfully created all embedding_models in 10.38 seconds	/-
+2024-08-23 10:43:36 INFO     Found the following embedding methods:
+DistMult
+2024-08-23 10:43:36 INFO     -/	Starting training	\-
+2024-08-23 10:44:25 INFO     Training	Epoch 0 | average train loss: 11.0094 | change to last epoch: 11.0094 (inf%)
+2024-08-23 10:44:26 INFO     Validation	Epoch 0 | average valid loss: 9.3098 | change to last epoch: 9.3098 (inf%)
+2024-08-23 10:44:26 INFO     -\	Training and optimization of epoch 0 finished in 49.88 seconds	/-
+2024-08-23 10:45:15 INFO     Training	Epoch 1 | average train loss: 9.3918 | change to last epoch: -1.6177 (-14.693%)
+2024-08-23 10:45:17 INFO     Validation	Epoch 1 | average valid loss: 8.5146 | change to last epoch: -0.7952 (-8.541%)
+2024-08-23 10:45:17 INFO     -\	Training and optimization of epoch 1 finished in 50.38 seconds	/-
+2024-08-23 10:46:05 INFO     Training	Epoch 2 | average train loss: 8.6738 | change to last epoch: -0.7180 (-7.645%)
+2024-08-23 10:46:07 INFO     Validation	Epoch 2 | average valid loss: 7.7508 | change to last epoch: -0.7638 (-8.971%)
+2024-08-23 10:46:07 INFO     -\	Training and optimization of epoch 2 finished in 49.98 seconds	/-
+2024-08-23 10:46:56 INFO     Training	Epoch 3 | average train loss: 7.8918 | change to last epoch: -0.7820 (-9.016%)
+2024-08-23 10:46:57 INFO     Validation	Epoch 3 | average valid loss: 7.0976 | change to last epoch: -0.6532 (-8.428%)
+2024-08-23 10:46:57 INFO     -\	Training and optimization of epoch 3 finished in 50.47 seconds	/-
+2024-08-23 10:47:44 INFO     Training	Epoch 4 | average train loss: 7.2482 | change to last epoch: -0.6436 (-8.155%)
+2024-08-23 10:47:45 INFO     Validation	Epoch 4 | average valid loss: 6.5550 | change to last epoch: -0.5426 (-7.645%)
+2024-08-23 10:47:48 INFO     
+average valid metrics:	MR: 1926.221	| MRR: 0.155	| H@1: 0.100	| H@3: 0.174	| H@10: 0.264	| AMRI: 0.735	| rank_deviation: 0.001
+average valid change:	MR: 1926.221	| MRR: 0.155	| H@1: 0.100	| H@3: 0.174	| H@10: 0.264	| AMRI: 0.735	| rank_deviation: 0.001
+average valid change %:	MR: 100.000%	| MRR: 100.000%	| H@1: 100.000%	| H@3: 100.000%	| H@10: 100.000%	| AMRI: 100.000%	| rank_deviation: 100.000%
+2024-08-23 10:47:48 INFO     Saving embedding_models at epoch 4 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 10:47:48 INFO     -\	Training and optimization of epoch 4 finished in 51.43 seconds	/-
+2024-08-23 10:48:36 INFO     Training	Epoch 5 | average train loss: 6.7646 | change to last epoch: -0.4836 (-6.671%)
+2024-08-23 10:48:37 INFO     Validation	Epoch 5 | average valid loss: 6.1210 | change to last epoch: -0.4339 (-6.620%)
+2024-08-23 10:48:37 INFO     -\	Training and optimization of epoch 5 finished in 48.35 seconds	/-
+2024-08-23 10:49:25 INFO     Training	Epoch 6 | average train loss: 6.3887 | change to last epoch: -0.3760 (-5.558%)
+2024-08-23 10:49:26 INFO     Validation	Epoch 6 | average valid loss: 5.8055 | change to last epoch: -0.3155 (-5.155%)
+2024-08-23 10:49:26 INFO     -\	Training and optimization of epoch 6 finished in 48.82 seconds	/-
+2024-08-23 10:50:14 INFO     Training	Epoch 7 | average train loss: 6.0970 | change to last epoch: -0.2917 (-4.566%)
+2024-08-23 10:50:15 INFO     Validation	Epoch 7 | average valid loss: 5.5725 | change to last epoch: -0.2329 (-4.012%)
+2024-08-23 10:50:15 INFO     -\	Training and optimization of epoch 7 finished in 49.21 seconds	/-
+2024-08-23 10:51:02 INFO     Training	Epoch 8 | average train loss: 5.8635 | change to last epoch: -0.2335 (-3.829%)
+2024-08-23 10:51:03 INFO     Validation	Epoch 8 | average valid loss: 5.4003 | change to last epoch: -0.1722 (-3.090%)
+2024-08-23 10:51:03 INFO     -\	Training and optimization of epoch 8 finished in 48.64 seconds	/-
+2024-08-23 10:51:51 INFO     Training	Epoch 9 | average train loss: 5.6722 | change to last epoch: -0.1913 (-3.263%)
+2024-08-23 10:51:52 INFO     Validation	Epoch 9 | average valid loss: 5.2708 | change to last epoch: -0.1296 (-2.400%)
+2024-08-23 10:51:56 INFO     
+average valid metrics:	MR: 866.704	| MRR: 0.229	| H@1: 0.161	| H@3: 0.253	| H@10: 0.361	| AMRI: 0.881	| rank_deviation: 0.001
+average valid change:	MR: -1059.517	| MRR: 0.074	| H@1: 0.061	| H@3: 0.079	| H@10: 0.097	| AMRI: 0.146	| rank_deviation: 0.000
+average valid change %:	MR: -55.005%	| MRR: 47.402%	| H@1: 60.363%	| H@3: 45.669%	| H@10: 36.756%	| AMRI: 19.822%	| rank_deviation: 11.097%
+2024-08-23 10:51:56 INFO     Saving embedding_models at epoch 9 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 10:51:56 INFO     -\	Training and optimization of epoch 9 finished in 52.37 seconds	/-
+2024-08-23 10:52:44 INFO     Training	Epoch 10 | average train loss: 5.5104 | change to last epoch: -0.1617 (-2.851%)
+2024-08-23 10:52:45 INFO     Validation	Epoch 10 | average valid loss: 5.1725 | change to last epoch: -0.0983 (-1.864%)
+2024-08-23 10:52:45 INFO     -\	Training and optimization of epoch 10 finished in 49.45 seconds	/-
+2024-08-23 10:53:33 INFO     Training	Epoch 11 | average train loss: 5.3707 | change to last epoch: -0.1398 (-2.536%)
+2024-08-23 10:53:34 INFO     Validation	Epoch 11 | average valid loss: 5.0934 | change to last epoch: -0.0791 (-1.529%)
+2024-08-23 10:53:34 INFO     -\	Training and optimization of epoch 11 finished in 48.32 seconds	/-
+2024-08-23 10:54:21 INFO     Training	Epoch 12 | average train loss: 5.2474 | change to last epoch: -0.1233 (-2.295%)
+2024-08-23 10:54:22 INFO     Validation	Epoch 12 | average valid loss: 5.0319 | change to last epoch: -0.0615 (-1.207%)
+2024-08-23 10:54:22 INFO     -\	Training and optimization of epoch 12 finished in 48.56 seconds	/-
+2024-08-23 10:55:10 INFO     Training	Epoch 13 | average train loss: 5.1370 | change to last epoch: -0.1104 (-2.104%)
+2024-08-23 10:55:11 INFO     Validation	Epoch 13 | average valid loss: 4.9827 | change to last epoch: -0.0492 (-0.979%)
+2024-08-23 10:55:11 INFO     -\	Training and optimization of epoch 13 finished in 49.12 seconds	/-
+2024-08-23 10:55:58 INFO     Training	Epoch 14 | average train loss: 5.0371 | change to last epoch: -0.0999 (-1.945%)
+2024-08-23 10:55:59 INFO     Validation	Epoch 14 | average valid loss: 4.9434 | change to last epoch: -0.0393 (-0.788%)
+2024-08-23 10:56:03 INFO     
+average valid metrics:	MR: 603.725	| MRR: 0.255	| H@1: 0.184	| H@3: 0.280	| H@10: 0.395	| AMRI: 0.917	| rank_deviation: 0.001
+average valid change:	MR: -262.979	| MRR: 0.026	| H@1: 0.023	| H@3: 0.027	| H@10: 0.035	| AMRI: 0.036	| rank_deviation: 0.000
+average valid change %:	MR: -30.342%	| MRR: 11.563%	| H@1: 14.359%	| H@3: 10.706%	| H@10: 9.570%	| AMRI: 4.106%	| rank_deviation: 36.624%
+2024-08-23 10:56:03 INFO     Saving embedding_models at epoch 14 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 10:56:03 INFO     -\	Training and optimization of epoch 14 finished in 51.65 seconds	/-
+2024-08-23 10:56:50 INFO     Training	Epoch 15 | average train loss: 4.9448 | change to last epoch: -0.0923 (-1.833%)
+2024-08-23 10:56:51 INFO     Validation	Epoch 15 | average valid loss: 4.9126 | change to last epoch: -0.0308 (-0.624%)
+2024-08-23 10:56:51 INFO     -\	Training and optimization of epoch 15 finished in 48.54 seconds	/-
+2024-08-23 10:57:39 INFO     Training	Epoch 16 | average train loss: 4.8604 | change to last epoch: -0.0844 (-1.706%)
+2024-08-23 10:57:40 INFO     Validation	Epoch 16 | average valid loss: 4.8876 | change to last epoch: -0.0250 (-0.509%)
+2024-08-23 10:57:40 INFO     -\	Training and optimization of epoch 16 finished in 48.84 seconds	/-
+2024-08-23 10:58:28 INFO     Training	Epoch 17 | average train loss: 4.7822 | change to last epoch: -0.0783 (-1.610%)
+2024-08-23 10:58:29 INFO     Validation	Epoch 17 | average valid loss: 4.8681 | change to last epoch: -0.0194 (-0.397%)
+2024-08-23 10:58:29 INFO     -\	Training and optimization of epoch 17 finished in 48.56 seconds	/-
+2024-08-23 10:59:17 INFO     Training	Epoch 18 | average train loss: 4.7108 | change to last epoch: -0.0714 (-1.492%)
+2024-08-23 10:59:18 INFO     Validation	Epoch 18 | average valid loss: 4.8546 | change to last epoch: -0.0135 (-0.278%)
+2024-08-23 10:59:18 INFO     -\	Training and optimization of epoch 18 finished in 49.16 seconds	/-
+2024-08-23 11:00:07 INFO     Training	Epoch 19 | average train loss: 4.6458 | change to last epoch: -0.0650 (-1.380%)
+2024-08-23 11:00:08 INFO     Validation	Epoch 19 | average valid loss: 4.8432 | change to last epoch: -0.0114 (-0.236%)
+2024-08-23 11:00:12 INFO     
+average valid metrics:	MR: 495.190	| MRR: 0.265	| H@1: 0.192	| H@3: 0.289	| H@10: 0.411	| AMRI: 0.932	| rank_deviation: 0.001
+average valid change:	MR: -108.535	| MRR: 0.010	| H@1: 0.008	| H@3: 0.009	| H@10: 0.016	| AMRI: 0.015	| rank_deviation: -0.000
+average valid change %:	MR: -17.978%	| MRR: 3.906%	| H@1: 4.227%	| H@3: 3.210%	| H@10: 3.974%	| AMRI: 1.628%	| rank_deviation: -14.622%
+2024-08-23 11:00:12 INFO     Saving embedding_models at epoch 19 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:00:12 INFO     -\	Training and optimization of epoch 19 finished in 54.01 seconds	/-
+2024-08-23 11:01:00 INFO     Training	Epoch 20 | average train loss: 4.5849 | change to last epoch: -0.0609 (-1.310%)
+2024-08-23 11:01:01 INFO     Validation	Epoch 20 | average valid loss: 4.8341 | change to last epoch: -0.0091 (-0.188%)
+2024-08-23 11:01:01 INFO     -\	Training and optimization of epoch 20 finished in 49.03 seconds	/-
+2024-08-23 11:01:49 INFO     Training	Epoch 21 | average train loss: 4.5296 | change to last epoch: -0.0553 (-1.206%)
+2024-08-23 11:01:50 INFO     Validation	Epoch 21 | average valid loss: 4.8294 | change to last epoch: -0.0046 (-0.096%)
+2024-08-23 11:01:50 INFO     -\	Training and optimization of epoch 21 finished in 49.46 seconds	/-
+2024-08-23 11:02:37 INFO     Training	Epoch 22 | average train loss: 4.4785 | change to last epoch: -0.0511 (-1.129%)
+2024-08-23 11:02:38 INFO     Validation	Epoch 22 | average valid loss: 4.8259 | change to last epoch: -0.0035 (-0.073%)
+2024-08-23 11:02:38 INFO     -\	Training and optimization of epoch 22 finished in 47.84 seconds	/-
+2024-08-23 11:03:26 INFO     Training	Epoch 23 | average train loss: 4.4317 | change to last epoch: -0.0468 (-1.045%)
+2024-08-23 11:03:27 INFO     Validation	Epoch 23 | average valid loss: 4.8228 | change to last epoch: -0.0032 (-0.065%)
+2024-08-23 11:03:27 INFO     -\	Training and optimization of epoch 23 finished in 48.29 seconds	/-
+2024-08-23 11:04:15 INFO     Training	Epoch 24 | average train loss: 4.3882 | change to last epoch: -0.0435 (-0.981%)
+2024-08-23 11:04:16 INFO     Validation	Epoch 24 | average valid loss: 4.8215 | change to last epoch: -0.0013 (-0.026%)
+2024-08-23 11:04:20 INFO     
+average valid metrics:	MR: 440.013	| MRR: 0.269	| H@1: 0.194	| H@3: 0.294	| H@10: 0.420	| AMRI: 0.940	| rank_deviation: 0.001
+average valid change:	MR: -55.177	| MRR: 0.004	| H@1: 0.002	| H@3: 0.006	| H@10: 0.009	| AMRI: 0.008	| rank_deviation: 0.000
+average valid change %:	MR: -11.143%	| MRR: 1.531%	| H@1: 0.862%	| H@3: 1.965%	| H@10: 2.192%	| AMRI: 0.814%	| rank_deviation: 34.251%
+2024-08-23 11:04:20 INFO     Saving embedding_models at epoch 24 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:04:20 INFO     -\	Training and optimization of epoch 24 finished in 53.22 seconds	/-
+2024-08-23 11:05:07 INFO     Training	Epoch 25 | average train loss: 4.3484 | change to last epoch: -0.0398 (-0.907%)
+2024-08-23 11:05:08 INFO     Validation	Epoch 25 | average valid loss: 4.8209 | change to last epoch: -0.0006 (-0.012%)
+2024-08-23 11:05:08 INFO     -\	Training and optimization of epoch 25 finished in 48.12 seconds	/-
+2024-08-23 11:05:54 INFO     Training	Epoch 26 | average train loss: 4.3114 | change to last epoch: -0.0370 (-0.850%)
+2024-08-23 11:05:55 INFO     Validation	Epoch 26 | average valid loss: 4.8211 | change to last epoch: 0.0002 (0.003%)
+2024-08-23 11:05:55 INFO     -\	Training and optimization of epoch 26 finished in 47.21 seconds	/-
+2024-08-23 11:06:41 INFO     Training	Epoch 27 | average train loss: 4.2770 | change to last epoch: -0.0345 (-0.799%)
+2024-08-23 11:06:42 INFO     Validation	Epoch 27 | average valid loss: 4.8225 | change to last epoch: 0.0014 (0.029%)
+2024-08-23 11:06:42 INFO     -\	Training and optimization of epoch 27 finished in 47.21 seconds	/-
+2024-08-23 11:07:28 INFO     Training	Epoch 28 | average train loss: 4.2454 | change to last epoch: -0.0316 (-0.738%)
+2024-08-23 11:07:29 INFO     Validation	Epoch 28 | average valid loss: 4.8236 | change to last epoch: 0.0011 (0.022%)
+2024-08-23 11:07:29 INFO     -\	Training and optimization of epoch 28 finished in 47.02 seconds	/-
+2024-08-23 11:08:16 INFO     Training	Epoch 29 | average train loss: 4.2156 | change to last epoch: -0.0298 (-0.701%)
+2024-08-23 11:08:17 INFO     Validation	Epoch 29 | average valid loss: 4.8261 | change to last epoch: 0.0025 (0.052%)
+2024-08-23 11:08:21 INFO     
+average valid metrics:	MR: 407.773	| MRR: 0.273	| H@1: 0.197	| H@3: 0.297	| H@10: 0.425	| AMRI: 0.944	| rank_deviation: 0.001
+average valid change:	MR: -32.240	| MRR: 0.003	| H@1: 0.003	| H@3: 0.002	| H@10: 0.005	| AMRI: 0.004	| rank_deviation: -0.000
+average valid change %:	MR: -7.327%	| MRR: 1.282%	| H@1: 1.576%	| H@3: 0.717%	| H@10: 1.195%	| AMRI: 0.472%	| rank_deviation: -29.765%
+2024-08-23 11:08:21 INFO     Saving embedding_models at epoch 29 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:08:21 INFO     -\	Training and optimization of epoch 29 finished in 51.17 seconds	/-
+2024-08-23 11:09:07 INFO     Training	Epoch 30 | average train loss: 4.1887 | change to last epoch: -0.0269 (-0.638%)
+2024-08-23 11:09:08 INFO     Validation	Epoch 30 | average valid loss: 4.8286 | change to last epoch: 0.0025 (0.052%)
+2024-08-23 11:09:08 INFO     -\	Training and optimization of epoch 30 finished in 47.31 seconds	/-
+2024-08-23 11:09:54 INFO     Training	Epoch 31 | average train loss: 4.1636 | change to last epoch: -0.0251 (-0.600%)
+2024-08-23 11:09:55 INFO     Validation	Epoch 31 | average valid loss: 4.8308 | change to last epoch: 0.0022 (0.047%)
+2024-08-23 11:09:55 INFO     -\	Training and optimization of epoch 31 finished in 47.25 seconds	/-
+2024-08-23 11:10:41 INFO     Training	Epoch 32 | average train loss: 4.1390 | change to last epoch: -0.0246 (-0.590%)
+2024-08-23 11:10:42 INFO     Validation	Epoch 32 | average valid loss: 4.8341 | change to last epoch: 0.0033 (0.069%)
+2024-08-23 11:10:42 INFO     -\	Training and optimization of epoch 32 finished in 47.33 seconds	/-
+2024-08-23 11:11:29 INFO     Training	Epoch 33 | average train loss: 4.1169 | change to last epoch: -0.0222 (-0.536%)
+2024-08-23 11:11:30 INFO     Validation	Epoch 33 | average valid loss: 4.8375 | change to last epoch: 0.0034 (0.069%)
+2024-08-23 11:11:30 INFO     -\	Training and optimization of epoch 33 finished in 47.33 seconds	/-
+2024-08-23 11:12:16 INFO     Training	Epoch 34 | average train loss: 4.0960 | change to last epoch: -0.0208 (-0.506%)
+2024-08-23 11:12:17 INFO     Validation	Epoch 34 | average valid loss: 4.8406 | change to last epoch: 0.0031 (0.064%)
+2024-08-23 11:12:21 INFO     
+average valid metrics:	MR: 386.860	| MRR: 0.275	| H@1: 0.198	| H@3: 0.301	| H@10: 0.428	| AMRI: 0.947	| rank_deviation: 0.000
+average valid change:	MR: -20.913	| MRR: 0.002	| H@1: 0.001	| H@3: 0.004	| H@10: 0.003	| AMRI: 0.003	| rank_deviation: -0.000
+average valid change %:	MR: -5.129%	| MRR: 0.755%	| H@1: 0.551%	| H@3: 1.375%	| H@10: 0.657%	| AMRI: 0.305%	| rank_deviation: -51.460%
+2024-08-23 11:12:21 INFO     Saving embedding_models at epoch 34 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:12:21 INFO     -\	Training and optimization of epoch 34 finished in 50.88 seconds	/-
+2024-08-23 11:13:08 INFO     Training	Epoch 35 | average train loss: 4.0765 | change to last epoch: -0.0196 (-0.478%)
+2024-08-23 11:13:09 INFO     Validation	Epoch 35 | average valid loss: 4.8441 | change to last epoch: 0.0035 (0.073%)
+2024-08-23 11:13:09 INFO     -\	Training and optimization of epoch 35 finished in 48.22 seconds	/-
+2024-08-23 11:13:55 INFO     Training	Epoch 36 | average train loss: 4.0576 | change to last epoch: -0.0189 (-0.463%)
+2024-08-23 11:13:56 INFO     Validation	Epoch 36 | average valid loss: 4.8478 | change to last epoch: 0.0037 (0.077%)
+2024-08-23 11:13:56 INFO     -\	Training and optimization of epoch 36 finished in 47.49 seconds	/-
+2024-08-23 11:14:42 INFO     Training	Epoch 37 | average train loss: 4.0408 | change to last epoch: -0.0168 (-0.415%)
+2024-08-23 11:14:44 INFO     Validation	Epoch 37 | average valid loss: 4.8521 | change to last epoch: 0.0043 (0.089%)
+2024-08-23 11:14:44 INFO     -\	Training and optimization of epoch 37 finished in 47.14 seconds	/-
+2024-08-23 11:15:30 INFO     Training	Epoch 38 | average train loss: 4.0240 | change to last epoch: -0.0167 (-0.414%)
+2024-08-23 11:15:31 INFO     Validation	Epoch 38 | average valid loss: 4.8564 | change to last epoch: 0.0042 (0.087%)
+2024-08-23 11:15:31 INFO     -\	Training and optimization of epoch 38 finished in 47.06 seconds	/-
+2024-08-23 11:16:17 INFO     Training	Epoch 39 | average train loss: 4.0087 | change to last epoch: -0.0153 (-0.381%)
+2024-08-23 11:16:19 INFO     Validation	Epoch 39 | average valid loss: 4.8599 | change to last epoch: 0.0036 (0.073%)
+2024-08-23 11:16:23 INFO     
+average valid metrics:	MR: 372.837	| MRR: 0.277	| H@1: 0.200	| H@3: 0.302	| H@10: 0.430	| AMRI: 0.949	| rank_deviation: 0.001
+average valid change:	MR: -14.023	| MRR: 0.002	| H@1: 0.002	| H@3: 0.001	| H@10: 0.002	| AMRI: 0.002	| rank_deviation: 0.000
+average valid change %:	MR: -3.625%	| MRR: 0.662%	| H@1: 0.952%	| H@3: 0.370%	| H@10: 0.546%	| AMRI: 0.204%	| rank_deviation: 74.836%
+2024-08-23 11:16:23 INFO     Saving embedding_models at epoch 39 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:16:23 INFO     -\	Training and optimization of epoch 39 finished in 51.9 seconds	/-
+2024-08-23 11:17:09 INFO     Training	Epoch 40 | average train loss: 3.9946 | change to last epoch: -0.0141 (-0.351%)
+2024-08-23 11:17:10 INFO     Validation	Epoch 40 | average valid loss: 4.8643 | change to last epoch: 0.0044 (0.091%)
+2024-08-23 11:17:10 INFO     -\	Training and optimization of epoch 40 finished in 47.96 seconds	/-
+2024-08-23 11:17:58 INFO     Training	Epoch 41 | average train loss: 3.9806 | change to last epoch: -0.0140 (-0.350%)
+2024-08-23 11:17:59 INFO     Validation	Epoch 41 | average valid loss: 4.8681 | change to last epoch: 0.0038 (0.078%)
+2024-08-23 11:17:59 INFO     -\	Training and optimization of epoch 41 finished in 48.47 seconds	/-
+2024-08-23 11:18:46 INFO     Training	Epoch 42 | average train loss: 3.9670 | change to last epoch: -0.0137 (-0.343%)
+2024-08-23 11:18:47 INFO     Validation	Epoch 42 | average valid loss: 4.8725 | change to last epoch: 0.0044 (0.090%)
+2024-08-23 11:18:47 INFO     -\	Training and optimization of epoch 42 finished in 48.0 seconds	/-
+2024-08-23 11:19:34 INFO     Training	Epoch 43 | average train loss: 3.9541 | change to last epoch: -0.0129 (-0.325%)
+2024-08-23 11:19:35 INFO     Validation	Epoch 43 | average valid loss: 4.8764 | change to last epoch: 0.0038 (0.079%)
+2024-08-23 11:19:35 INFO     -\	Training and optimization of epoch 43 finished in 47.91 seconds	/-
+2024-08-23 11:20:22 INFO     Training	Epoch 44 | average train loss: 3.9423 | change to last epoch: -0.0117 (-0.297%)
+2024-08-23 11:20:23 INFO     Validation	Epoch 44 | average valid loss: 4.8803 | change to last epoch: 0.0040 (0.082%)
+2024-08-23 11:20:28 INFO     
+average valid metrics:	MR: 362.506	| MRR: 0.277	| H@1: 0.199	| H@3: 0.303	| H@10: 0.432	| AMRI: 0.950	| rank_deviation: 0.001
+average valid change:	MR: -10.331	| MRR: 0.000	| H@1: -0.000	| H@3: 0.002	| H@10: 0.001	| AMRI: 0.001	| rank_deviation: 0.001
+average valid change %:	MR: -2.771%	| MRR: 0.095%	| H@1: -0.214%	| H@3: 0.510%	| H@10: 0.325%	| AMRI: 0.150%	| rank_deviation: 74.906%
+2024-08-23 11:20:28 INFO     Saving embedding_models at epoch 44 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:20:28 INFO     -\	Training and optimization of epoch 44 finished in 52.69 seconds	/-
+2024-08-23 11:21:15 INFO     Training	Epoch 45 | average train loss: 3.9309 | change to last epoch: -0.0115 (-0.291%)
+2024-08-23 11:21:16 INFO     Validation	Epoch 45 | average valid loss: 4.8847 | change to last epoch: 0.0044 (0.090%)
+2024-08-23 11:21:16 INFO     -\	Training and optimization of epoch 45 finished in 48.48 seconds	/-
+2024-08-23 11:22:03 INFO     Training	Epoch 46 | average train loss: 3.9194 | change to last epoch: -0.0114 (-0.291%)
+2024-08-23 11:22:04 INFO     Validation	Epoch 46 | average valid loss: 4.8895 | change to last epoch: 0.0048 (0.099%)
+2024-08-23 11:22:04 INFO     -\	Training and optimization of epoch 46 finished in 48.34 seconds	/-
+2024-08-23 11:22:52 INFO     Training	Epoch 47 | average train loss: 3.9094 | change to last epoch: -0.0100 (-0.256%)
+2024-08-23 11:22:53 INFO     Validation	Epoch 47 | average valid loss: 4.8936 | change to last epoch: 0.0041 (0.084%)
+2024-08-23 11:22:53 INFO     -\	Training and optimization of epoch 47 finished in 48.44 seconds	/-
+2024-08-23 11:23:41 INFO     Training	Epoch 48 | average train loss: 3.8988 | change to last epoch: -0.0105 (-0.270%)
+2024-08-23 11:23:42 INFO     Validation	Epoch 48 | average valid loss: 4.8981 | change to last epoch: 0.0044 (0.091%)
+2024-08-23 11:23:42 INFO     -\	Training and optimization of epoch 48 finished in 49.43 seconds	/-
+2024-08-23 11:24:30 INFO     Training	Epoch 49 | average train loss: 3.8898 | change to last epoch: -0.0090 (-0.232%)
+2024-08-23 11:24:31 INFO     Validation	Epoch 49 | average valid loss: 4.9018 | change to last epoch: 0.0037 (0.075%)
+2024-08-23 11:24:36 INFO     
+average valid metrics:	MR: 354.851	| MRR: 0.278	| H@1: 0.201	| H@3: 0.303	| H@10: 0.433	| AMRI: 0.951	| rank_deviation: 0.001
+average valid change:	MR: -7.655	| MRR: 0.001	| H@1: 0.002	| H@3: -0.000	| H@10: 0.001	| AMRI: 0.001	| rank_deviation: -0.000
+average valid change %:	MR: -2.112%	| MRR: 0.510%	| H@1: 0.945%	| H@3: -0.085%	| H@10: 0.264%	| AMRI: 0.111%	| rank_deviation: -16.315%
+2024-08-23 11:24:36 INFO     Saving embedding_models at epoch 49 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:24:36 INFO     -\	Training and optimization of epoch 49 finished in 53.37 seconds	/-
+2024-08-23 11:25:22 INFO     Training	Epoch 50 | average train loss: 3.8805 | change to last epoch: -0.0094 (-0.241%)
+2024-08-23 11:25:23 INFO     Validation	Epoch 50 | average valid loss: 4.9061 | change to last epoch: 0.0043 (0.089%)
+2024-08-23 11:25:23 INFO     -\	Training and optimization of epoch 50 finished in 47.86 seconds	/-
+2024-08-23 11:26:11 INFO     Training	Epoch 51 | average train loss: 3.8714 | change to last epoch: -0.0090 (-0.232%)
+2024-08-23 11:26:12 INFO     Validation	Epoch 51 | average valid loss: 4.9104 | change to last epoch: 0.0043 (0.088%)
+2024-08-23 11:26:12 INFO     -\	Training and optimization of epoch 51 finished in 48.18 seconds	/-
+2024-08-23 11:26:59 INFO     Training	Epoch 52 | average train loss: 3.8628 | change to last epoch: -0.0086 (-0.223%)
+2024-08-23 11:27:00 INFO     Validation	Epoch 52 | average valid loss: 4.9150 | change to last epoch: 0.0046 (0.093%)
+2024-08-23 11:27:00 INFO     -\	Training and optimization of epoch 52 finished in 48.59 seconds	/-
+2024-08-23 11:27:47 INFO     Training	Epoch 53 | average train loss: 3.8548 | change to last epoch: -0.0080 (-0.206%)
+2024-08-23 11:27:48 INFO     Validation	Epoch 53 | average valid loss: 4.9191 | change to last epoch: 0.0042 (0.084%)
+2024-08-23 11:27:48 INFO     -\	Training and optimization of epoch 53 finished in 47.65 seconds	/-
+2024-08-23 11:28:35 INFO     Training	Epoch 54 | average train loss: 3.8469 | change to last epoch: -0.0079 (-0.206%)
+2024-08-23 11:28:36 INFO     Validation	Epoch 54 | average valid loss: 4.9239 | change to last epoch: 0.0048 (0.097%)
+2024-08-23 11:28:40 INFO     
+average valid metrics:	MR: 349.061	| MRR: 0.279	| H@1: 0.201	| H@3: 0.303	| H@10: 0.434	| AMRI: 0.952	| rank_deviation: 0.001
+average valid change:	MR: -5.791	| MRR: 0.000	| H@1: -0.000	| H@3: 0.000	| H@10: 0.001	| AMRI: 0.001	| rank_deviation: -0.000
+average valid change %:	MR: -1.632%	| MRR: 0.055%	| H@1: -0.099%	| H@3: 0.075%	| H@10: 0.264%	| AMRI: 0.084%	| rank_deviation: -21.932%
+2024-08-23 11:28:40 INFO     Saving embedding_models at epoch 54 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:28:40 INFO     -\	Training and optimization of epoch 54 finished in 52.3 seconds	/-
+2024-08-23 11:29:27 INFO     Training	Epoch 55 | average train loss: 3.8394 | change to last epoch: -0.0075 (-0.195%)
+2024-08-23 11:29:28 INFO     Validation	Epoch 55 | average valid loss: 4.9277 | change to last epoch: 0.0038 (0.078%)
+2024-08-23 11:29:28 INFO     -\	Training and optimization of epoch 55 finished in 47.66 seconds	/-
+2024-08-23 11:30:14 INFO     Training	Epoch 56 | average train loss: 3.8318 | change to last epoch: -0.0075 (-0.196%)
+2024-08-23 11:30:15 INFO     Validation	Epoch 56 | average valid loss: 4.9324 | change to last epoch: 0.0047 (0.095%)
+2024-08-23 11:30:15 INFO     -\	Training and optimization of epoch 56 finished in 47.46 seconds	/-
+2024-08-23 11:31:02 INFO     Training	Epoch 57 | average train loss: 3.8244 | change to last epoch: -0.0074 (-0.193%)
+2024-08-23 11:31:03 INFO     Validation	Epoch 57 | average valid loss: 4.9362 | change to last epoch: 0.0038 (0.077%)
+2024-08-23 11:31:03 INFO     -\	Training and optimization of epoch 57 finished in 47.73 seconds	/-
+2024-08-23 11:31:51 INFO     Training	Epoch 58 | average train loss: 3.8181 | change to last epoch: -0.0064 (-0.167%)
+2024-08-23 11:31:52 INFO     Validation	Epoch 58 | average valid loss: 4.9411 | change to last epoch: 0.0049 (0.100%)
+2024-08-23 11:31:52 INFO     -\	Training and optimization of epoch 58 finished in 48.93 seconds	/-
+2024-08-23 11:32:40 INFO     Training	Epoch 59 | average train loss: 3.8115 | change to last epoch: -0.0066 (-0.172%)
+2024-08-23 11:32:42 INFO     Validation	Epoch 59 | average valid loss: 4.9452 | change to last epoch: 0.0041 (0.082%)
+2024-08-23 11:32:46 INFO     
+average valid metrics:	MR: 344.644	| MRR: 0.279	| H@1: 0.201	| H@3: 0.304	| H@10: 0.436	| AMRI: 0.953	| rank_deviation: 0.001
+average valid change:	MR: -4.417	| MRR: 0.000	| H@1: 0.000	| H@3: 0.001	| H@10: 0.002	| AMRI: 0.001	| rank_deviation: -0.000
+average valid change %:	MR: -1.265%	| MRR: 0.167%	| H@1: 0.227%	| H@3: 0.188%	| H@10: 0.375%	| AMRI: 0.064%	| rank_deviation: -3.122%
+2024-08-23 11:32:46 INFO     Saving embedding_models at epoch 59 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:32:46 INFO     -\	Training and optimization of epoch 59 finished in 53.95 seconds	/-
+2024-08-23 11:33:33 INFO     Training	Epoch 60 | average train loss: 3.8052 | change to last epoch: -0.0062 (-0.164%)
+2024-08-23 11:33:34 INFO     Validation	Epoch 60 | average valid loss: 4.9491 | change to last epoch: 0.0039 (0.079%)
+2024-08-23 11:33:34 INFO     -\	Training and optimization of epoch 60 finished in 48.51 seconds	/-
+2024-08-23 11:34:22 INFO     Training	Epoch 61 | average train loss: 3.7989 | change to last epoch: -0.0063 (-0.166%)
+2024-08-23 11:34:23 INFO     Validation	Epoch 61 | average valid loss: 4.9531 | change to last epoch: 0.0040 (0.080%)
+2024-08-23 11:34:23 INFO     -\	Training and optimization of epoch 61 finished in 48.77 seconds	/-
+2024-08-23 11:35:12 INFO     Training	Epoch 62 | average train loss: 3.7925 | change to last epoch: -0.0064 (-0.169%)
+2024-08-23 11:35:13 INFO     Validation	Epoch 62 | average valid loss: 4.9572 | change to last epoch: 0.0041 (0.083%)
+2024-08-23 11:35:13 INFO     -\	Training and optimization of epoch 62 finished in 49.42 seconds	/-
+2024-08-23 11:36:03 INFO     Training	Epoch 63 | average train loss: 3.7873 | change to last epoch: -0.0052 (-0.136%)
+2024-08-23 11:36:04 INFO     Validation	Epoch 63 | average valid loss: 4.9615 | change to last epoch: 0.0043 (0.086%)
+2024-08-23 11:36:04 INFO     -\	Training and optimization of epoch 63 finished in 51.44 seconds	/-
+2024-08-23 11:36:54 INFO     Training	Epoch 64 | average train loss: 3.7813 | change to last epoch: -0.0060 (-0.160%)
+2024-08-23 11:36:55 INFO     Validation	Epoch 64 | average valid loss: 4.9656 | change to last epoch: 0.0042 (0.084%)
+2024-08-23 11:37:00 INFO     
+average valid metrics:	MR: 341.180	| MRR: 0.279	| H@1: 0.201	| H@3: 0.304	| H@10: 0.436	| AMRI: 0.953	| rank_deviation: 0.001
+average valid change:	MR: -3.465	| MRR: 0.000	| H@1: -0.000	| H@3: -0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -1.005%	| MRR: 0.077%	| H@1: -0.014%	| H@3: -0.019%	| H@10: 0.059%	| AMRI: 0.050%	| rank_deviation: 32.222%
+2024-08-23 11:37:00 INFO     Saving embedding_models at epoch 64 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:37:00 INFO     -\	Training and optimization of epoch 64 finished in 55.82 seconds	/-
+2024-08-23 11:37:48 INFO     Training	Epoch 65 | average train loss: 3.7763 | change to last epoch: -0.0050 (-0.133%)
+2024-08-23 11:37:49 INFO     Validation	Epoch 65 | average valid loss: 4.9695 | change to last epoch: 0.0039 (0.078%)
+2024-08-23 11:37:49 INFO     -\	Training and optimization of epoch 65 finished in 49.21 seconds	/-
+2024-08-23 11:38:37 INFO     Training	Epoch 66 | average train loss: 3.7704 | change to last epoch: -0.0059 (-0.155%)
+2024-08-23 11:38:38 INFO     Validation	Epoch 66 | average valid loss: 4.9737 | change to last epoch: 0.0042 (0.085%)
+2024-08-23 11:38:38 INFO     -\	Training and optimization of epoch 66 finished in 49.16 seconds	/-
+2024-08-23 11:39:26 INFO     Training	Epoch 67 | average train loss: 3.7654 | change to last epoch: -0.0050 (-0.132%)
+2024-08-23 11:39:27 INFO     Validation	Epoch 67 | average valid loss: 4.9779 | change to last epoch: 0.0042 (0.085%)
+2024-08-23 11:39:27 INFO     -\	Training and optimization of epoch 67 finished in 48.5 seconds	/-
+2024-08-23 11:40:14 INFO     Training	Epoch 68 | average train loss: 3.7603 | change to last epoch: -0.0051 (-0.136%)
+2024-08-23 11:40:15 INFO     Validation	Epoch 68 | average valid loss: 4.9820 | change to last epoch: 0.0040 (0.081%)
+2024-08-23 11:40:15 INFO     -\	Training and optimization of epoch 68 finished in 48.04 seconds	/-
+2024-08-23 11:41:03 INFO     Training	Epoch 69 | average train loss: 3.7558 | change to last epoch: -0.0045 (-0.120%)
+2024-08-23 11:41:04 INFO     Validation	Epoch 69 | average valid loss: 4.9852 | change to last epoch: 0.0032 (0.064%)
+2024-08-23 11:41:08 INFO     
+average valid metrics:	MR: 338.354	| MRR: 0.279	| H@1: 0.201	| H@3: 0.305	| H@10: 0.436	| AMRI: 0.954	| rank_deviation: 0.001
+average valid change:	MR: -2.826	| MRR: 0.000	| H@1: -0.000	| H@3: 0.001	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.828%	| MRR: 0.052%	| H@1: -0.042%	| H@3: 0.310%	| H@10: -0.059%	| AMRI: 0.041%	| rank_deviation: -41.428%
+2024-08-23 11:41:08 INFO     Saving embedding_models at epoch 69 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:41:08 INFO     -\	Training and optimization of epoch 69 finished in 53.53 seconds	/-
+2024-08-23 11:41:56 INFO     Training	Epoch 70 | average train loss: 3.7503 | change to last epoch: -0.0055 (-0.146%)
+2024-08-23 11:41:57 INFO     Validation	Epoch 70 | average valid loss: 4.9896 | change to last epoch: 0.0044 (0.088%)
+2024-08-23 11:41:57 INFO     -\	Training and optimization of epoch 70 finished in 49.06 seconds	/-
+2024-08-23 11:42:45 INFO     Training	Epoch 71 | average train loss: 3.7462 | change to last epoch: -0.0041 (-0.111%)
+2024-08-23 11:42:46 INFO     Validation	Epoch 71 | average valid loss: 4.9935 | change to last epoch: 0.0039 (0.078%)
+2024-08-23 11:42:46 INFO     -\	Training and optimization of epoch 71 finished in 49.08 seconds	/-
+2024-08-23 11:43:34 INFO     Training	Epoch 72 | average train loss: 3.7419 | change to last epoch: -0.0043 (-0.115%)
+2024-08-23 11:43:35 INFO     Validation	Epoch 72 | average valid loss: 4.9975 | change to last epoch: 0.0040 (0.081%)
+2024-08-23 11:43:35 INFO     -\	Training and optimization of epoch 72 finished in 48.26 seconds	/-
+2024-08-23 11:44:22 INFO     Training	Epoch 73 | average train loss: 3.7376 | change to last epoch: -0.0043 (-0.114%)
+2024-08-23 11:44:23 INFO     Validation	Epoch 73 | average valid loss: 5.0011 | change to last epoch: 0.0036 (0.072%)
+2024-08-23 11:44:23 INFO     -\	Training and optimization of epoch 73 finished in 48.71 seconds	/-
+2024-08-23 11:45:11 INFO     Training	Epoch 74 | average train loss: 3.7332 | change to last epoch: -0.0044 (-0.118%)
+2024-08-23 11:45:12 INFO     Validation	Epoch 74 | average valid loss: 5.0048 | change to last epoch: 0.0037 (0.074%)
+2024-08-23 11:45:16 INFO     
+average valid metrics:	MR: 335.900	| MRR: 0.279	| H@1: 0.201	| H@3: 0.304	| H@10: 0.436	| AMRI: 0.954	| rank_deviation: 0.001
+average valid change:	MR: -2.454	| MRR: -0.000	| H@1: -0.000	| H@3: -0.001	| H@10: 0.001	| AMRI: 0.000	| rank_deviation: 0.001
+average valid change %:	MR: -0.725%	| MRR: -0.027%	| H@1: -0.156%	| H@3: -0.290%	| H@10: 0.183%	| AMRI: 0.035%	| rank_deviation: 83.212%
+2024-08-23 11:45:16 INFO     Early stopping in 14 validation steps.
+2024-08-23 11:45:16 INFO     -\	Training and optimization of epoch 74 finished in 52.93 seconds	/-
+2024-08-23 11:46:05 INFO     Training	Epoch 75 | average train loss: 3.7291 | change to last epoch: -0.0041 (-0.109%)
+2024-08-23 11:46:06 INFO     Validation	Epoch 75 | average valid loss: 5.0088 | change to last epoch: 0.0040 (0.079%)
+2024-08-23 11:46:06 INFO     -\	Training and optimization of epoch 75 finished in 49.48 seconds	/-
+2024-08-23 11:46:54 INFO     Training	Epoch 76 | average train loss: 3.7253 | change to last epoch: -0.0038 (-0.102%)
+2024-08-23 11:46:55 INFO     Validation	Epoch 76 | average valid loss: 5.0127 | change to last epoch: 0.0039 (0.079%)
+2024-08-23 11:46:55 INFO     -\	Training and optimization of epoch 76 finished in 48.79 seconds	/-
+2024-08-23 11:47:41 INFO     Training	Epoch 77 | average train loss: 3.7207 | change to last epoch: -0.0047 (-0.125%)
+2024-08-23 11:47:43 INFO     Validation	Epoch 77 | average valid loss: 5.0161 | change to last epoch: 0.0034 (0.067%)
+2024-08-23 11:47:43 INFO     -\	Training and optimization of epoch 77 finished in 47.97 seconds	/-
+2024-08-23 11:48:30 INFO     Training	Epoch 78 | average train loss: 3.7173 | change to last epoch: -0.0034 (-0.091%)
+2024-08-23 11:48:31 INFO     Validation	Epoch 78 | average valid loss: 5.0198 | change to last epoch: 0.0037 (0.074%)
+2024-08-23 11:48:31 INFO     -\	Training and optimization of epoch 78 finished in 48.34 seconds	/-
+2024-08-23 11:49:20 INFO     Training	Epoch 79 | average train loss: 3.7133 | change to last epoch: -0.0039 (-0.105%)
+2024-08-23 11:49:21 INFO     Validation	Epoch 79 | average valid loss: 5.0236 | change to last epoch: 0.0039 (0.077%)
+2024-08-23 11:49:25 INFO     
+average valid metrics:	MR: 333.974	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.954	| rank_deviation: 0.001
+average valid change:	MR: -1.926	| MRR: 0.000	| H@1: 0.000	| H@3: 0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: -0.001
+average valid change %:	MR: -0.573%	| MRR: 0.072%	| H@1: 0.028%	| H@3: 0.009%	| H@10: 0.065%	| AMRI: 0.028%	| rank_deviation: -43.147%
+2024-08-23 11:49:25 INFO     Saving embedding_models at epoch 79 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:49:25 INFO     -\	Training and optimization of epoch 79 finished in 54.47 seconds	/-
+2024-08-23 11:50:14 INFO     Training	Epoch 80 | average train loss: 3.7098 | change to last epoch: -0.0036 (-0.096%)
+2024-08-23 11:50:15 INFO     Validation	Epoch 80 | average valid loss: 5.0273 | change to last epoch: 0.0037 (0.074%)
+2024-08-23 11:50:15 INFO     -\	Training and optimization of epoch 80 finished in 49.45 seconds	/-
+2024-08-23 11:51:02 INFO     Training	Epoch 81 | average train loss: 3.7058 | change to last epoch: -0.0039 (-0.106%)
+2024-08-23 11:51:03 INFO     Validation	Epoch 81 | average valid loss: 5.0307 | change to last epoch: 0.0033 (0.066%)
+2024-08-23 11:51:03 INFO     -\	Training and optimization of epoch 81 finished in 48.55 seconds	/-
+2024-08-23 11:51:50 INFO     Training	Epoch 82 | average train loss: 3.7024 | change to last epoch: -0.0035 (-0.093%)
+2024-08-23 11:51:51 INFO     Validation	Epoch 82 | average valid loss: 5.0346 | change to last epoch: 0.0040 (0.079%)
+2024-08-23 11:51:51 INFO     -\	Training and optimization of epoch 82 finished in 47.2 seconds	/-
+2024-08-23 11:52:36 INFO     Training	Epoch 83 | average train loss: 3.6991 | change to last epoch: -0.0033 (-0.088%)
+2024-08-23 11:52:37 INFO     Validation	Epoch 83 | average valid loss: 5.0377 | change to last epoch: 0.0030 (0.060%)
+2024-08-23 11:52:37 INFO     -\	Training and optimization of epoch 83 finished in 46.77 seconds	/-
+2024-08-23 11:53:24 INFO     Training	Epoch 84 | average train loss: 3.6957 | change to last epoch: -0.0034 (-0.091%)
+2024-08-23 11:53:25 INFO     Validation	Epoch 84 | average valid loss: 5.0414 | change to last epoch: 0.0038 (0.075%)
+2024-08-23 11:53:30 INFO     
+average valid metrics:	MR: 332.283	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.954	| rank_deviation: 0.001
+average valid change:	MR: -1.692	| MRR: 0.000	| H@1: -0.000	| H@3: 0.001	| H@10: 0.001	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.507%	| MRR: 0.004%	| H@1: -0.043%	| H@3: 0.375%	| H@10: 0.248%	| AMRI: 0.024%	| rank_deviation: 55.922%
+2024-08-23 11:53:30 INFO     Saving embedding_models at epoch 84 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:53:30 INFO     -\	Training and optimization of epoch 84 finished in 52.74 seconds	/-
+2024-08-23 11:54:18 INFO     Training	Epoch 85 | average train loss: 3.6924 | change to last epoch: -0.0033 (-0.090%)
+2024-08-23 11:54:19 INFO     Validation	Epoch 85 | average valid loss: 5.0452 | change to last epoch: 0.0038 (0.075%)
+2024-08-23 11:54:19 INFO     -\	Training and optimization of epoch 85 finished in 49.15 seconds	/-
+2024-08-23 11:55:06 INFO     Training	Epoch 86 | average train loss: 3.6892 | change to last epoch: -0.0032 (-0.086%)
+2024-08-23 11:55:08 INFO     Validation	Epoch 86 | average valid loss: 5.0488 | change to last epoch: 0.0035 (0.070%)
+2024-08-23 11:55:08 INFO     -\	Training and optimization of epoch 86 finished in 48.3 seconds	/-
+2024-08-23 11:55:55 INFO     Training	Epoch 87 | average train loss: 3.6860 | change to last epoch: -0.0032 (-0.086%)
+2024-08-23 11:55:56 INFO     Validation	Epoch 87 | average valid loss: 5.0519 | change to last epoch: 0.0032 (0.063%)
+2024-08-23 11:55:56 INFO     -\	Training and optimization of epoch 87 finished in 48.06 seconds	/-
+2024-08-23 11:56:45 INFO     Training	Epoch 88 | average train loss: 3.6831 | change to last epoch: -0.0029 (-0.079%)
+2024-08-23 11:56:46 INFO     Validation	Epoch 88 | average valid loss: 5.0558 | change to last epoch: 0.0039 (0.077%)
+2024-08-23 11:56:46 INFO     -\	Training and optimization of epoch 88 finished in 50.6 seconds	/-
+2024-08-23 11:57:36 INFO     Training	Epoch 89 | average train loss: 3.6796 | change to last epoch: -0.0035 (-0.096%)
+2024-08-23 11:57:37 INFO     Validation	Epoch 89 | average valid loss: 5.0589 | change to last epoch: 0.0031 (0.061%)
+2024-08-23 11:57:42 INFO     
+average valid metrics:	MR: 330.722	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -1.561	| MRR: 0.000	| H@1: -0.000	| H@3: -0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.470%	| MRR: 0.045%	| H@1: -0.085%	| H@3: -0.084%	| H@10: 0.098%	| AMRI: 0.022%	| rank_deviation: -23.056%
+2024-08-23 11:57:42 INFO     Saving embedding_models at epoch 89 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 11:57:42 INFO     -\	Training and optimization of epoch 89 finished in 56.13 seconds	/-
+2024-08-23 11:58:32 INFO     Training	Epoch 90 | average train loss: 3.6772 | change to last epoch: -0.0024 (-0.066%)
+2024-08-23 11:58:33 INFO     Validation	Epoch 90 | average valid loss: 5.0623 | change to last epoch: 0.0033 (0.066%)
+2024-08-23 11:58:33 INFO     -\	Training and optimization of epoch 90 finished in 50.92 seconds	/-
+2024-08-23 11:59:23 INFO     Training	Epoch 91 | average train loss: 3.6742 | change to last epoch: -0.0030 (-0.082%)
+2024-08-23 11:59:24 INFO     Validation	Epoch 91 | average valid loss: 5.0658 | change to last epoch: 0.0035 (0.070%)
+2024-08-23 11:59:24 INFO     -\	Training and optimization of epoch 91 finished in 50.61 seconds	/-
+2024-08-23 12:00:14 INFO     Training	Epoch 92 | average train loss: 3.6712 | change to last epoch: -0.0030 (-0.081%)
+2024-08-23 12:00:15 INFO     Validation	Epoch 92 | average valid loss: 5.0694 | change to last epoch: 0.0036 (0.070%)
+2024-08-23 12:00:15 INFO     -\	Training and optimization of epoch 92 finished in 50.8 seconds	/-
+2024-08-23 12:01:04 INFO     Training	Epoch 93 | average train loss: 3.6682 | change to last epoch: -0.0030 (-0.081%)
+2024-08-23 12:01:05 INFO     Validation	Epoch 93 | average valid loss: 5.0726 | change to last epoch: 0.0033 (0.065%)
+2024-08-23 12:01:05 INFO     -\	Training and optimization of epoch 93 finished in 50.66 seconds	/-
+2024-08-23 12:01:54 INFO     Training	Epoch 94 | average train loss: 3.6661 | change to last epoch: -0.0021 (-0.057%)
+2024-08-23 12:01:55 INFO     Validation	Epoch 94 | average valid loss: 5.0761 | change to last epoch: 0.0034 (0.068%)
+2024-08-23 12:02:00 INFO     
+average valid metrics:	MR: 329.659	| MRR: 0.279	| H@1: 0.200	| H@3: 0.304	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -1.063	| MRR: -0.000	| H@1: -0.000	| H@3: -0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.321%	| MRR: -0.108%	| H@1: -0.185%	| H@3: -0.131%	| H@10: -0.007%	| AMRI: 0.015%	| rank_deviation: 9.988%
+2024-08-23 12:02:00 INFO     Early stopping in 14 validation steps.
+2024-08-23 12:02:00 INFO     -\	Training and optimization of epoch 94 finished in 55.1 seconds	/-
+2024-08-23 12:02:49 INFO     Training	Epoch 95 | average train loss: 3.6633 | change to last epoch: -0.0028 (-0.076%)
+2024-08-23 12:02:51 INFO     Validation	Epoch 95 | average valid loss: 5.0793 | change to last epoch: 0.0032 (0.063%)
+2024-08-23 12:02:51 INFO     -\	Training and optimization of epoch 95 finished in 50.14 seconds	/-
+2024-08-23 12:03:40 INFO     Training	Epoch 96 | average train loss: 3.6602 | change to last epoch: -0.0031 (-0.085%)
+2024-08-23 12:03:41 INFO     Validation	Epoch 96 | average valid loss: 5.0825 | change to last epoch: 0.0032 (0.064%)
+2024-08-23 12:03:41 INFO     -\	Training and optimization of epoch 96 finished in 50.16 seconds	/-
+2024-08-23 12:04:28 INFO     Training	Epoch 97 | average train loss: 3.6575 | change to last epoch: -0.0027 (-0.073%)
+2024-08-23 12:04:29 INFO     Validation	Epoch 97 | average valid loss: 5.0856 | change to last epoch: 0.0031 (0.060%)
+2024-08-23 12:04:29 INFO     -\	Training and optimization of epoch 97 finished in 48.14 seconds	/-
+2024-08-23 12:05:16 INFO     Training	Epoch 98 | average train loss: 3.6549 | change to last epoch: -0.0026 (-0.072%)
+2024-08-23 12:05:17 INFO     Validation	Epoch 98 | average valid loss: 5.0889 | change to last epoch: 0.0033 (0.066%)
+2024-08-23 12:05:17 INFO     -\	Training and optimization of epoch 98 finished in 48.18 seconds	/-
+2024-08-23 12:06:04 INFO     Training	Epoch 99 | average train loss: 3.6529 | change to last epoch: -0.0019 (-0.053%)
+2024-08-23 12:06:05 INFO     Validation	Epoch 99 | average valid loss: 5.0922 | change to last epoch: 0.0032 (0.064%)
+2024-08-23 12:06:10 INFO     
+average valid metrics:	MR: 328.477	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -1.182	| MRR: 0.000	| H@1: 0.001	| H@3: 0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.358%	| MRR: 0.143%	| H@1: 0.270%	| H@3: 0.150%	| H@10: 0.078%	| AMRI: 0.017%	| rank_deviation: -3.027%
+2024-08-23 12:06:10 INFO     Saving embedding_models at epoch 99 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 12:06:10 INFO     -\	Training and optimization of epoch 99 finished in 52.92 seconds	/-
+2024-08-23 12:06:57 INFO     Training	Epoch 100 | average train loss: 3.6500 | change to last epoch: -0.0029 (-0.080%)
+2024-08-23 12:06:58 INFO     Validation	Epoch 100 | average valid loss: 5.0951 | change to last epoch: 0.0029 (0.058%)
+2024-08-23 12:06:58 INFO     -\	Training and optimization of epoch 100 finished in 48.37 seconds	/-
+2024-08-23 12:07:46 INFO     Training	Epoch 101 | average train loss: 3.6472 | change to last epoch: -0.0028 (-0.077%)
+2024-08-23 12:07:48 INFO     Validation	Epoch 101 | average valid loss: 5.0982 | change to last epoch: 0.0031 (0.061%)
+2024-08-23 12:07:48 INFO     -\	Training and optimization of epoch 101 finished in 49.16 seconds	/-
+2024-08-23 12:08:35 INFO     Training	Epoch 102 | average train loss: 3.6455 | change to last epoch: -0.0017 (-0.047%)
+2024-08-23 12:08:36 INFO     Validation	Epoch 102 | average valid loss: 5.1012 | change to last epoch: 0.0030 (0.059%)
+2024-08-23 12:08:36 INFO     -\	Training and optimization of epoch 102 finished in 48.74 seconds	/-
+2024-08-23 12:09:23 INFO     Training	Epoch 103 | average train loss: 3.6431 | change to last epoch: -0.0024 (-0.066%)
+2024-08-23 12:09:24 INFO     Validation	Epoch 103 | average valid loss: 5.1042 | change to last epoch: 0.0030 (0.059%)
+2024-08-23 12:09:24 INFO     -\	Training and optimization of epoch 103 finished in 48.11 seconds	/-
+2024-08-23 12:10:13 INFO     Training	Epoch 104 | average train loss: 3.6410 | change to last epoch: -0.0021 (-0.057%)
+2024-08-23 12:10:15 INFO     Validation	Epoch 104 | average valid loss: 5.1074 | change to last epoch: 0.0032 (0.063%)
+2024-08-23 12:10:20 INFO     
+average valid metrics:	MR: 327.362	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -1.115	| MRR: 0.000	| H@1: 0.001	| H@3: 0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.340%	| MRR: 0.107%	| H@1: 0.298%	| H@3: 0.019%	| H@10: -0.046%	| AMRI: 0.016%	| rank_deviation: 31.216%
+2024-08-23 12:10:20 INFO     Saving embedding_models at epoch 104 in data/FB15K-237_Entity_sampling_N10_min0.6_max0.7/results_average_score_08.23_10_43/model_files
+2024-08-23 12:10:20 INFO     -\	Training and optimization of epoch 104 finished in 55.36 seconds	/-
+2024-08-23 12:11:08 INFO     Training	Epoch 105 | average train loss: 3.6382 | change to last epoch: -0.0028 (-0.078%)
+2024-08-23 12:11:09 INFO     Validation	Epoch 105 | average valid loss: 5.1107 | change to last epoch: 0.0033 (0.064%)
+2024-08-23 12:11:09 INFO     -\	Training and optimization of epoch 105 finished in 49.7 seconds	/-
+2024-08-23 12:11:57 INFO     Training	Epoch 106 | average train loss: 3.6363 | change to last epoch: -0.0019 (-0.052%)
+2024-08-23 12:11:58 INFO     Validation	Epoch 106 | average valid loss: 5.1136 | change to last epoch: 0.0030 (0.058%)
+2024-08-23 12:11:58 INFO     -\	Training and optimization of epoch 106 finished in 48.92 seconds	/-
+2024-08-23 12:12:48 INFO     Training	Epoch 107 | average train loss: 3.6337 | change to last epoch: -0.0026 (-0.071%)
+2024-08-23 12:12:49 INFO     Validation	Epoch 107 | average valid loss: 5.1167 | change to last epoch: 0.0030 (0.059%)
+2024-08-23 12:12:49 INFO     -\	Training and optimization of epoch 107 finished in 50.77 seconds	/-
+2024-08-23 12:13:40 INFO     Training	Epoch 108 | average train loss: 3.6324 | change to last epoch: -0.0013 (-0.036%)
+2024-08-23 12:13:41 INFO     Validation	Epoch 108 | average valid loss: 5.1196 | change to last epoch: 0.0030 (0.058%)
+2024-08-23 12:13:41 INFO     -\	Training and optimization of epoch 108 finished in 51.64 seconds	/-
+2024-08-23 12:14:31 INFO     Training	Epoch 109 | average train loss: 3.6297 | change to last epoch: -0.0028 (-0.076%)
+2024-08-23 12:14:32 INFO     Validation	Epoch 109 | average valid loss: 5.1224 | change to last epoch: 0.0028 (0.055%)
+2024-08-23 12:14:38 INFO     
+average valid metrics:	MR: 326.547	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.439	| AMRI: 0.955	| rank_deviation: 0.000
+average valid change:	MR: -0.815	| MRR: -0.000	| H@1: -0.001	| H@3: -0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: -0.001
+average valid change %:	MR: -0.249%	| MRR: -0.102%	| H@1: -0.311%	| H@3: -0.047%	| H@10: 0.065%	| AMRI: 0.012%	| rank_deviation: -59.474%
+2024-08-23 12:14:38 INFO     Early stopping in 14 validation steps.
+2024-08-23 12:14:38 INFO     -\	Training and optimization of epoch 109 finished in 56.98 seconds	/-
+2024-08-23 12:15:28 INFO     Training	Epoch 110 | average train loss: 3.6275 | change to last epoch: -0.0022 (-0.059%)
+2024-08-23 12:15:29 INFO     Validation	Epoch 110 | average valid loss: 5.1257 | change to last epoch: 0.0033 (0.064%)
+2024-08-23 12:15:29 INFO     -\	Training and optimization of epoch 110 finished in 51.31 seconds	/-
+2024-08-23 12:16:19 INFO     Training	Epoch 111 | average train loss: 3.6258 | change to last epoch: -0.0017 (-0.047%)
+2024-08-23 12:16:20 INFO     Validation	Epoch 111 | average valid loss: 5.1286 | change to last epoch: 0.0029 (0.056%)
+2024-08-23 12:16:20 INFO     -\	Training and optimization of epoch 111 finished in 50.76 seconds	/-
+2024-08-23 12:17:10 INFO     Training	Epoch 112 | average train loss: 3.6235 | change to last epoch: -0.0023 (-0.062%)
+2024-08-23 12:17:11 INFO     Validation	Epoch 112 | average valid loss: 5.1314 | change to last epoch: 0.0028 (0.055%)
+2024-08-23 12:17:11 INFO     -\	Training and optimization of epoch 112 finished in 51.03 seconds	/-
+2024-08-23 12:18:01 INFO     Training	Epoch 113 | average train loss: 3.6217 | change to last epoch: -0.0018 (-0.051%)
+2024-08-23 12:18:02 INFO     Validation	Epoch 113 | average valid loss: 5.1341 | change to last epoch: 0.0026 (0.052%)
+2024-08-23 12:18:02 INFO     -\	Training and optimization of epoch 113 finished in 51.51 seconds	/-
+2024-08-23 12:18:53 INFO     Training	Epoch 114 | average train loss: 3.6198 | change to last epoch: -0.0019 (-0.053%)
+2024-08-23 12:18:54 INFO     Validation	Epoch 114 | average valid loss: 5.1371 | change to last epoch: 0.0030 (0.058%)
+2024-08-23 12:18:59 INFO     
+average valid metrics:	MR: 325.725	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -0.822	| MRR: -0.000	| H@1: -0.000	| H@3: 0.000	| H@10: -0.001	| AMRI: 0.000	| rank_deviation: 0.001
+average valid change %:	MR: -0.252%	| MRR: -0.026%	| H@1: -0.128%	| H@3: 0.037%	| H@10: -0.163%	| AMRI: 0.012%	| rank_deviation: 105.664%
+2024-08-23 12:18:59 INFO     Early stopping in 13 validation steps.
+2024-08-23 12:18:59 INFO     -\	Training and optimization of epoch 114 finished in 56.94 seconds	/-
+2024-08-23 12:19:49 INFO     Training	Epoch 115 | average train loss: 3.6180 | change to last epoch: -0.0017 (-0.048%)
+2024-08-23 12:19:50 INFO     Validation	Epoch 115 | average valid loss: 5.1400 | change to last epoch: 0.0029 (0.057%)
+2024-08-23 12:19:50 INFO     -\	Training and optimization of epoch 115 finished in 51.02 seconds	/-
+2024-08-23 12:20:41 INFO     Training	Epoch 116 | average train loss: 3.6160 | change to last epoch: -0.0021 (-0.057%)
+2024-08-23 12:20:42 INFO     Validation	Epoch 116 | average valid loss: 5.1426 | change to last epoch: 0.0026 (0.051%)
+2024-08-23 12:20:42 INFO     -\	Training and optimization of epoch 116 finished in 51.97 seconds	/-
+2024-08-23 12:21:31 INFO     Training	Epoch 117 | average train loss: 3.6141 | change to last epoch: -0.0019 (-0.052%)
+2024-08-23 12:21:32 INFO     Validation	Epoch 117 | average valid loss: 5.1457 | change to last epoch: 0.0031 (0.060%)
+2024-08-23 12:21:32 INFO     -\	Training and optimization of epoch 117 finished in 49.89 seconds	/-
+2024-08-23 12:22:20 INFO     Training	Epoch 118 | average train loss: 3.6122 | change to last epoch: -0.0019 (-0.052%)
+2024-08-23 12:22:21 INFO     Validation	Epoch 118 | average valid loss: 5.1484 | change to last epoch: 0.0028 (0.053%)
+2024-08-23 12:22:21 INFO     -\	Training and optimization of epoch 118 finished in 48.56 seconds	/-
+2024-08-23 12:23:07 INFO     Training	Epoch 119 | average train loss: 3.6102 | change to last epoch: -0.0020 (-0.055%)
+2024-08-23 12:23:08 INFO     Validation	Epoch 119 | average valid loss: 5.1512 | change to last epoch: 0.0027 (0.053%)
+2024-08-23 12:23:14 INFO     
+average valid metrics:	MR: 324.843	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+average valid change:	MR: -0.883	| MRR: 0.000	| H@1: 0.000	| H@3: 0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.271%	| MRR: 0.078%	| H@1: 0.213%	| H@3: 0.103%	| H@10: 0.085%	| AMRI: 0.013%	| rank_deviation: 17.126%
+2024-08-23 12:23:14 INFO     Early stopping in 12 validation steps.
+2024-08-23 12:23:14 INFO     -\	Training and optimization of epoch 119 finished in 52.92 seconds	/-
+2024-08-23 12:24:02 INFO     Training	Epoch 120 | average train loss: 3.6090 | change to last epoch: -0.0012 (-0.034%)
+2024-08-23 12:24:03 INFO     Validation	Epoch 120 | average valid loss: 5.1538 | change to last epoch: 0.0027 (0.052%)
+2024-08-23 12:24:03 INFO     -\	Training and optimization of epoch 120 finished in 49.5 seconds	/-
+2024-08-23 12:24:52 INFO     Training	Epoch 121 | average train loss: 3.6068 | change to last epoch: -0.0022 (-0.061%)
+2024-08-23 12:24:53 INFO     Validation	Epoch 121 | average valid loss: 5.1567 | change to last epoch: 0.0029 (0.057%)
+2024-08-23 12:24:53 INFO     -\	Training and optimization of epoch 121 finished in 49.91 seconds	/-
+2024-08-23 12:25:42 INFO     Training	Epoch 122 | average train loss: 3.6056 | change to last epoch: -0.0012 (-0.032%)
+2024-08-23 12:25:43 INFO     Validation	Epoch 122 | average valid loss: 5.1596 | change to last epoch: 0.0029 (0.056%)
+2024-08-23 12:25:43 INFO     -\	Training and optimization of epoch 122 finished in 50.0 seconds	/-
+2024-08-23 12:26:32 INFO     Training	Epoch 123 | average train loss: 3.6031 | change to last epoch: -0.0025 (-0.070%)
+2024-08-23 12:26:33 INFO     Validation	Epoch 123 | average valid loss: 5.1618 | change to last epoch: 0.0022 (0.043%)
+2024-08-23 12:26:33 INFO     -\	Training and optimization of epoch 123 finished in 50.13 seconds	/-
+2024-08-23 12:27:22 INFO     Training	Epoch 124 | average train loss: 3.6015 | change to last epoch: -0.0016 (-0.045%)
+2024-08-23 12:27:23 INFO     Validation	Epoch 124 | average valid loss: 5.1646 | change to last epoch: 0.0028 (0.053%)
+2024-08-23 12:27:28 INFO     
+average valid metrics:	MR: 324.066	| MRR: 0.280	| H@1: 0.200	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.777	| MRR: -0.000	| H@1: -0.001	| H@3: 0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.001
+average valid change %:	MR: -0.239%	| MRR: -0.098%	| H@1: -0.284%	| H@3: 0.037%	| H@10: -0.033%	| AMRI: 0.011%	| rank_deviation: -48.739%
+2024-08-23 12:27:28 INFO     Early stopping in 11 validation steps.
+2024-08-23 12:27:28 INFO     -\	Training and optimization of epoch 124 finished in 55.18 seconds	/-
+2024-08-23 12:28:17 INFO     Training	Epoch 125 | average train loss: 3.6003 | change to last epoch: -0.0012 (-0.034%)
+2024-08-23 12:28:18 INFO     Validation	Epoch 125 | average valid loss: 5.1673 | change to last epoch: 0.0027 (0.053%)
+2024-08-23 12:28:18 INFO     -\	Training and optimization of epoch 125 finished in 49.83 seconds	/-
+2024-08-23 12:29:06 INFO     Training	Epoch 126 | average train loss: 3.5982 | change to last epoch: -0.0020 (-0.056%)
+2024-08-23 12:29:07 INFO     Validation	Epoch 126 | average valid loss: 5.1698 | change to last epoch: 0.0025 (0.048%)
+2024-08-23 12:29:07 INFO     -\	Training and optimization of epoch 126 finished in 48.84 seconds	/-
+2024-08-23 12:29:54 INFO     Training	Epoch 127 | average train loss: 3.5965 | change to last epoch: -0.0017 (-0.047%)
+2024-08-23 12:29:55 INFO     Validation	Epoch 127 | average valid loss: 5.1725 | change to last epoch: 0.0027 (0.052%)
+2024-08-23 12:29:55 INFO     -\	Training and optimization of epoch 127 finished in 48.11 seconds	/-
+2024-08-23 12:30:44 INFO     Training	Epoch 128 | average train loss: 3.5947 | change to last epoch: -0.0019 (-0.051%)
+2024-08-23 12:30:45 INFO     Validation	Epoch 128 | average valid loss: 5.1751 | change to last epoch: 0.0027 (0.051%)
+2024-08-23 12:30:45 INFO     -\	Training and optimization of epoch 128 finished in 49.64 seconds	/-
+2024-08-23 12:31:32 INFO     Training	Epoch 129 | average train loss: 3.5935 | change to last epoch: -0.0011 (-0.032%)
+2024-08-23 12:31:33 INFO     Validation	Epoch 129 | average valid loss: 5.1775 | change to last epoch: 0.0024 (0.046%)
+2024-08-23 12:31:39 INFO     
+average valid metrics:	MR: 323.482	| MRR: 0.280	| H@1: 0.201	| H@3: 0.306	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.584	| MRR: 0.000	| H@1: 0.000	| H@3: 0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.001
+average valid change %:	MR: -0.180%	| MRR: 0.060%	| H@1: 0.213%	| H@3: 0.093%	| H@10: 0.039%	| AMRI: 0.008%	| rank_deviation: 99.833%
+2024-08-23 12:31:39 INFO     Early stopping in 10 validation steps.
+2024-08-23 12:31:39 INFO     -\	Training and optimization of epoch 129 finished in 53.77 seconds	/-
+2024-08-23 12:32:28 INFO     Training	Epoch 130 | average train loss: 3.5921 | change to last epoch: -0.0015 (-0.041%)
+2024-08-23 12:32:30 INFO     Validation	Epoch 130 | average valid loss: 5.1803 | change to last epoch: 0.0027 (0.053%)
+2024-08-23 12:32:30 INFO     -\	Training and optimization of epoch 130 finished in 50.98 seconds	/-
+2024-08-23 12:33:19 INFO     Training	Epoch 131 | average train loss: 3.5903 | change to last epoch: -0.0018 (-0.049%)
+2024-08-23 12:33:20 INFO     Validation	Epoch 131 | average valid loss: 5.1827 | change to last epoch: 0.0024 (0.047%)
+2024-08-23 12:33:20 INFO     -\	Training and optimization of epoch 131 finished in 50.53 seconds	/-
+2024-08-23 12:34:09 INFO     Training	Epoch 132 | average train loss: 3.5889 | change to last epoch: -0.0014 (-0.038%)
+2024-08-23 12:34:10 INFO     Validation	Epoch 132 | average valid loss: 5.1854 | change to last epoch: 0.0027 (0.053%)
+2024-08-23 12:34:10 INFO     -\	Training and optimization of epoch 132 finished in 49.81 seconds	/-
+2024-08-23 12:34:59 INFO     Training	Epoch 133 | average train loss: 3.5877 | change to last epoch: -0.0012 (-0.034%)
+2024-08-23 12:35:00 INFO     Validation	Epoch 133 | average valid loss: 5.1879 | change to last epoch: 0.0024 (0.047%)
+2024-08-23 12:35:00 INFO     -\	Training and optimization of epoch 133 finished in 50.52 seconds	/-
+2024-08-23 12:35:50 INFO     Training	Epoch 134 | average train loss: 3.5859 | change to last epoch: -0.0018 (-0.051%)
+2024-08-23 12:35:52 INFO     Validation	Epoch 134 | average valid loss: 5.1902 | change to last epoch: 0.0024 (0.045%)
+2024-08-23 12:35:57 INFO     
+average valid metrics:	MR: 322.806	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.675	| MRR: -0.000	| H@1: -0.000	| H@3: -0.001	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.209%	| MRR: -0.094%	| H@1: -0.170%	| H@3: -0.224%	| H@10: -0.059%	| AMRI: 0.010%	| rank_deviation: -16.653%
+2024-08-23 12:35:57 INFO     Early stopping in 9 validation steps.
+2024-08-23 12:35:57 INFO     -\	Training and optimization of epoch 134 finished in 56.82 seconds	/-
+2024-08-23 12:36:47 INFO     Training	Epoch 135 | average train loss: 3.5846 | change to last epoch: -0.0013 (-0.037%)
+2024-08-23 12:36:48 INFO     Validation	Epoch 135 | average valid loss: 5.1928 | change to last epoch: 0.0026 (0.051%)
+2024-08-23 12:36:48 INFO     -\	Training and optimization of epoch 135 finished in 50.55 seconds	/-
+2024-08-23 12:37:37 INFO     Training	Epoch 136 | average train loss: 3.5832 | change to last epoch: -0.0014 (-0.039%)
+2024-08-23 12:37:38 INFO     Validation	Epoch 136 | average valid loss: 5.1955 | change to last epoch: 0.0026 (0.051%)
+2024-08-23 12:37:38 INFO     -\	Training and optimization of epoch 136 finished in 50.64 seconds	/-
+2024-08-23 12:38:28 INFO     Training	Epoch 137 | average train loss: 3.5815 | change to last epoch: -0.0017 (-0.047%)
+2024-08-23 12:38:29 INFO     Validation	Epoch 137 | average valid loss: 5.1978 | change to last epoch: 0.0023 (0.044%)
+2024-08-23 12:38:29 INFO     -\	Training and optimization of epoch 137 finished in 50.55 seconds	/-
+2024-08-23 12:39:18 INFO     Training	Epoch 138 | average train loss: 3.5799 | change to last epoch: -0.0016 (-0.045%)
+2024-08-23 12:39:19 INFO     Validation	Epoch 138 | average valid loss: 5.2006 | change to last epoch: 0.0028 (0.054%)
+2024-08-23 12:39:19 INFO     -\	Training and optimization of epoch 138 finished in 50.03 seconds	/-
+2024-08-23 12:40:09 INFO     Training	Epoch 139 | average train loss: 3.5785 | change to last epoch: -0.0014 (-0.040%)
+2024-08-23 12:40:10 INFO     Validation	Epoch 139 | average valid loss: 5.2028 | change to last epoch: 0.0022 (0.042%)
+2024-08-23 12:40:15 INFO     
+average valid metrics:	MR: 322.141	| MRR: 0.279	| H@1: 0.200	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.665	| MRR: -0.000	| H@1: -0.000	| H@3: -0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.206%	| MRR: -0.028%	| H@1: -0.142%	| H@3: -0.075%	| H@10: 0.078%	| AMRI: 0.010%	| rank_deviation: 5.709%
+2024-08-23 12:40:15 INFO     Early stopping in 8 validation steps.
+2024-08-23 12:40:15 INFO     	 Reducing learning rate
+2024-08-23 12:40:15 INFO     -\	Training and optimization of epoch 139 finished in 56.43 seconds	/-
+2024-08-23 12:41:05 INFO     Training	Epoch 140 | average train loss: 3.5771 | change to last epoch: -0.0013 (-0.037%)
+2024-08-23 12:41:06 INFO     Validation	Epoch 140 | average valid loss: 5.2053 | change to last epoch: 0.0025 (0.048%)
+2024-08-23 12:41:06 INFO     -\	Training and optimization of epoch 140 finished in 50.46 seconds	/-
+2024-08-23 12:41:55 INFO     Training	Epoch 141 | average train loss: 3.5758 | change to last epoch: -0.0013 (-0.037%)
+2024-08-23 12:41:56 INFO     Validation	Epoch 141 | average valid loss: 5.2073 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 12:41:56 INFO     -\	Training and optimization of epoch 141 finished in 50.46 seconds	/-
+2024-08-23 12:42:46 INFO     Training	Epoch 142 | average train loss: 3.5745 | change to last epoch: -0.0013 (-0.038%)
+2024-08-23 12:42:47 INFO     Validation	Epoch 142 | average valid loss: 5.2097 | change to last epoch: 0.0024 (0.046%)
+2024-08-23 12:42:47 INFO     -\	Training and optimization of epoch 142 finished in 50.35 seconds	/-
+2024-08-23 12:43:37 INFO     Training	Epoch 143 | average train loss: 3.5734 | change to last epoch: -0.0011 (-0.030%)
+2024-08-23 12:43:38 INFO     Validation	Epoch 143 | average valid loss: 5.2124 | change to last epoch: 0.0027 (0.051%)
+2024-08-23 12:43:38 INFO     -\	Training and optimization of epoch 143 finished in 51.19 seconds	/-
+2024-08-23 12:44:26 INFO     Training	Epoch 144 | average train loss: 3.5719 | change to last epoch: -0.0015 (-0.043%)
+2024-08-23 12:44:27 INFO     Validation	Epoch 144 | average valid loss: 5.2148 | change to last epoch: 0.0024 (0.046%)
+2024-08-23 12:44:33 INFO     
+average valid metrics:	MR: 321.697	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.445	| MRR: 0.000	| H@1: 0.001	| H@3: 0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.138%	| MRR: 0.142%	| H@1: 0.313%	| H@3: 0.037%	| H@10: -0.039%	| AMRI: 0.006%	| rank_deviation: 5.400%
+2024-08-23 12:44:33 INFO     Early stopping in 7 validation steps.
+2024-08-23 12:44:33 INFO     -\	Training and optimization of epoch 144 finished in 55.45 seconds	/-
+2024-08-23 12:45:21 INFO     Training	Epoch 145 | average train loss: 3.5704 | change to last epoch: -0.0014 (-0.040%)
+2024-08-23 12:45:22 INFO     Validation	Epoch 145 | average valid loss: 5.2172 | change to last epoch: 0.0023 (0.045%)
+2024-08-23 12:45:22 INFO     -\	Training and optimization of epoch 145 finished in 48.55 seconds	/-
+2024-08-23 12:46:09 INFO     Training	Epoch 146 | average train loss: 3.5694 | change to last epoch: -0.0010 (-0.028%)
+2024-08-23 12:46:10 INFO     Validation	Epoch 146 | average valid loss: 5.2201 | change to last epoch: 0.0029 (0.056%)
+2024-08-23 12:46:10 INFO     -\	Training and optimization of epoch 146 finished in 48.15 seconds	/-
+2024-08-23 12:46:57 INFO     Training	Epoch 147 | average train loss: 3.5677 | change to last epoch: -0.0017 (-0.049%)
+2024-08-23 12:46:58 INFO     Validation	Epoch 147 | average valid loss: 5.2220 | change to last epoch: 0.0019 (0.037%)
+2024-08-23 12:46:58 INFO     -\	Training and optimization of epoch 147 finished in 48.19 seconds	/-
+2024-08-23 12:47:46 INFO     Training	Epoch 148 | average train loss: 3.5666 | change to last epoch: -0.0011 (-0.030%)
+2024-08-23 12:47:47 INFO     Validation	Epoch 148 | average valid loss: 5.2242 | change to last epoch: 0.0022 (0.043%)
+2024-08-23 12:47:47 INFO     -\	Training and optimization of epoch 148 finished in 48.76 seconds	/-
+2024-08-23 12:48:34 INFO     Training	Epoch 149 | average train loss: 3.5651 | change to last epoch: -0.0015 (-0.042%)
+2024-08-23 12:48:35 INFO     Validation	Epoch 149 | average valid loss: 5.2265 | change to last epoch: 0.0023 (0.043%)
+2024-08-23 12:48:42 INFO     
+average valid metrics:	MR: 321.148	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.438	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.549	| MRR: -0.000	| H@1: -0.000	| H@3: -0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.171%	| MRR: -0.025%	| H@1: -0.071%	| H@3: -0.122%	| H@10: -0.039%	| AMRI: 0.008%	| rank_deviation: -10.247%
+2024-08-23 12:48:42 INFO     Early stopping in 6 validation steps.
+2024-08-23 12:48:42 INFO     -\	Training and optimization of epoch 149 finished in 54.55 seconds	/-
+2024-08-23 12:49:28 INFO     Training	Epoch 150 | average train loss: 3.5642 | change to last epoch: -0.0010 (-0.027%)
+2024-08-23 12:49:29 INFO     Validation	Epoch 150 | average valid loss: 5.2288 | change to last epoch: 0.0023 (0.043%)
+2024-08-23 12:49:29 INFO     -\	Training and optimization of epoch 150 finished in 47.61 seconds	/-
+2024-08-23 12:50:16 INFO     Training	Epoch 151 | average train loss: 3.5626 | change to last epoch: -0.0015 (-0.043%)
+2024-08-23 12:50:17 INFO     Validation	Epoch 151 | average valid loss: 5.2312 | change to last epoch: 0.0024 (0.047%)
+2024-08-23 12:50:17 INFO     -\	Training and optimization of epoch 151 finished in 48.16 seconds	/-
+2024-08-23 12:51:04 INFO     Training	Epoch 152 | average train loss: 3.5619 | change to last epoch: -0.0007 (-0.020%)
+2024-08-23 12:51:06 INFO     Validation	Epoch 152 | average valid loss: 5.2335 | change to last epoch: 0.0023 (0.044%)
+2024-08-23 12:51:06 INFO     -\	Training and optimization of epoch 152 finished in 48.26 seconds	/-
+2024-08-23 12:51:51 INFO     Training	Epoch 153 | average train loss: 3.5604 | change to last epoch: -0.0015 (-0.043%)
+2024-08-23 12:51:52 INFO     Validation	Epoch 153 | average valid loss: 5.2359 | change to last epoch: 0.0023 (0.045%)
+2024-08-23 12:51:52 INFO     -\	Training and optimization of epoch 153 finished in 46.9 seconds	/-
+2024-08-23 12:52:38 INFO     Training	Epoch 154 | average train loss: 3.5596 | change to last epoch: -0.0008 (-0.023%)
+2024-08-23 12:52:39 INFO     Validation	Epoch 154 | average valid loss: 5.2379 | change to last epoch: 0.0020 (0.039%)
+2024-08-23 12:52:46 INFO     
+average valid metrics:	MR: 320.671	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.477	| MRR: 0.000	| H@1: 0.000	| H@3: 0.000	| H@10: -0.001	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.148%	| MRR: 0.011%	| H@1: 0.128%	| H@3: 0.019%	| H@10: -0.124%	| AMRI: 0.007%	| rank_deviation: 42.814%
+2024-08-23 12:52:46 INFO     Early stopping in 5 validation steps.
+2024-08-23 12:52:46 INFO     -\	Training and optimization of epoch 154 finished in 53.08 seconds	/-
+2024-08-23 12:53:32 INFO     Training	Epoch 155 | average train loss: 3.5581 | change to last epoch: -0.0015 (-0.043%)
+2024-08-23 12:53:33 INFO     Validation	Epoch 155 | average valid loss: 5.2403 | change to last epoch: 0.0024 (0.046%)
+2024-08-23 12:53:33 INFO     -\	Training and optimization of epoch 155 finished in 47.21 seconds	/-
+2024-08-23 12:54:19 INFO     Training	Epoch 156 | average train loss: 3.5573 | change to last epoch: -0.0008 (-0.022%)
+2024-08-23 12:54:20 INFO     Validation	Epoch 156 | average valid loss: 5.2426 | change to last epoch: 0.0023 (0.043%)
+2024-08-23 12:54:20 INFO     -\	Training and optimization of epoch 156 finished in 47.19 seconds	/-
+2024-08-23 12:55:07 INFO     Training	Epoch 157 | average train loss: 3.5558 | change to last epoch: -0.0015 (-0.043%)
+2024-08-23 12:55:08 INFO     Validation	Epoch 157 | average valid loss: 5.2447 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 12:55:08 INFO     -\	Training and optimization of epoch 157 finished in 47.7 seconds	/-
+2024-08-23 12:55:54 INFO     Training	Epoch 158 | average train loss: 3.5546 | change to last epoch: -0.0012 (-0.034%)
+2024-08-23 12:55:55 INFO     Validation	Epoch 158 | average valid loss: 5.2467 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 12:55:55 INFO     -\	Training and optimization of epoch 158 finished in 47.36 seconds	/-
+2024-08-23 12:56:41 INFO     Training	Epoch 159 | average train loss: 3.5539 | change to last epoch: -0.0006 (-0.018%)
+2024-08-23 12:56:42 INFO     Validation	Epoch 159 | average valid loss: 5.2489 | change to last epoch: 0.0021 (0.041%)
+2024-08-23 12:56:49 INFO     
+average valid metrics:	MR: 320.152	| MRR: 0.279	| H@1: 0.200	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.519	| MRR: -0.000	| H@1: -0.001	| H@3: -0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.162%	| MRR: -0.130%	| H@1: -0.369%	| H@3: -0.009%	| H@10: -0.091%	| AMRI: 0.007%	| rank_deviation: -15.989%
+2024-08-23 12:56:49 INFO     Early stopping in 4 validation steps.
+2024-08-23 12:56:49 INFO     -\	Training and optimization of epoch 159 finished in 53.59 seconds	/-
+2024-08-23 12:57:35 INFO     Training	Epoch 160 | average train loss: 3.5525 | change to last epoch: -0.0014 (-0.039%)
+2024-08-23 12:57:36 INFO     Validation	Epoch 160 | average valid loss: 5.2510 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 12:57:36 INFO     -\	Training and optimization of epoch 160 finished in 47.72 seconds	/-
+2024-08-23 12:58:22 INFO     Training	Epoch 161 | average train loss: 3.5516 | change to last epoch: -0.0009 (-0.026%)
+2024-08-23 12:58:23 INFO     Validation	Epoch 161 | average valid loss: 5.2530 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 12:58:23 INFO     -\	Training and optimization of epoch 161 finished in 47.16 seconds	/-
+2024-08-23 12:59:09 INFO     Training	Epoch 162 | average train loss: 3.5505 | change to last epoch: -0.0011 (-0.032%)
+2024-08-23 12:59:11 INFO     Validation	Epoch 162 | average valid loss: 5.2552 | change to last epoch: 0.0022 (0.041%)
+2024-08-23 12:59:11 INFO     -\	Training and optimization of epoch 162 finished in 47.1 seconds	/-
+2024-08-23 12:59:56 INFO     Training	Epoch 163 | average train loss: 3.5492 | change to last epoch: -0.0013 (-0.036%)
+2024-08-23 12:59:57 INFO     Validation	Epoch 163 | average valid loss: 5.2574 | change to last epoch: 0.0022 (0.042%)
+2024-08-23 12:59:57 INFO     -\	Training and optimization of epoch 163 finished in 46.73 seconds	/-
+2024-08-23 13:00:43 INFO     Training	Epoch 164 | average train loss: 3.5482 | change to last epoch: -0.0010 (-0.027%)
+2024-08-23 13:00:44 INFO     Validation	Epoch 164 | average valid loss: 5.2595 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 13:00:50 INFO     
+average valid metrics:	MR: 319.681	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.471	| MRR: 0.000	| H@1: 0.001	| H@3: -0.000	| H@10: -0.000	| AMRI: 0.000	| rank_deviation: -0.000
+average valid change %:	MR: -0.147%	| MRR: 0.086%	| H@1: 0.285%	| H@3: -0.056%	| H@10: -0.091%	| AMRI: 0.007%	| rank_deviation: -0.000%
+2024-08-23 13:00:50 INFO     Early stopping in 3 validation steps.
+2024-08-23 13:00:50 INFO     -\	Training and optimization of epoch 164 finished in 52.8 seconds	/-
+2024-08-23 13:01:36 INFO     Training	Epoch 165 | average train loss: 3.5472 | change to last epoch: -0.0010 (-0.029%)
+2024-08-23 13:01:37 INFO     Validation	Epoch 165 | average valid loss: 5.2617 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 13:01:37 INFO     -\	Training and optimization of epoch 165 finished in 46.79 seconds	/-
+2024-08-23 13:02:24 INFO     Training	Epoch 166 | average train loss: 3.5460 | change to last epoch: -0.0012 (-0.033%)
+2024-08-23 13:02:25 INFO     Validation	Epoch 166 | average valid loss: 5.2637 | change to last epoch: 0.0021 (0.040%)
+2024-08-23 13:02:25 INFO     -\	Training and optimization of epoch 166 finished in 47.71 seconds	/-
+2024-08-23 13:03:11 INFO     Training	Epoch 167 | average train loss: 3.5449 | change to last epoch: -0.0011 (-0.032%)
+2024-08-23 13:03:12 INFO     Validation	Epoch 167 | average valid loss: 5.2657 | change to last epoch: 0.0019 (0.037%)
+2024-08-23 13:03:12 INFO     -\	Training and optimization of epoch 167 finished in 47.44 seconds	/-
+2024-08-23 13:03:59 INFO     Training	Epoch 168 | average train loss: 3.5442 | change to last epoch: -0.0007 (-0.020%)
+2024-08-23 13:04:00 INFO     Validation	Epoch 168 | average valid loss: 5.2679 | change to last epoch: 0.0022 (0.042%)
+2024-08-23 13:04:00 INFO     -\	Training and optimization of epoch 168 finished in 47.9 seconds	/-
+2024-08-23 13:04:47 INFO     Training	Epoch 169 | average train loss: 3.5431 | change to last epoch: -0.0011 (-0.031%)
+2024-08-23 13:04:48 INFO     Validation	Epoch 169 | average valid loss: 5.2697 | change to last epoch: 0.0018 (0.035%)
+2024-08-23 13:04:54 INFO     
+average valid metrics:	MR: 319.254	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.426	| MRR: -0.000	| H@1: -0.000	| H@3: -0.001	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.000
+average valid change %:	MR: -0.133%	| MRR: -0.055%	| H@1: -0.043%	| H@3: -0.178%	| H@10: 0.046%	| AMRI: 0.006%	| rank_deviation: 0.000%
+2024-08-23 13:04:54 INFO     Early stopping in 2 validation steps.
+2024-08-23 13:04:54 INFO     -\	Training and optimization of epoch 169 finished in 54.34 seconds	/-
+2024-08-23 13:05:41 INFO     Training	Epoch 170 | average train loss: 3.5424 | change to last epoch: -0.0007 (-0.020%)
+2024-08-23 13:05:42 INFO     Validation	Epoch 170 | average valid loss: 5.2719 | change to last epoch: 0.0022 (0.042%)
+2024-08-23 13:05:42 INFO     -\	Training and optimization of epoch 170 finished in 47.73 seconds	/-
+2024-08-23 13:06:30 INFO     Training	Epoch 171 | average train loss: 3.5410 | change to last epoch: -0.0014 (-0.040%)
+2024-08-23 13:06:31 INFO     Validation	Epoch 171 | average valid loss: 5.2738 | change to last epoch: 0.0019 (0.035%)
+2024-08-23 13:06:31 INFO     -\	Training and optimization of epoch 171 finished in 49.09 seconds	/-
+2024-08-23 13:07:19 INFO     Training	Epoch 172 | average train loss: 3.5398 | change to last epoch: -0.0012 (-0.034%)
+2024-08-23 13:07:20 INFO     Validation	Epoch 172 | average valid loss: 5.2762 | change to last epoch: 0.0024 (0.045%)
+2024-08-23 13:07:20 INFO     -\	Training and optimization of epoch 172 finished in 48.72 seconds	/-
+2024-08-23 13:08:07 INFO     Training	Epoch 173 | average train loss: 3.5392 | change to last epoch: -0.0006 (-0.017%)
+2024-08-23 13:08:08 INFO     Validation	Epoch 173 | average valid loss: 5.2782 | change to last epoch: 0.0021 (0.039%)
+2024-08-23 13:08:08 INFO     -\	Training and optimization of epoch 173 finished in 48.63 seconds	/-
+2024-08-23 13:08:56 INFO     Training	Epoch 174 | average train loss: 3.5381 | change to last epoch: -0.0010 (-0.029%)
+2024-08-23 13:08:57 INFO     Validation	Epoch 174 | average valid loss: 5.2804 | change to last epoch: 0.0021 (0.041%)
+2024-08-23 13:09:04 INFO     
+average valid metrics:	MR: 318.800	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.001
+average valid change:	MR: -0.454	| MRR: -0.000	| H@1: -0.000	| H@3: -0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: -0.001
+average valid change %:	MR: -0.142%	| MRR: -0.015%	| H@1: -0.057%	| H@3: -0.009%	| H@10: 0.046%	| AMRI: 0.007%	| rank_deviation: -52.337%
+2024-08-23 13:09:04 INFO     Early stopping in 1 validation steps.
+2024-08-23 13:09:04 INFO     -\	Training and optimization of epoch 174 finished in 55.62 seconds	/-
+2024-08-23 13:09:53 INFO     Training	Epoch 175 | average train loss: 3.5370 | change to last epoch: -0.0012 (-0.033%)
+2024-08-23 13:09:54 INFO     Validation	Epoch 175 | average valid loss: 5.2823 | change to last epoch: 0.0019 (0.036%)
+2024-08-23 13:09:54 INFO     -\	Training and optimization of epoch 175 finished in 50.39 seconds	/-
+2024-08-23 13:10:44 INFO     Training	Epoch 176 | average train loss: 3.5364 | change to last epoch: -0.0006 (-0.017%)
+2024-08-23 13:10:45 INFO     Validation	Epoch 176 | average valid loss: 5.2843 | change to last epoch: 0.0020 (0.039%)
+2024-08-23 13:10:45 INFO     -\	Training and optimization of epoch 176 finished in 50.56 seconds	/-
+2024-08-23 13:11:35 INFO     Training	Epoch 177 | average train loss: 3.5351 | change to last epoch: -0.0013 (-0.038%)
+2024-08-23 13:11:36 INFO     Validation	Epoch 177 | average valid loss: 5.2864 | change to last epoch: 0.0021 (0.039%)
+2024-08-23 13:11:36 INFO     -\	Training and optimization of epoch 177 finished in 50.81 seconds	/-
+2024-08-23 13:12:26 INFO     Training	Epoch 178 | average train loss: 3.5340 | change to last epoch: -0.0011 (-0.030%)
+2024-08-23 13:12:28 INFO     Validation	Epoch 178 | average valid loss: 5.2883 | change to last epoch: 0.0019 (0.036%)
+2024-08-23 13:12:28 INFO     -\	Training and optimization of epoch 178 finished in 51.71 seconds	/-
+2024-08-23 13:13:18 INFO     Training	Epoch 179 | average train loss: 3.5331 | change to last epoch: -0.0009 (-0.026%)
+2024-08-23 13:13:19 INFO     Validation	Epoch 179 | average valid loss: 5.2902 | change to last epoch: 0.0018 (0.034%)
+2024-08-23 13:13:25 INFO     
+average valid metrics:	MR: 318.345	| MRR: 0.280	| H@1: 0.201	| H@3: 0.304	| H@10: 0.437	| AMRI: 0.956	| rank_deviation: 0.002
+average valid change:	MR: -0.455	| MRR: 0.000	| H@1: 0.000	| H@3: 0.000	| H@10: 0.000	| AMRI: 0.000	| rank_deviation: 0.001
+average valid change %:	MR: -0.143%	| MRR: 0.064%	| H@1: 0.227%	| H@3: 0.047%	| H@10: 0.098%	| AMRI: 0.007%	| rank_deviation: 174.694%
+2024-08-23 13:13:25 INFO     	 Early stopping
+2024-08-23 13:13:25 INFO     	 Loading best model saved at epoch 104
+2024-08-23 13:13:25 INFO     -\	Successfully finished training and optimizing all subgraphs in 2 hours, 29 minutes, 49.1 seconds	/-
+2024-08-23 13:13:32 INFO     
+average valid metrics:	MR: 327.362	| MRR: 0.280	| H@1: 0.201	| H@3: 0.305	| H@10: 0.438	| AMRI: 0.955	| rank_deviation: 0.001
+2024-08-23 13:13:32 INFO     Finished ensemble training and testing in 2 hours, 30 minutes, 11.48 seconds.
+2024-08-23 13:13:32 INFO     The entire process including sampling, training and testing took 2 hours, 30 minutes, 13.56 seconds.
