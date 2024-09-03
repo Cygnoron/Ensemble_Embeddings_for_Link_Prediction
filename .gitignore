@@ -10,8 +10,10 @@ venv/
 **/**.drawio**
 /to_discuss/outline_training_testing_process.png
 **.pyc
+**.pt
 **/wandb/**
 
 #**/experiments/**
 **/to_discuss/**
+**/results_for_thesis/**
 **/logs/**
