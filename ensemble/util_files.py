@@ -4,12 +4,13 @@ import logging
 import os
 import pickle
 import shutil
+import uuid
 from datetime import datetime
 
 import numpy as np
 import torch
 
-from ensemble import Constants, util
+from ensemble import Constants
 from ensemble.util import get_unique_triple_ids
 
 
@@ -333,13 +334,13 @@ def create_entity_and_relation_name_set_file(dataset):
 
 def get_info_directory_path(dataset_out_dir, args):
     # included_models = util.format_set(set(args.kge_models.keys()), "_")
-    included_models=""
-    hyper_param_str = f"results_{args.aggregation_method[2]}{included_models}"
+    uuid_path = uuid.uuid4()
+    hyper_param_str = f"results_{args.aggregation_method[2]}"
 
     if not args.no_time_dependent_file_path:
-        hyper_param_str += datetime.now().strftime('_%m.%d_%H_%M')
+        hyper_param_str += datetime.now().strftime('_%m.%d_%H_%M_%S')
 
-    info_directory = os.path.join(dataset_out_dir, hyper_param_str)
+    info_directory = os.path.join(dataset_out_dir, f"{hyper_param_str}_{uuid_path}")
     check_directory(info_directory)
     return info_directory
 
