@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH -A hk-project-test-p0022606
+#SBATCH -A hk-project-pai00011
 #SBATCH --ntasks=1
-#SBATCH --time=15:00:00
+#SBATCH --time=05:00:00
 #SBATCH --mem=488000
 #SBATCH --job-name=Ensemble_experiment_FB15K-237_ComplEx
-#SBATCH --partition=accelerated
-#SBATCH --gres=gpu:1
+#SBATCH --partition=accelerated-h100
+#SBATCH --gres=gpu:4
 #SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments/FB15K-237
 #SBATCH --mail-user="st162185@stud.uni-stuttgart.de"
 #SBATCH --mail-type=ALL
@@ -19,16 +19,16 @@ source set_env.sh
 sampling_method="Entity"
 rho="-1"
 rank="32"
-reg="0.05"
+reg="0.0"
 aggregation_method="average"
 subgraph_size_range="(0.2, 0.3)"
 subgraph_amount=5
 
+params_rho=("-1" "0.5" "1" "2")
+
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --sampling_method) sampling_method="$2"; shift ;;
-        --rho) rho="$2"; shift ;;
         --rank) rank="$2"; shift ;;
         --aggregation_method) aggregation_method="$2"; shift ;;
         --subgraph_size_range) subgraph_size_range="$2"; shift ;;
@@ -39,10 +39,24 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [[ $rank == 500 ]]; then
-    reg="0.05"
+    reg="0.0"
 fi
 
-python run_ensemble_embedding.py --dataset FB15K-237 \
+
+
+# Determine the number of available GPUs
+NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+
+# Loop over the number of GPUs and launch a job on each
+for (( i=0; i<$NUM_GPUS; i++ ))
+ do
+
+  if [[ ${params_rho[$i]} == "-1" ]]; then
+    sampling_method="Entity"
+  elif [[ ${params_rho[$i]} != "-1" ]]; then
+    sampling_method="Feature"
+  fi
+    MODEL_PARAMS=(--dataset FB15K-237 \
                                  --model ComplEx \
                                  --rank "$rank" \
                                  --regularizer N3 \
@@ -64,10 +78,16 @@ python run_ensemble_embedding.py --dataset FB15K-237 \
                                  --rho "$rho" \
                                  --aggregation_method "$aggregation_method" \
                                  --model_dropout_factor 10 \
-                                 --only_valid \
                                  --wandb_project "Experiments" \
+                                 --only_valid \
                                  --no_progress_bar \
-                                 --no_sampling
+                                 --no_sampling)
+
+  CUDA_VISIBLE_DEVICES=$i python run_ensemble_embedding.py "${MODEL_PARAMS[@]}" &
+done
+
+# Wait for all background processes to finish
+wait
 
 cd experiments/FB15K-237 || exit 1
 
