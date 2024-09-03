@@ -9,7 +9,7 @@ from models.base import KGModel
 from utils.euclidean import givens_rotations, givens_reflection
 from utils.hyperbolic import mobius_add, expmap0, project, hyp_distance_multi_c
 
-HYP_MODELS = ["RotH", "RefH", "AttH"]
+HYP_MODELS = ["RotH", "RefH", "AttH", "SEPA"]
 
 
 class BaseH(KGModel):
@@ -117,6 +117,112 @@ class AttH(BaseH):
         context_vec = self.context_vec(queries[:, 1]).view((-1, 1, self.rank))
         att_weights = torch.sum(context_vec * cands * self.scale, dim=-1, keepdim=True)
         att_weights = self.act(att_weights)
+        att_q = torch.sum(att_weights * cands, dim=1)
+        lhs = expmap0(att_q, c)
+        rel, _ = torch.chunk(self.rel(queries[:, 1]), 2, dim=1)
+        rel = expmap0(rel, c)
+        res = project(mobius_add(lhs, rel, c), c)
+        return (res, c), self.bh(queries[:, 0])
+
+
+class SEPA(BaseH):
+    """Hyperbolic attention model combining several query representations"""
+
+    def __init__(self, args):
+        super(SEPA, self).__init__(args)
+
+        # reflection
+        self.ref = nn.Embedding(self.sizes[1], self.rank)
+        self.ref.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        # rotation
+        self.rot = nn.Embedding(self.sizes[1], self.rank)
+        self.rot.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        # translation
+        self.tr = nn.Embedding(self.sizes[1], self.rank)
+        self.tr.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        # distmult
+        self.dm = nn.Embedding(self.sizes[1], self.rank)
+        self.dm.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        # complex
+        self.cp = nn.Embedding(self.sizes[1], self.rank)
+        self.cp.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+
+        # attention
+        self.context_vec = nn.Embedding(self.sizes[1], self.rank)
+        self.context_vec.weight.data = self.init_size * torch.randn((self.sizes[1], self.rank), dtype=self.data_type)
+        self.act = nn.Softmax(dim=1)
+        self.args = args
+        if args.dtype == "double":
+            self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).double().cuda()
+        else:
+            self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
+
+    def get_reflection_queries(self, queries):
+        lhs_ref_e = givens_reflection(
+            self.ref(queries[:, 1]), self.entity(queries[:, 0])
+        )
+        return lhs_ref_e
+
+    def get_rotation_queries(self, queries):
+        lhs_rot_e = givens_rotations(
+            self.rot(queries[:, 1]), self.entity(queries[:, 0])
+        )
+        return lhs_rot_e
+
+    def get_transe_queries(self, queries):
+        tr = self.tr(queries[:, 1])
+        h = self.entity(queries[:, 0])
+        lhs_tr_e = h + tr
+        return lhs_tr_e
+
+    def get_complex_queries(self, queries):
+        cp = self.cp(queries[:, 1])
+        cp = cp[:, :self.rank // 2], cp[:, self.rank // 2:]
+        h = self.entity(queries[:, 0])
+        h = h[:, :self.rank // 2], h[:, self.rank // 2:]
+        lhse_cp_e = h[0] * cp[0] - h[1] * cp[1], h[0] * cp[1] + h[1] * cp[0]
+        lhs_cp_e = torch.cat((lhse_cp_e[0], lhse_cp_e[1]), dim=1)
+        return lhs_cp_e
+
+    def get_distmult_queries(self, queries):
+        dm = self.dm(queries[:, 1])
+        h = self.entity(queries[:, 0])
+        lhs_dm_e = h * dm
+        return lhs_dm_e
+
+    def get_queries(self, queries):
+        """Compute embedding and biases of queries."""
+        c = F.softplus(self.c[queries[:, 1]])
+        # lhs_ref_e = self.get_reflection_queries(queries).view((-1, 1, self.rank))
+        # lhs_rot_e = self.get_rotation_queries(queries).view((-1, 1, self.rank))
+        lhs_tr_e = self.get_transe_queries(queries).view((-1, 1, self.rank))
+        lhs_cp_e = self.get_complex_queries(queries).view((-1, 1, self.rank))
+        lhs_dm_e = self.get_distmult_queries(queries).view((-1, 1, self.rank))
+
+        # self-attention mechanism
+        # Add here all the KGE query representations (lhs_kge_e) you want to combine
+
+        # cands = torch.cat([lhs_ref_e, lhs_rot_e, lhs_tr_e, lhs_cp_e, lhs_dm_e], dim=1)
+        cands = torch.cat([lhs_tr_e, lhs_cp_e, lhs_dm_e], dim=1)
+        # cands = torch.cat([lhs_ref_e, lhs_rot_e, lhs_tr_e, lhs_dm_e], dim=1) #mulde
+
+        context_vec = self.context_vec(queries[:, 1]).view((-1, 1, self.rank))
+        att_weights = torch.sum(context_vec * cands * self.scale, dim=-1, keepdim=True)
+        att_weights = self.act(att_weights)
+
+        # regularization
+        # reg_att_weights = torch.mul(att_weights,att_weights)
+        # att_sum = torch.sum(reg_att_weights,dim=1)
+        # att_normalizer = torch.div(1,att_sum)
+        # norm_att_weights = torch.mul(reg_att_weights,att_normalizer.unsqueeze(-1))
+
+        # save alphas
+        self.att = att_weights
+
         att_q = torch.sum(att_weights * cands, dim=1)
         lhs = expmap0(att_q, c)
         rel, _ = torch.chunk(self.rel(queries[:, 1]), 2, dim=1)

@@ -1,5 +1,4 @@
 # sampling methods
-import logging
 
 DEBUG_SAMPLING = [0, "Debug sampling", "Debug_sampling"]
 ENTITY_SAMPLING = [1, "Entity sampling", "Entity_sampling"]
@@ -14,8 +13,8 @@ AGGREGATION_METHODS = [MAX_SCORE_AGGREGATION, AVERAGE_SCORE_AGGREGATION, ATTENTI
 
 # embedding methods
 COMPL_EX, ROTAT_E = "ComplEx", "RotatE"
-TRANS_E, DIST_MULT, CP, MUR_E, ROT_E, REF_E, ATT_E = "TransE", "DistMult", "CP", "MurE", "RotE", "RefE", "AttE"
-ROT_H, REF_H, ATT_H = "RotH", "RefH", "AttH"
+TRANS_E, DIST_MULT, CP, MUR_E, ROT_E, REF_E, ATT_E, SEA = "TransE", "DistMult", "CP", "MurE", "RotE", "RefE", "AttE", "SEA"
+ROT_H, REF_H, ATT_H, SEPA = "RotH", "RefH", "AttH", "SEPA"
 EMBEDDING_METHODS = [COMPL_EX, ROTAT_E, TRANS_E, DIST_MULT, CP, MUR_E, ROT_E, REF_E, ATT_E, ROT_H, REF_H, ATT_H]
 
 # logging levels
