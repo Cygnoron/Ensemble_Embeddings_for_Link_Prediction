@@ -567,7 +567,7 @@ def get_args(args, model):
             if isinstance(vars(args)[key], str):
                 vars(args)[key] = int(vars(args)[key])
         except ValueError:
-            logging.debug("Couldn't parse to int")
+            logging.debug(f"Couldn't parse {key} to int")
         logging.debug(f"{key}: {vars(args)[key]} ({type(vars(args)[key])})")
 
     # Apply model-specific mappings to the arguments
@@ -577,10 +577,9 @@ def get_args(args, model):
             try:
                 try:
                     if isinstance(value, str):
-                        vars(args)[key] = int(vars(args)[key])
+                        vars(args)[key] = float(vars(args)[key])
                         value = vars(args)[key]
-
-                except ValueError:
+                except Exception:
                     value = json.loads(value)
                     logging.debug(f"Dict {value} for key {key}")
             except Exception:
@@ -590,23 +589,23 @@ def get_args(args, model):
             if isinstance(value, dict):
                 if "all" in list(value.keys()):
                     try:
-                        vars(args_subgraph)[key] = int(value['all'])
+                        vars(args_subgraph)[key] = float(value['all'])
                     except ValueError:
                         vars(args_subgraph)[key] = value['all']
                 elif model in list(value.keys()):
                     try:
-                        vars(args_subgraph)[key] = int(value[model])
+                        vars(args_subgraph)[key] = float(value[model])
                     except ValueError:
                         vars(args_subgraph)[key] = value[model]
                 elif "rest" in list(value.keys()):
                     try:
-                        vars(args_subgraph)[key] = int(value['rest'])
+                        vars(args_subgraph)[key] = float(value['rest'])
                     except ValueError:
                         vars(args_subgraph)[key] = value['rest']
                 else:
                     first_key = next(iter(value.keys()))
                     try:
-                        vars(args_subgraph)[key] = int(value[first_key])
+                        vars(args_subgraph)[key] = float(value[first_key])
                     except ValueError:
                         vars(args_subgraph)[key] = value[first_key]
                 counter += 1
