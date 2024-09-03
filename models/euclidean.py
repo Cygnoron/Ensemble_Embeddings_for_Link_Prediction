@@ -284,7 +284,9 @@ class SEA(BaseE):
 
         context_vec = self.context_vec(queries[:, 1]).view((-1, 1, self.rank))
         att_weights = torch.sum(context_vec * cands * self.scale, dim=-1, keepdim=True)
-        att_weights = self.act(att_weights)
+        activation = nn.Softmax(dim=1)
+        # att_weights = self.act(att_weights)
+        att_weights = activation(att_weights)
 
         # regularization
         # reg_att_weights = torch.mul(att_weights,att_weights)

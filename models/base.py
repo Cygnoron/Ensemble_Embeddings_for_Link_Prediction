@@ -91,6 +91,7 @@ class KGModel(nn.Module, ABC):
             self.init_theta()
         self.act = nn.Softmax(dim=-1)
         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
+        self.att = []
 
     @abstractmethod
     def get_queries(self, queries):

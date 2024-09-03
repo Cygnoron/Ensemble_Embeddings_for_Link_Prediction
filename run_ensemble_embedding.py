@@ -175,7 +175,7 @@ def run_baseline():
     # --- Setup args ---
     args = parser.parse_args()
 
-    args.model = "DistMult"
+    args.model = "TransE"
     args.dataset = "NELL-995-h100"
     args.max_epochs = 500
     args.rank = 32
@@ -185,11 +185,11 @@ def run_baseline():
     args.batch_size = 500
     args.debug = False
 
-    args.learning_rate = 0.1
-    args.reg = 0.05
-    args.optimizer = "Adagrad"
+    args.learning_rate = 0.001
+    args.reg = 0.0
+    args.optimizer = "Adam"
     args.neg_sample_size = -1
-    args.bias = "none"
+    args.bias = "learn"
     args.double_neg = False
     args.multi_c = False
 
@@ -202,7 +202,7 @@ def run_baseline():
     args.entities = None
     args.relation_names = None
     args.model_name = args.model
-    # args.wandb_project = "Experiments"
+    args.wandb_project = "Experiments"
 
     # --- Training ---
     Constants.get_wandb(args.wandb_project)
@@ -314,7 +314,7 @@ def run_embedding_manual():
     model_dropout_factor = 10
     entities_per_step = 1
 
-    args = argparse.Namespace(no_sampling=False, no_training=True, no_time_dependent_file_path=False,
+    args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho,
                               entities_per_step=entities_per_step,
@@ -323,9 +323,6 @@ def run_embedding_manual():
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
-
-    # --- Setup model training ---
-    args.kge_models = {Constants.DIST_MULT: []}
 
     # --- Setup wandb ---
     # args.wandb_project = "Experiments"
@@ -376,36 +373,43 @@ def run_embedding_manual():
     error = False
     try:
         if not args.no_training:
+            args.kge_models = {Constants.SEA: []}
+
             # general parameters
             args.max_epochs = 500
             args.rank = 32
             args.patience = 15
             args.valid = 5
             args.dtype = "single"
-            args.batch_size = 1000
+            args.batch_size = 500
             args.debug = False
 
             # individually settable parameters
             args.learning_rate = {'TransE': 0.1, 'DistMult': 0.1,
                                   'ComplEx': 0.1, 'RotatE': 0.001,
-                                  'AttE': 0.001, 'AttH': 0.001}
+                                  'AttE': 0.001, 'AttH': 0.001,
+                                  'SEA': 0.001}
             args.reg = {'TransE': 0.0, 'DistMult': 0.05,
                         'ComplEx': 0.05,
                         'rest': 0.0}
             args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad",
                               'ComplEx': "Adagrad", 'RotatE': "Adagrad",
                               'AttE': "Adam", 'AttH': "Adam",
+                              'SEA': "Adam",
                               'Unified': "Adagrad"}
             args.neg_sample_size = {"TransE": -1, 'DistMult': -1,
                                     'ComplEx': -1, 'RotatE': 250,
-                                    'AttE': -1, 'AttH': 250}
+                                    'AttE': -1, 'AttH': 250,
+                                    'SEA': 250}
             args.bias = {'TransE': "learn", 'DistMult': "none",
                          'ComplEx': "none",
                          'AttE': "learn",
+                         'SEA': "learn",
                          'rest': "none"}
             args.double_neg = {'TransE': True, 'DistMult': False,
                                'ComplEx': True,
-                               'AttE': False, 'AttH': False}
+                               'AttE': False, 'AttH': False,
+                               'SEA': False}
             args.multi_c = {'AttE': True, 'AttH': True,
                             'rest': False}
 
@@ -439,10 +443,10 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    # run_embedding(parser.parse_args())
 
     # Function to run manual via IDE
-    # run_embedding_manual()
+    run_embedding_manual()
 
     # Function to run baseline
     # run_baseline()

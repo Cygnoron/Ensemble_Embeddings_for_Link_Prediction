@@ -565,9 +565,9 @@ def get_args(args, model):
     for key in vars(args):
         try:
             if isinstance(vars(args)[key], str):
-                vars(args)[key] = int(vars(args)[key])
+                vars(args)[key] = float(vars(args)[key])
         except ValueError:
-            logging.debug(f"Couldn't parse {key} to int")
+            logging.debug(f"Couldn't parse {key} to float")
         logging.debug(f"{key}: {vars(args)[key]} ({type(vars(args)[key])})")
 
     # Apply model-specific mappings to the arguments

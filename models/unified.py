@@ -177,17 +177,23 @@ class Unified(KGModel):
                         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
 
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
+
         created_embeddings = False
         for embedding_method in self.embedding_methods:
-            if embedding_method == Constants.SEA and not created_embeddings:
-                from models.euclidean import SEA
-                SEA_buffer = SEA(self.args)
-                self.ref = SEA_buffer.ref
-                self.rot = SEA_buffer.rot
-                self.tr = SEA_buffer.tr
-                self.dm = SEA_buffer.dm
-                self.cp = SEA_buffer.cp
-                self.context_vec = SEA_buffer.context_vec
+            if embedding_method == (Constants.SEA or Constants.SEPA) and not created_embeddings:
+                buffer = None
+                if embedding_method == Constants.SEA:
+                    from models.euclidean import SEA
+                    buffer = SEA(self.args)
+                elif embedding_method == Constants.SEPA:
+                    from models.hyperbolic import SEPA
+                    buffer = SEPA(self.args)
+                self.ref = buffer.ref
+                self.rot = buffer.rot
+                self.tr = buffer.tr
+                self.dm = buffer.dm
+                self.cp = buffer.cp
+                self.context_vec = buffer.context_vec
                 created_embeddings = True
 
     def forward(self, queries, eval_mode=False):
@@ -389,10 +395,27 @@ class Unified(KGModel):
         rel_emb_temp = []
         rel_diag_emb_temp = []
 
+        SEA_SEPA = False
+        if (Constants.SEA or Constants.SEPA) in self.embedding_methods:
+            SEA_SEPA = True
+            ref_emb_temp = []
+            rot_emb_temp = []
+            tr_emb_temp = []
+            dm_emb_temp = []
+            cp_emb_temp = []
+            context_emb_temp = []
+
         for single_model in self.single_models:
             # if single_model.model.model_dropout:
             #     logging.debug(f"Ignoring model {single_model.model.subgraph}.")
             #     continue
+            if SEA_SEPA and single_model.model.model_name == (Constants.SEA or Constants.SEPA):
+                ref_emb_temp.append(single_model.model.ref.weight.data[queries[:, 1]])
+                rot_emb_temp.append(single_model.model.rot.weight.data[queries[:, 1]])
+                tr_emb_temp.append(single_model.model.tr.weight.data[queries[:, 1]])
+                dm_emb_temp.append(single_model.model.dm.weight.data[queries[:, 1]])
+                cp_emb_temp.append(single_model.model.cp.weight.data[queries[:, 1]])
+                context_emb_temp.append(single_model.model.context_vec.weight.data[queries[:, 1]])
 
             if single_model.model.model_name in EUC_MODELS:
                 ent_emb_temp.append(single_model.model.entity.weight.data[queries[:, 0]])
@@ -416,8 +439,29 @@ class Unified(KGModel):
                                                            dim=-1).cuda()
         self.rel.weight.data[queries[:, 1]] = torch.sum(rel_emb_temp * self.att_rel_cross_model[queries[:, 1]],
                                                         dim=-1).cuda()
-        self.rel_diag.weight.data[queries[:, 1]] = torch.sum(
-            rel_diag_emb_temp * self.att_rel_cross_model[queries[:, 1]], dim=-1).cuda()
+        self.rel_diag.weight.data[queries[:, 1]] = torch.sum(rel_diag_emb_temp *
+                                                             self.att_rel_cross_model[queries[:, 1]], dim=-1).cuda()
+        if SEA_SEPA:
+            ref_emb_temp = torch.stack(ref_emb_temp, dim=-1).cuda()
+            rot_emb_temp = torch.stack(rot_emb_temp, dim=-1).cuda()
+            tr_emb_temp = torch.stack(tr_emb_temp, dim=-1).cuda()
+            dm_emb_temp = torch.stack(dm_emb_temp, dim=-1).cuda()
+            cp_emb_temp = torch.stack(cp_emb_temp, dim=-1).cuda()
+            context_emb_temp = torch.stack(context_emb_temp, dim=-1).cuda()
+
+            self.ref.weight.data[queries[:, 1]] = torch.sum(ref_emb_temp * self.att_rel_cross_model[queries[:, 1]],
+                                                            dim=-1).cuda()
+            self.rot.weight.data[queries[:, 1]] = torch.sum(rot_emb_temp * self.att_rel_cross_model[queries[:, 1]],
+                                                            dim=-1).cuda()
+            self.tr.weight.data[queries[:, 1]] = torch.sum(tr_emb_temp * self.att_rel_cross_model[queries[:, 1]],
+                                                           dim=-1).cuda()
+            self.dm.weight.data[queries[:, 1]] = torch.sum(dm_emb_temp * self.att_rel_cross_model[queries[:, 1]],
+                                                           dim=-1).cuda()
+            self.cp.weight.data[queries[:, 1]] = torch.sum(cp_emb_temp * self.att_rel_cross_model[queries[:, 1]],
+                                                           dim=-1).cuda()
+            self.context_vec.weight.data[queries[:, 1]] = torch.sum(context_emb_temp *
+                                                                    self.att_rel_cross_model[queries[:, 1]],
+                                                                    dim=-1).cuda()
 
     def min_max_normalize(self, tensor, dim):
         """
@@ -457,7 +501,6 @@ class Unified(KGModel):
         for embedding_method in self.embedding_methods:
             if embedding_method == Constants.ATT_E:
                 lhs_e, lhs_biases = self.get_queries_AttE(queries)
-
             else:
                 method = get_class(embedding_method)
                 lhs_e, lhs_biases = getattr(method, "get_queries")(self, queries)
@@ -601,7 +644,7 @@ class Unified(KGModel):
         if embedding_method not in EUC_MODELS:
             return
 
-        methods_dist = ["TransE", "DistMult", "MurE", "RotE", "RefE", "AttE"]
+        methods_dist = ["TransE", "DistMult", "MurE", "RotE", "RefE", "AttE", "SEA"]
         methods_dot = ["CP"]
 
         if embedding_method in methods_dot:
@@ -693,7 +736,14 @@ class Unified(KGModel):
             single_model.model.theta_rel.weight.data[actual_queries[:, 1]] = \
                 self.theta_rel_unified.weight.data[actual_queries[:, 1]][:, :, index]
 
-        # --- required functions for the case of complex embeddings ---
+            if single_model.model.model_name in [Constants.SEA, Constants.SEPA]:
+                single_model.model.ref.weight.data[actual_queries[:, 1]] = self.ref.weight.data[actual_queries[:, 1]]
+                single_model.model.rot.weight.data[actual_queries[:, 1]] = self.rot.weight.data[actual_queries[:, 1]]
+                single_model.model.tr.weight.data[actual_queries[:, 1]] = self.tr.weight.data[actual_queries[:, 1]]
+                single_model.model.dm.weight.data[actual_queries[:, 1]] = self.dm.weight.data[actual_queries[:, 1]]
+                single_model.model.cp.weight.data[actual_queries[:, 1]] = self.cp.weight.data[actual_queries[:, 1]]
+
+    # --- required functions for the case of complex embeddings ---
 
     def get_rhs_complex(self, queries, eval_mode):
         """
@@ -756,7 +806,7 @@ class Unified(KGModel):
         else:
             return torch.sum(lhs_e[0] * rhs_e[0] + lhs_e[1] * rhs_e[1], 1, keepdim=True)
 
-        # --- required functions for the case of AttE ---
+    # --- required functions for the case of AttE ---
 
     def get_queries_AttE(self, queries):
         """
@@ -814,6 +864,41 @@ class Unified(KGModel):
         lhs_ref_e = givens_reflection(reflection, self.entity(queries[:, 0])).view((-1, 1, self.rank))
         lhs_rot_e = givens_rotations(rotation, self.entity(queries[:, 0])).view((-1, 1, self.rank))
         return lhs_ref_e, lhs_rot_e, context_vec
+
+    # --- required functions for the case of SEA and SEPA ---
+
+    def get_reflection_queries(self, queries):
+        lhs_ref_e = givens_reflection(
+            self.ref(queries[:, 1]), self.entity(queries[:, 0])
+        )
+        return lhs_ref_e
+
+    def get_rotation_queries(self, queries):
+        lhs_rot_e = givens_rotations(
+            self.rot(queries[:, 1]), self.entity(queries[:, 0])
+        )
+        return lhs_rot_e
+
+    def get_transe_queries(self, queries):
+        tr = self.tr(queries[:, 1])
+        h = self.entity(queries[:, 0])
+        lhs_tr_e = h + tr
+        return lhs_tr_e
+
+    def get_complex_queries(self, queries):
+        cp = self.cp(queries[:, 1])
+        cp = cp[:, :self.rank // 2], cp[:, self.rank // 2:]
+        h = self.entity(queries[:, 0])
+        h = h[:, :self.rank // 2], h[:, self.rank // 2:]
+        lhse_cp_e = h[0] * cp[0] - h[1] * cp[1], h[0] * cp[1] + h[1] * cp[0]
+        lhs_cp_e = torch.cat((lhse_cp_e[0], lhse_cp_e[1]), dim=1)
+        return lhs_cp_e
+
+    def get_distmult_queries(self, queries):
+        dm = self.dm(queries[:, 1])
+        h = self.entity(queries[:, 0])
+        lhs_dm_e = h * dm
+        return lhs_dm_e
 
 
 def get_actual_queries(queries, single_model=None, entities=None, relation_names=None):
