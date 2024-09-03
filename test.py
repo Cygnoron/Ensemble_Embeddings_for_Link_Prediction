@@ -32,28 +32,34 @@ def test(model_dir, mode="test", paths=None):
         config = json.load(f)
         args = argparse.Namespace(**config)
 
-    parent_dataset = args.dataset_dir.split('_')[0]
+    try:
+        args.dataset_dir = args.dataset_dir.replace('/', os.sep)
+        parent_dataset = args.dataset_dir.split('_')[0]
+    except:
+        parent_dataset = os.path.join("data", args.dataset)
     paths.dataset_path = parent_dataset
 
     try:
-        args.dataset_dir = args.dataset_dir.replace('/', os.sep)
         last_subgraph_path = os.path.join(args.dataset_dir, f"sub_{args.subgraph_amount - 1:03d}", "train.pickle")
         open(last_subgraph_path, mode='r')
         print(f"All subgraphs exist.")
 
-    except FileNotFoundError:
-        print("Subgraphs not found, resampling based on given parameters...")
+    except Exception:
+        if hasattr(paths, "init_config_name"):
+            print("Subgraphs not found, resampling based on given parameters...")
 
-        util_files.check_directory(args.dataset_dir)
-        info_directory = util_files.get_info_directory_path(args.dataset_dir, args)
+            util_files.check_directory(args.dataset_dir)
+            info_directory = util_files.get_info_directory_path(args.dataset_dir, args)
 
-        parent_dataset = parent_dataset.split(os.sep)[1]
-        print(f"Sampling {args.subgraph_amount} subgraphs with size {args.subgraph_size_range} from {parent_dataset}.")
+            parent_dataset = parent_dataset.split(os.sep)[1]
+            print(
+                f"Sampling {args.subgraph_amount} subgraphs with size {args.subgraph_size_range} from {parent_dataset}.")
 
-        subsampling.sample_graph(info_directory, parent_dataset, args.dataset_dir, args.sampling_method,
-                                 subgraph_amount=args.subgraph_amount,
-                                 subgraph_size_range=args.subgraph_size_range, entities_per_step=args.entities_per_step,
-                                 rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
+            subsampling.sample_graph(info_directory, parent_dataset, args.dataset_dir, args.sampling_method,
+                                     subgraph_amount=args.subgraph_amount,
+                                     subgraph_size_range=args.subgraph_size_range,
+                                     entities_per_step=args.entities_per_step,
+                                     rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
 
     # create dataset
     if not hasattr(paths, "dataset_path"):
@@ -121,15 +127,28 @@ if __name__ == "__main__":
 
     test_baseline = True
     test_ensemble = True
+    filter_inclusive = False
+    filter_exclusive = False
 
     # args = parser.parse_args()
     # to_list = os.path.join("data", args.model_dir)
     to_list = args.model_dir
     result_directories = os.listdir(to_list)
 
+    filters = ["WN18RR", "DistMult"]
+
     with (open(os.path.join("Results", f"general_{split}_metrics.txt"), "w+") as out_file):
         for result_directory in result_directories:
             if not os.path.isdir(os.path.join(to_list, result_directory)):
+                # skip if result_directory is no directory
+                continue
+
+            if any(filter_item in result_directory for filter_item in filters) and filter_inclusive:
+                # skip if some filters are present in result_directory
+                continue
+
+            if not all(filter_item in result_directory for filter_item in filters) and filter_exclusive:
+                # skip if not all filters are present in result_directory
                 continue
 
             if "base" in result_directory.lower() and test_baseline:
@@ -148,7 +167,7 @@ if __name__ == "__main__":
                     print(format_metrics(test_metrics, split=split))
                     print(format_metrics_latex(test_metrics, args_test), "\n")
 
-                except FileNotFoundError or IOError as file_error:
+                except Exception:
                     print(f"A error occurred during {split}ing of {result_directory}")
                     traceback.print_exc()
 
@@ -175,7 +194,7 @@ if __name__ == "__main__":
                     print(format_metrics(test_metrics, split=split))
                     print(format_metrics_latex(test_metrics, args_test), "\n")
 
-                except FileNotFoundError as file_error:
+                except Exception:
                     print(f"A error occurred during {split}ing of {result_directory}")
                     traceback.print_exc()
         exit_str = (f"-------------------------------------------------------------------------"
