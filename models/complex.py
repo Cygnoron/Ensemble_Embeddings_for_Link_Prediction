@@ -1,5 +1,4 @@
 """Euclidean Knowledge Graph embedding models where embeddings are in complex space."""
-import logging
 
 import torch
 from torch import nn
@@ -20,8 +19,8 @@ class BaseC(KGModel):
         """Initialize a Complex KGModel."""
         # prevent errors when running baseline
         if not hasattr(args, 'entities') or not hasattr(args, 'relation_names'):
-            args.entities = None
-            args.relation_names = None
+            self.entities = None
+            self.relation_names = None
 
         super(BaseC, self).__init__(args.sizes, args.rank, args.dropout, args.gamma, args.dtype, args.bias,
                                     args.init_size, args.model, subgraph=args.subgraph, entities=args.entities,
@@ -30,14 +29,13 @@ class BaseC(KGModel):
         assert self.rank % 2 == 0, "Complex models require even embedding dimension"
         self.rank = self.rank // 2
         self.embeddings = nn.ModuleList([
-            nn.Embedding(s, 2 * self.rank, sparse=True, dtype=self.data_type)
+            nn.Embedding(s, 2 * self.rank, sparse=True)
             for s in self.sizes[:2]
         ])
 
-        for embedding in self.embeddings:
-            embedding.weight.data = torch.zeros(embedding.weight.data.size(), dtype=self.data_type) + 1e-8
-
         if self.is_in_ensemble:
+            for embedding in self.embeddings:
+                embedding.weight.data = torch.zeros(embedding.weight.data.size(), dtype=self.data_type) + 1e-8
             self.embeddings[0].weight.data[self.entities] = self.init_size * torch.randn(
                 (len(self.entities), 2 * self.rank), dtype=self.data_type)
             self.embeddings[1].weight.data[self.relation_names] = self.init_size * torch.randn(

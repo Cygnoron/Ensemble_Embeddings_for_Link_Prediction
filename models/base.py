@@ -72,6 +72,8 @@ class KGModel(nn.Module, ABC):
             self.model_dropout = False
             if entities is None or relation_names is None:
                 self.is_in_ensemble = False
+                self.entities = entities
+                self.relation_names = relation_names
             else:
                 self.is_in_ensemble = True
                 self.att_ent_single = None
@@ -83,7 +85,7 @@ class KGModel(nn.Module, ABC):
             self.is_in_ensemble = False
 
         # ensemble attention
-        if self.is_in_ensemble or self.is_unified_model :
+        if self.is_in_ensemble or self.is_unified_model:
             self.theta_ent = None
             self.theta_rel = None
             self.init_theta()

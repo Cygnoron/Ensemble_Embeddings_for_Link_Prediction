@@ -177,6 +177,18 @@ class Unified(KGModel):
                         self.scale = torch.Tensor([1. / np.sqrt(self.rank)]).cuda()
 
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
+        created_embeddings = False
+        for embedding_method in self.embedding_methods:
+            if embedding_method == Constants.SEA and not created_embeddings:
+                from models.euclidean import SEA
+                SEA_buffer = SEA(self.args)
+                self.ref = SEA_buffer.ref
+                self.rot = SEA_buffer.rot
+                self.tr = SEA_buffer.tr
+                self.dm = SEA_buffer.dm
+                self.cp = SEA_buffer.cp
+                self.context_vec = SEA_buffer.context_vec
+                created_embeddings = True
 
     def forward(self, queries, eval_mode=False):
         """
