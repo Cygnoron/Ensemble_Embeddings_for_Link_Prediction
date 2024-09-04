@@ -317,7 +317,7 @@ def run_embedding_manual():
     dataset_in = "NELL-995-h100"
     # subgraph_amount = 30
     # subgraph_amount = 10
-    subgraph_amount = 10
+    subgraph_amount = 5
     # subgraph_size_range = (0.6, 0.7)
     subgraph_size_range = (0.2, 0.3)
     # rho = 2.0
@@ -396,14 +396,14 @@ def run_embedding_manual():
     error = False
     try:
         if not args.no_training:
-            args.kge_models = util.get_embedding_methods("{\"TransE\": [\"0:3\", 8], \"DistMult\": [\"7:9\"], "
-                                                         "\"ComplEx\": [2], \"AttE\": [3]}")
-            # args.kge_models = {
-            #     Constants.DIST_MULT: ["0:9", 4],
-            #     Constants.TRANS_E: list(range(20, 30)),
-            #     Constants.ATT_E: [3],
-            #     Constants.COMPL_EX: list(range(10, 20)),
-            # }
+            # args.kge_models = util.get_embedding_methods("{\"TransE\": [\"0:3\", 8], \"DistMult\": [\"7:9\"], "
+            #                                              "\"ComplEx\": [2], \"AttE\": [3]}")
+            args.kge_models = {
+                Constants.DIST_MULT: ["0:9", 4],
+                Constants.TRANS_E: list(range(20, 30)),
+                Constants.SEPA: ['all'],
+                Constants.COMPL_EX: list(range(10, 20)),
+            }
 
             # general parameters
             args.max_epochs = 50
@@ -418,30 +418,33 @@ def run_embedding_manual():
             args.learning_rate = {'TransE': 0.1, 'DistMult': 0.1,
                                   'ComplEx': 0.1, 'RotatE': 0.001,
                                   'AttE': 0.001, 'AttH': 0.001,
-                                  'SEA': 0.001}
+                                  'SEA': 0.001, 'SEPA': 0.001}
             args.reg = {'TransE': 0.0, 'DistMult': 0.05,
                         'ComplEx': 0.05,
                         'rest': 0.0}
             args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad",
                               'ComplEx': "Adagrad", 'RotatE': "SparseAdam",
                               'AttE': "Adam", 'AttH': "Adam",
-                              'SEA': "Adam",
+                              'SEA': "Adam", 'SEPA': "Adagrad",
                               'Unified': "Adagrad"}
 
             args.neg_sample_size = {"TransE": -1, 'DistMult': -1,
                                     'ComplEx': -1, 'RotatE': 250,
                                     'AttE': -1, 'AttH': 250,
-                                    'SEA': 250}
+                                    'SEA': 250, 'SEPA': -1}
             args.bias = {'TransE': "learn", 'DistMult': "none",
                          'ComplEx': "none",
                          'AttE': "learn",
-                         'SEA': "learn",
+                         'SEA': "learn", 'SEPA': "none",
+                         'Unified': "learn",
                          'rest': "none"}
             args.double_neg = {'TransE': True, 'DistMult': False,
                                'ComplEx': True,
                                'AttE': False, 'AttH': False,
-                               'SEA': False}
+                               'SEA': False, 'SEPA': False}
             args.multi_c = {'AttE': True, 'AttH': True,
+                            'SEPA': True,
+                            'Unified': True,
                             'rest': False}
 
             args.regularizer = {'all': "N3"}
