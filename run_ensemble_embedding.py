@@ -44,7 +44,7 @@ parser.add_argument(
 )
 #   - Individually specifiable hyperparameters -
 parser.add_argument(
-    '--model', type=str, default="{\"TransE\":[\"all\"]}",
+    '--model', type=str, default="TransE",
     help='JSON string of the mapping from embedding methods to subgraphs.\n'
          '- <subgraph number> in a mapping sets the specified subgraphs to this method\n'
          '- \'all\' in a mapping sets all subgraphs to this method. This has the same effect as --model <MODEL_NAME>\n'
@@ -163,9 +163,12 @@ parser.add_argument(
     "--no_time_dependent_file_path", action='store_true', help="Turn off specifying the current time in file path, "
                                                                "when creating logs and other files."
 )
+parser.add_argument(
+    "--baseline", action='store_true', help="Start a run using a baseline method and all given parameters"
+)
 
 
-def run_baseline():
+def run_baseline(args, manual=False):
     """
     Run the baseline configuration for the knowledge graph embedding model.
 
@@ -174,36 +177,51 @@ def run_baseline():
     """
 
     # --- Setup args ---
-    args = parser.parse_args()
+    if manual:
+        args = parser.parse_args()
 
-    args.model = "TransE"
-    args.dataset = "NELL-995-h100"
-    args.max_epochs = 500
-    args.rank = 32
-    args.patience = 15
-    args.valid = 5
-    args.dtype = "single"
-    args.batch_size = 500
-    args.debug = False
+        args.model = "TransE"
+        args.dataset = "NELL-995-h100"
+        args.max_epochs = 500
+        args.rank = 32
+        args.patience = 15
+        args.valid = 5
+        args.dtype = "single"
+        args.batch_size = 500
+        args.debug = False
 
-    args.learning_rate = 0.001
-    args.reg = 0.0
-    args.optimizer = "Adam"
-    args.neg_sample_size = -1
-    args.bias = "learn"
-    args.double_neg = False
-    args.multi_c = False
+        args.learning_rate = 0.001
+        args.reg = 0.0
+        args.optimizer = "Adam"
+        args.neg_sample_size = -1
+        args.bias = "learn"
+        args.double_neg = False
+        args.multi_c = False
 
-    args.regularizer = "N3"
-    args.init_size = 0.001
-    args.gamma = 0.0
-    args.dropout = 0.0
+        args.regularizer = "N3"
+        args.init_size = 0.001
+        args.gamma = 0.0
+        args.dropout = 0.0
 
-    args.no_progress_bar = False
+        args.no_progress_bar = False
+        args.wandb_project = "Experiments"
+
+    # delete unused parameters
+    del (args.model_dropout_factor, args.aggregation_method, args.enforcement, args.entities_per_step, args.rho,
+         args.sampling_method, args.subgraph_size_range, args.subgraph_amount, args.no_sampling, args.no_training,
+         args.no_time_dependent_file_path)
+
+    # set needed parameters
     args.entities = None
     args.relation_names = None
     args.model_name = args.model
-    args.wandb_project = "Experiments"
+
+    # enforce required datatypes
+    args.reg = float(args.reg)
+    args.gamma = float(args.gamma)
+    args.init_size = float(args.init_size)
+    args.learning_rate = float(args.learning_rate)
+    args.neg_sample_size = int(args.neg_sample_size)
 
     # --- Training ---
     Constants.get_wandb(args.wandb_project)
@@ -476,11 +494,21 @@ def run_embedding_manual():
 
 
 if __name__ == "__main__":
-    # Function to run via command prompt
-    run_embedding(parser.parse_args())
+    args = parser.parse_args()
 
-    # Function to run manual via IDE
-    # run_embedding_manual()
+    if args.baseline:
+        # Function to run baseline via command prompt
+        run_baseline(args)
 
-    # Function to run baseline
-    # run_baseline()
+        # Function to run baseline manual via IDE
+        run_baseline(args, manual=True)
+
+    else:
+        # Function to run ensemble via command prompt
+        run_embedding(args)
+
+        # Function to run ensemble manual via IDE
+        # run_embedding_manual()
+
+
+

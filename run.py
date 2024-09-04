@@ -186,8 +186,9 @@ def train(args):
     logging.info(format_metrics(valid_metrics, split="valid"))
 
     # Test metrics
-    # test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes), epoch=args.max_epochs + 20)
-    # logging.info(format_metrics(test_metrics, split="test"))
+    if not args.only_valid:
+        test_metrics = avg_both(*model.compute_metrics(test_examples, filters, args.sizes), epoch=args.max_epochs + 20)
+        logging.info(format_metrics(test_metrics, split="test"))
 
 
 if __name__ == "__main__":
