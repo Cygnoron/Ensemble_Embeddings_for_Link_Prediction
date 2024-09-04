@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH -A hk-project-pai00011
 #SBATCH --ntasks=1
-#SBATCH --time=10:00:00
+#SBATCH --time=05:00:00
 #SBATCH --mem=488000
-#SBATCH --job-name=Ensemble_experiment_WN18RR_RotatE
+#SBATCH --job-name=RotatE_WN18RR
 #SBATCH --partition=accelerated-h100
 #SBATCH --gres=gpu:4
 #SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments/WN18RR
@@ -51,32 +51,65 @@ for (( i=0; i<$NUM_GPUS; i++ ))
   fi
 
   rho=${params_rho[$i]}
-  MODEL_PARAMS=(--dataset WN18RR \
-                                 --model RotatE \
-                                 --rank "$rank" \
-                                 --regularizer N3 \
-                                 --reg 0.0 \
-                                 --optimizer "{\"Unified\": \"Adagrad\", \"rest\": \"SparseAdam\"}" \
-                                 --max_epochs 500 \
-                                 --patience 15 \
-                                 --valid 5 \
-                                 --batch_size 1000 \
-                                 --neg_sample_size "{\"Unified\": -1, \"rest\": 250}" \
-                                 --init_size 0.001 \
-                                 --learning_rate 0.001 \
-                                 --gamma 0.0 \
-                                 --bias none \
-                                 --dtype single \
-                                 --subgraph_amount "$subgraph_amount" \
-                                 --subgraph_size_range "$subgraph_size_range" \
-                                 --sampling_method "$sampling_method" \
-                                 --rho "$rho" \
-                                 --aggregation_method "$aggregation_method" \
-                                 --model_dropout_factor 10 \
-                                 --wandb_project "Experiments" \
-                                 --only_valid \
-                                 --no_progress_bar \
-                                 --no_sampling)
+
+  if [[ $rank == 32 ]]; then
+    MODEL_PARAMS=(--dataset WN18RR \
+                  --model RotatE \
+                  --rank "$rank" \
+                  --regularizer N3 \
+                  --reg 0.0 \
+                  --optimizer "{\"Unified\": \"Adagrad\", \"rest\": \"SparseAdam\"}" \
+                  --max_epochs 500 \
+                  --patience 15 \
+                  --valid 5 \
+                  --batch_size 1000 \
+                  --neg_sample_size "{\"Unified\": -1, \"rest\": 250}" \
+                  --init_size 0.001 \
+                  --learning_rate 0.001 \
+                  --gamma 0.0 \
+                  --bias none \
+                  --dtype single \
+                  --subgraph_amount "$subgraph_amount" \
+                  --subgraph_size_range "$subgraph_size_range" \
+                  --sampling_method "$sampling_method" \
+                  --rho "$rho" \
+                  --aggregation_method "$aggregation_method" \
+                  --model_dropout_factor 10 \
+                  --wandb_project "Experiments" \
+                  --only_valid \
+                  --no_progress_bar \
+                  --no_sampling \
+                  )
+  elif [[ $rank == 500 ]]; then
+    MODEL_PARAMS=(--dataset WN18RR \
+                  --model RotatE \
+                  --rank "$rank" \
+                  --regularizer N3 \
+                  --reg 0.0 \
+                  --optimizer Adagrad \
+                  --max_epochs 500 \
+                  --patience 15 \
+                  --valid 5 \
+                  --batch_size 500 \
+                  --neg_sample_size "{\"Unified\": -1, \"rest\": 250}" \
+                  --init_size 0.001 \
+                  --learning_rate 0.001 \
+                  --gamma 0.0 \
+                  --bias none \
+                  --dtype single \
+                  --subgraph_amount "$subgraph_amount" \
+                  --subgraph_size_range "$subgraph_size_range" \
+                  --sampling_method "$sampling_method" \
+                  --rho "$rho" \
+                  --aggregation_method "$aggregation_method" \
+                  --model_dropout_factor 10 \
+                  --wandb_project "Experiments" \
+                  --only_valid \
+                  --no_progress_bar \
+                  --no_sampling \
+                  )
+  fi
+
 
   CUDA_VISIBLE_DEVICES=$i python run_ensemble_embedding.py "${MODEL_PARAMS[@]}" &
 done

@@ -3,7 +3,7 @@
 #SBATCH --ntasks=1
 #SBATCH --time=05:00:00
 #SBATCH --mem=488000
-#SBATCH --job-name=Ensemble_experiment_NELL-995-h100_DistMult
+#SBATCH --job-name=DistMult_NELL
 #SBATCH --partition=accelerated-h100
 #SBATCH --gres=gpu:4
 #SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments/NELL-995-h100
@@ -19,7 +19,6 @@ source set_env.sh
 sampling_method="Entity"
 rho="-1"
 rank="32"
-reg="0.0"
 aggregation_method="average"
 subgraph_size_range="(0.2, 0.3)"
 subgraph_amount=5
@@ -38,12 +37,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [[ $rank == 500 ]]; then
-    reg="0.0"
-fi
-
-
-
 # Determine the number of available GPUs
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 
@@ -56,32 +49,67 @@ for (( i=0; i<$NUM_GPUS; i++ ))
   elif [[ ${params_rho[$i]} != "-1" ]]; then
     sampling_method="Feature"
   fi
+
+  rho=${params_rho[$i]}
+
+  if [[ $rank == 32 ]]; then
     MODEL_PARAMS=(--dataset NELL-995-h100 \
-                                 --model DistMult \
-                                 --rank "$rank" \
-                                 --regularizer N3 \
-                                 --reg "$reg" \
-                                 --optimizer Adagrad \
-                                 --max_epochs 500 \
-                                 --patience 15 \
-                                 --valid 5 \
-                                 --batch_size 1000 \
-                                 --neg_sample_size -1 \
-                                 --init_size 0.001 \
-                                 --learning_rate 0.1 \
-                                 --gamma 0.0 \
-                                 --bias none \
-                                 --dtype single \
-                                 --subgraph_amount "$subgraph_amount" \
-                                 --subgraph_size_range "$subgraph_size_range" \
-                                 --sampling_method "$sampling_method" \
-                                 --rho "$rho" \
-                                 --aggregation_method "$aggregation_method" \
-                                 --model_dropout_factor 10 \
-                                 --wandb_project "Experiments" \
-                                 --only_valid \
-                                 --no_progress_bar \
-                                 --no_sampling)
+                  --model DistMult \
+                  --rank "$rank" \
+                  --regularizer N3 \
+                  --reg 0.05 \
+                  --optimizer Adagrad \
+                  --max_epochs 500 \
+                  --patience 15 \
+                  --valid 5 \
+                  --batch_size 1000 \
+                  --neg_sample_size -1 \
+                  --init_size 0.001 \
+                  --learning_rate 0.1 \
+                  --gamma 0.0 \
+                  --bias none \
+                  --dtype single \
+                  --subgraph_amount "$subgraph_amount" \
+                  --subgraph_size_range "$subgraph_size_range" \
+                  --sampling_method "$sampling_method" \
+                  --rho "$rho" \
+                  --aggregation_method "$aggregation_method" \
+                  --model_dropout_factor 10 \
+                  --wandb_project "Experiments" \
+                  --only_valid \
+                  --no_progress_bar \
+                  --no_sampling \
+                  )
+  elif [[ $rank == 500 ]]; then
+    MODEL_PARAMS=(--dataset NELL-995-h100 \
+                  --model DistMult \
+                  --rank "$rank" \
+                  --regularizer N3 \
+                  --reg 0.0 \
+                  --optimizer Adagrad \
+                  --max_epochs 500 \
+                  --patience 15 \
+                  --valid 5 \
+                  --batch_size 500 \
+                  --neg_sample_size "{\"Unified\": -1, \"rest\": 250}" \
+                  --init_size 0.001 \
+                  --learning_rate 0.05 \
+                  --gamma 0.0 \
+                  --bias none \
+                  --dtype single \
+                  --subgraph_amount "$subgraph_amount" \
+                  --subgraph_size_range "$subgraph_size_range" \
+                  --sampling_method "$sampling_method" \
+                  --rho "$rho" \
+                  --aggregation_method "$aggregation_method" \
+                  --model_dropout_factor 10 \
+                  --wandb_project "Experiments" \
+                  --only_valid \
+                  --no_progress_bar \
+                  --no_sampling \
+                  )
+  fi
+
 
   CUDA_VISIBLE_DEVICES=$i python run_ensemble_embedding.py "${MODEL_PARAMS[@]}" &
 done
