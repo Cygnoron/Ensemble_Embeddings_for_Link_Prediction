@@ -36,8 +36,8 @@ class BaseH(KGModel):
             self.entity.weight.data = self.init_size * torch.randn((self.sizes[0], self.rank), dtype=self.data_type)
             self.rel.weight.data = self.init_size * torch.randn((self.sizes[1], 2 * self.rank), dtype=self.data_type)
 
-        self.rel_diag = nn.Embedding(self.sizes[1], self.rank)
-        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], self.rank), dtype=self.data_type) - 1.0
+        self.rel_diag = nn.Embedding(self.sizes[1], 2 * self.rank)
+        self.rel_diag.weight.data = 2 * torch.rand((self.sizes[1], 2 * self.rank), dtype=self.data_type) - 1.0
         self.multi_c = args.multi_c
         if self.multi_c:
             c_init = torch.ones((self.sizes[1], 1), dtype=self.data_type)

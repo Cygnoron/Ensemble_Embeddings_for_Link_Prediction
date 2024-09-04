@@ -182,7 +182,7 @@ class Unified(KGModel):
 
         created_embeddings = False
         for embedding_method in self.embedding_methods:
-            if embedding_method == (Constants.SEA or Constants.SEPA) and not created_embeddings:
+            if embedding_method == Constants.SEA or embedding_method == Constants.SEPA and not created_embeddings:
                 buffer = None
                 if embedding_method == Constants.SEA:
                     from models.euclidean import SEA
@@ -583,6 +583,10 @@ class Unified(KGModel):
         for index, embedding_method in enumerate(self.embedding_methods):
             if embedding_method in COMPLEX_MODELS:
                 score = self.similarity_score_complex(lhs_e[:, :, index], rhs_e[:, :, index], eval_mode)
+            elif embedding_method in HYP_MODELS:
+                method = get_class(embedding_method, base_method=True)
+                lhs_e_hyp = (lhs_e[0][:, :, index], lhs_e[1][:, :, index])
+                score = getattr(method, "similarity_score")(self, lhs_e_hyp, rhs_e[:, :, index], eval_mode)
             else:
                 method = get_class(embedding_method, base_method=True)
                 self.set_sim(embedding_method)
@@ -606,33 +610,33 @@ class Unified(KGModel):
 
         return score
 
-    def normalize(self, score, dim):
-
-        activation = nn.Softmax(dim=dim)
-        score = activation(score)
-
-        return score
-
-    def min_max_normalize(self, tensor, dim):
-        """
-        Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
-
-        Args:
-            tensor (torch.Tensor): The input tensor.
-            dim (int): The dimension along which to normalize.
-
-        Returns:
-            torch.Tensor: The normalized tensor.
-        """
-        # return tensor
-
-        min_vals, _ = tensor.min(dim=dim, keepdim=True)
-        max_vals, _ = tensor.max(dim=dim, keepdim=True)
-        range_vals = max_vals - min_vals
-
-        # Avoid division by zero
-        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-6)
-        return normalized_tensor
+    # def normalize(self, score, dim):
+    #
+    #     activation = nn.Softmax(dim=dim)
+    #     score = activation(score)
+    #
+    #     return score
+    #
+    # def min_max_normalize(self, tensor, dim):
+    #     """
+    #     Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
+    #
+    #     Args:
+    #         tensor (torch.Tensor): The input tensor.
+    #         dim (int): The dimension along which to normalize.
+    #
+    #     Returns:
+    #         torch.Tensor: The normalized tensor.
+    #     """
+    #     # return tensor
+    #
+    #     min_vals, _ = tensor.min(dim=dim, keepdim=True)
+    #     max_vals, _ = tensor.max(dim=dim, keepdim=True)
+    #     range_vals = max_vals - min_vals
+    #
+    #     # Avoid division by zero
+    #     normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-6)
+    #     return normalized_tensor
 
     def set_sim(self, embedding_method):
         """

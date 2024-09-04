@@ -578,7 +578,7 @@ def get_args(args, model):
                  "reg"]
     counter = 0
 
-    # Convert string arguments to integers if possible
+    # Convert string arguments to float if possible
     for key in vars(args):
         try:
             if isinstance(vars(args)[key], str):
@@ -622,7 +622,10 @@ def get_args(args, model):
                 else:
                     first_key = next(iter(value.keys()))
                     try:
-                        vars(args_subgraph)[key] = float(value[first_key])
+                        if isinstance(value[first_key], bool):
+                            vars(args_subgraph)[key] = bool(value[first_key])
+                        else:
+                            vars(args_subgraph)[key] = float(value[first_key])
                     except ValueError:
                         vars(args_subgraph)[key] = value[first_key]
                 counter += 1
