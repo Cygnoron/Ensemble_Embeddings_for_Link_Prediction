@@ -19,6 +19,7 @@ source set_env.sh
 sampling_method="Entity"
 rho="-1"
 rank="32"
+reg="0.0"
 aggregation_method="average"
 subgraph_size_range="(0.2, 0.3)"
 subgraph_amount=5
@@ -36,6 +37,12 @@ while [[ "$#" -gt 0 ]]; do
     esac
     shift
 done
+
+if [[ $rank == 500 ]]; then
+    reg="0.0"
+fi
+
+
 
 # Determine the number of available GPUs
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
@@ -55,13 +62,13 @@ for (( i=0; i<$NUM_GPUS; i++ ))
                                  --model SEA \
                                  --rank "$rank" \
                                  --regularizer N3 \
-                                 --reg 0.0 \
+                                 --reg "$reg" \
                                  --optimizer Adam \
                                  --max_epochs 500 \
                                  --patience 15 \
                                  --valid 5 \
                                  --batch_size 1000 \
-                                 --neg_sample_size "{\"Unified\": -1, \"rest\": 250}" \
+                                 --neg_sample_size "{\"Unified\": -1, \"rest\": -1}" \
                                  --init_size 0.001 \
                                  --learning_rate 0.001 \
                                  --gamma 0.0 \
