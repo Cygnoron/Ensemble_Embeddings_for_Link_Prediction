@@ -19,7 +19,6 @@ source set_env.sh
 sampling_method="Entity"
 rho="-1"
 rank="32"
-reg="0.0"
 aggregation_method="average"
 subgraph_size_range="(0.2, 0.3)"
 subgraph_amount=5
@@ -38,12 +37,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [[ $rank == 500 ]]; then
-    reg="0.0"
-fi
-
-
-
 # Determine the number of available GPUs
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 
@@ -59,10 +52,10 @@ for (( i=0; i<$NUM_GPUS; i++ ))
 
   rho=${params_rho[$i]}
   MODEL_PARAMS=(--dataset WN18RR \
-                                 --model SEA \
+                                 --model SEPA \
                                  --rank "$rank" \
                                  --regularizer N3 \
-                                 --reg "$reg" \
+                                 --reg 0.0 \
                                  --optimizer Adam \
                                  --max_epochs 500 \
                                  --patience 15 \
@@ -81,8 +74,9 @@ for (( i=0; i<$NUM_GPUS; i++ ))
                                  --aggregation_method "$aggregation_method" \
                                  --model_dropout_factor 10 \
                                  --wandb_project "Experiments" \
-                                 --only_valid \
+                                 --multi_c \
                                  --no_progress_bar \
+                                 --only_valid \
                                  --no_sampling)
 
   CUDA_VISIBLE_DEVICES=$i python run_ensemble_embedding.py "${MODEL_PARAMS[@]}" &
