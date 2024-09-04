@@ -3,7 +3,7 @@
 #SBATCH --ntasks=1
 #SBATCH --time=05:00:00
 #SBATCH --mem=488000
-#SBATCH --job-name=Ensemble_experiment_SEA
+#SBATCH --job-name=TDCA
 #SBATCH --partition=accelerated-h100
 #SBATCH --gres=gpu:4
 #SBATCH --chdir /home/hk-project-test-p0021631/st_st162185/Ensemble_Embedding_for_Link_Prediction/experiments/Multiple_models
@@ -52,20 +52,20 @@ for (( i=0; i<$NUM_GPUS; i++ ))
 
   rho=${params_rho[$i]}
   MODEL_PARAMS=(--dataset WN18RR \
-                                 --model "{\"TransE\": [0], \"DistMult\": [1], \"ComplEx\": [2]}" \
+                                 --model "{\"TransE\": [0], \"DistMult\": [1], \"ComplEx\": [2], \"AttE\": [3]}" \
                                  --rank "$rank" \
                                  --regularizer N3 \
-                                 --reg "{\"Unified\": 0.0, \"TransE\": 0.0, \"DistMult\": 0.05, \"ComplEx\": 0.0}" \
-                                 --optimizer "{\"Unified\": \"Adagrad\", \"TransE\": \"Adam\", \"DistMult\": \"Adagrad\", \"ComplEx\": \"Adagrad\"}" \
+                                 --reg "{\"Unified\": 0.0, \"TransE\": 0.0, \"DistMult\": 0.05, \"ComplEx\": 0.0, \"AttE\": 0.0}" \
+                                 --optimizer "{\"Unified\": \"Adagrad\", \"TransE\": \"Adam\", \"DistMult\": \"Adagrad\", \"ComplEx\": \"Adagrad\", \"AttE\": \"Adam\"}" \
                                  --max_epochs 500 \
                                  --patience 15 \
                                  --valid 1 \
                                  --batch_size 1000 \
-                                 --neg_sample_size "{\"Unified\": -1, \"TransE\": 250, \"DistMult\": -1, \"ComplEx\": -1}" \
+                                 --neg_sample_size "{\"Unified\": -1, \"TransE\": -1, \"DistMult\": -1, \"ComplEx\": -1, \"AttE\": -1}" \
                                  --init_size 0.001 \
-                                 --learning_rate "{\"Unified\": 0.1, \"TransE\": 0.001, \"DistMult\": 0.1, \"ComplEx\": 0.001}" \
+                                 --learning_rate "{\"Unified\": 0.1, \"TransE\": 0.001, \"DistMult\": 0.1, \"ComplEx\": 0.001, \"AttE\": 0.001}" \
                                  --gamma 0.0 \
-                                 --bias "{\"Unified\": \"none\", \"TransE\": \"none\", \"DistMult\": \"none\", \"ComplEx\": \"learn\"}" \
+                                 --bias "{\"Unified\": \"none\", \"TransE\": \"none\", \"DistMult\": \"none\", \"ComplEx\": \"learn\", \"AttE\": \"none\"}" \
                                  --dtype single \
                                  --subgraph_amount "$subgraph_amount" \
                                  --subgraph_size_range "$subgraph_size_range" \
@@ -73,10 +73,10 @@ for (( i=0; i<$NUM_GPUS; i++ ))
                                  --rho "$rho" \
                                  --aggregation_method "$aggregation_method" \
                                  --model_dropout_factor 10 \
-                                 --wandb_project "Experiments" \
                                  --only_valid \
-                                 --no_progress_bar \
                                  --no_sampling)
+#                                 --wandb_project "Experiments" \
+#                                 --no_progress_bar \
 
   CUDA_VISIBLE_DEVICES=$i python run_ensemble_embedding.py "${MODEL_PARAMS[@]}" &
 done

@@ -15,7 +15,7 @@ for rank in "${params_rank[@]}"; do
       echo "--rank $rank --aggregation_method $aggregation_method --subgraph_amount $subgraph_amount --subgraph_size_range $subgraph_size_range"
       sbatch train_SEA.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
       sbatch train_TransE_DistMult_ComplEx.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
-#      sbatch train_NELL-995-h100_RotatE.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
+      sbatch train_TransE_DistMult_ComplEx_AttE.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
 #      sbatch train_NELL-995-h100_ComplEx.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
 #      sbatch train_NELL-995-h100_AttE.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
 #      sbatch train_NELL-995-h100_AttH.sh --rank "$rank" --aggregation_method "$aggregation_method" --subgraph_amount "$subgraph_amount" --subgraph_size_range "$subgraph_size_range"
