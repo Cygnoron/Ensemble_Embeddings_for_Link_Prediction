@@ -155,6 +155,9 @@ class KGModel(nn.Module, ABC):
         if self.bias == 'constant':
             return self.gamma.item() + score
         elif self.bias == 'learn':
+            if self.is_unified_model:
+                lhs_biases = self.aggregate_scores(lhs_biases, stacking=False)
+                rhs_biases = self.aggregate_scores(rhs_biases, stacking=False)
             if eval_mode:
                 return lhs_biases + rhs_biases.t() + score
             else:

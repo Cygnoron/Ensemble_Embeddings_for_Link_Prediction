@@ -589,7 +589,13 @@ class Unified(KGModel):
                 score = getattr(method, "similarity_score")(self, lhs_e[:, :, index], rhs_e[:, :, index], eval_mode)
             score_list.append(score)
 
-        score_list = torch.stack(score_list, dim=-1).to('cuda')
+        score = self.aggregate_scores(score_list)
+
+        return score
+
+    def aggregate_scores(self, score_list, stacking=True):
+        if stacking:
+            score_list = torch.stack(score_list, dim=-1).to('cuda')
         if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
             score, _ = torch.max(score_list, dim=-1)
             score = score.to('cuda')
