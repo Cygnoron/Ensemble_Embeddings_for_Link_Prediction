@@ -15,8 +15,7 @@ from ensemble.util import get_unique_triple_ids
 
 
 def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sampling_method, subgraph_amount=10,
-                 subgraph_size_range=(0.1, 0.7), rho=-1, entities_per_step=1, enforcement=1, no_progress_bar=False,
-                 random_seed=42):
+                 subgraph_size_range=(0.1, 0.7), rho=-1, entities_per_step=1, enforcement=1, no_progress_bar=False):
     """
     The sample_graph function samples subgraphs from a given dataset based on various parameters and a chosen sampling method.
 
@@ -31,7 +30,6 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
         entities_per_step (int, optional): Maximum number of entities to sample per step. Defaults to 1.
         enforcement (int, optional): Enforcement level for ensuring the inclusion of all entities and relation names. Defaults to 1.
         no_progress_bar (bool, optional): Flag to disable the progress bar. Defaults to False.
-        random_seed (int, optional): Seed for random number generation. Defaults to 42.
 
     """
 
@@ -77,17 +75,6 @@ def sample_graph(info_directory: str, dataset_in: str, dataset_out_dir: str, sam
             hyperparameter_str = f", rho = {relation_name_amount_str} "
         else:
             rho = len(relation_name_set.keys())
-
-        if type(random_seed) is str:
-            try:
-                random_seed = int(random_seed)
-                logging.debug(f"Converting seed {random_seed} to int.")
-            except ValueError:
-                random_seed = random.randint(0, 2 ** 32 - 1)
-                logging.debug(f"Selecting a random sampling seed: Seed {random_seed}")
-
-        random.seed(random_seed)
-        logging.info(f"Seed for subgraph sampling: {random_seed}")
 
         # init was successful
         init_successful = True

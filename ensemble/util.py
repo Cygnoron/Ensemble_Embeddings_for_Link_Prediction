@@ -144,7 +144,7 @@ def assign_model_to_subgraph(kge_models, args):
                     logging.debug(f"Removed illegal assignment \"{assignment}\"")
                     kge_models[embedding_model].remove(assignment)
             elif type(assignment) is str:
-                if assignment != "all" and assignment != "rest":
+                if assignment != "all" and assignment != "rest" and ":" not in assignment:
                     logging.debug(f"Removed illegal assignment \"{assignment}\"")
                     kge_models[embedding_model].remove(assignment)
     logging.debug(f"kge_models after checking for illegal assignments:\n{format_dict(kge_models)}")
@@ -191,9 +191,26 @@ def assign_model_to_subgraph(kge_models, args):
         for subgraph in kge_models[embedding_model]:
             if subgraph == "rest":
                 continue
-            # Set specific embedding class_name for the subgraph, if specified
-            subgraph_embedding_mapping[subgraph] = embedding_model
+            elif isinstance(subgraph, str):
+                if ":" in subgraph:
+                    start_end = subgraph.split(":")
+                    for subgraph_num in range(int(start_end[0]), int(start_end[1]) + 1):
+                        if subgraph_num not in subgraph_embedding_mapping.keys():
+                            subgraph_embedding_mapping[subgraph_num] = embedding_model
+                        else:
+                            logging.info(f"The mapping from subgraph to embedding model "
+                                         f"({subgraph_num} -> {embedding_model}) could not be applied due to the existing "
+                                         f"mapping ({subgraph_num} -> {subgraph_embedding_mapping[subgraph_num]}).")
+            else:
+                # Set specific embedding class_name for the subgraph, if specified
+                if subgraph not in subgraph_embedding_mapping.keys():
+                    subgraph_embedding_mapping[subgraph] = embedding_model
+                else:
+                    logging.info(f"The mapping from subgraph to embedding model ({subgraph} -> {embedding_model}) "
+                                 f"could not be applied due to the existing mapping "
+                                 f"({subgraph} -> {subgraph_embedding_mapping[subgraph]}).")
     # List containing only specific mappings for subgraphs
+
     mapped_subgraphs = list(subgraph_embedding_mapping.keys())
 
     logging.info(f"Subgraphs with fixed embedding:\n{format_dict(subgraph_embedding_mapping)}\n\t\t"
@@ -225,7 +242,7 @@ def assign_model_to_subgraph(kge_models, args):
 
     list(subgraph_embedding_mapping.keys()).sort()
 
-    logging.info(f"Mapping from embedding methods to subgraphs: {inverse_dict(subgraph_embedding_mapping)}")
+    logging.info(f"Mapping from embedding methods to subgraphs:\n{format_dict(inverse_dict(subgraph_embedding_mapping))}")
     return subgraph_embedding_mapping
 
 

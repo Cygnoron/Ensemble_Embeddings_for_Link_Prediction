@@ -178,6 +178,8 @@ class Unified(KGModel):
 
         logging.info(f"Found the following embedding methods:\n{util.format_set(self.embedding_methods)}")
 
+        # self.embedding_methods = list(self.embedding_methods)
+
         created_embeddings = False
         for embedding_method in self.embedding_methods:
             if embedding_method == (Constants.SEA or Constants.SEPA) and not created_embeddings:
@@ -463,27 +465,6 @@ class Unified(KGModel):
                                                                     self.att_rel_cross_model[queries[:, 1]],
                                                                     dim=-1).cuda()
 
-    def min_max_normalize(self, tensor, dim):
-        """
-        Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
-
-        Args:
-            tensor (torch.Tensor): The input tensor.
-            dim (int): The dimension along which to normalize.
-
-        Returns:
-            torch.Tensor: The normalized tensor.
-        """
-        return tensor
-
-        min_vals, _ = tensor.min(dim=dim, keepdim=True)
-        max_vals, _ = tensor.max(dim=dim, keepdim=True)
-        range_vals = max_vals - min_vals
-
-        # Avoid division by zero
-        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-6)
-        return normalized_tensor
-
     def get_queries(self, queries):
         """
         Retrieves the query embeddings and biases.
@@ -505,15 +486,6 @@ class Unified(KGModel):
                 method = get_class(embedding_method)
                 lhs_e, lhs_biases = getattr(method, "get_queries")(self, queries)
 
-            if isinstance(lhs_e, tuple):
-                lhs_e = list(lhs_e)
-                lhs_e[0] = self.min_max_normalize(lhs_e[0], dim=0)
-                lhs_e = tuple(lhs_e)
-                lhs_biases = self.min_max_normalize(lhs_biases, dim=0)
-            else:
-                lhs_e = self.min_max_normalize(lhs_e, dim=0)
-                lhs_biases = self.min_max_normalize(lhs_biases, dim=0)
-
             lhs_e_list.append(lhs_e)
             lhs_biases_list.append(lhs_biases)
 
@@ -531,27 +503,28 @@ class Unified(KGModel):
 
         else:
             lhs_e_list = torch.stack(lhs_e_list, dim=-1).to('cuda')
+        lhs_biases_list = torch.stack(lhs_biases_list, dim=-1)
 
-        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-            if isinstance(lhs_e_list, tuple):
-                lhs_e = (torch.max(lhs_e_list[0], dim=-1)[0].to('cuda'), torch.max(lhs_e_list[1], dim=-1)[0].to('cuda'))
-            else:
-                lhs_e, _ = torch.max(lhs_e_list, dim=-1)
-                lhs_e = lhs_e.to('cuda')
-            lhs_biases, _ = torch.max(torch.stack(lhs_biases_list, dim=-1), dim=-1)
-            lhs_biases = lhs_biases.to('cuda')
+        # if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+        #     if isinstance(lhs_e_list, tuple):
+        #         lhs_e = (torch.max(lhs_e_list[0], dim=-1)[0].to('cuda'), torch.max(lhs_e_list[1], dim=-1)[0].to('cuda'))
+        #     else:
+        #         lhs_e, _ = torch.max(lhs_e_list, dim=-1)
+        #         lhs_e = lhs_e.to('cuda')
+        #     lhs_biases, _ = torch.max(lhs_biases_list, dim=-1)
+        #     lhs_biases = lhs_biases.to('cuda')
+        #
+        # elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+        #     if isinstance(lhs_e_list, tuple):
+        #         lhs_e = (torch.mean(lhs_e_list[0], dim=-1).to('cuda'), torch.mean(lhs_e_list[1], dim=-1).to('cuda'))
+        #     else:
+        #         lhs_e = torch.mean(lhs_e_list, dim=-1).to('cuda')
+        #     lhs_biases = torch.mean(lhs_biases_list, dim=-1).to('cuda')
+        #
+        # else:
+        #     raise ValueError(f'Aggregation method {self.aggregation_method} in get_queries not supported.')
 
-        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-            if isinstance(lhs_e_list, tuple):
-                lhs_e = (torch.mean(lhs_e_list[0], dim=-1).to('cuda'), torch.mean(lhs_e_list[1], dim=-1).to('cuda'))
-            else:
-                lhs_e = torch.mean(lhs_e_list, dim=-1).to('cuda')
-            lhs_biases = torch.mean(torch.stack(lhs_biases_list, dim=-1), dim=-1).to('cuda')
-
-        else:
-            raise ValueError(f'Aggregation method {self.aggregation_method} in get_queries not supported.')
-
-        return lhs_e, lhs_biases
+        return lhs_e_list, lhs_biases_list
 
     def get_rhs(self, queries, eval_mode):
         """
@@ -575,30 +548,23 @@ class Unified(KGModel):
                 method = get_class(embedding_method, base_method=True)
                 rhs_e, rhs_biases = getattr(method, "get_rhs")(self, queries, eval_mode)
 
-            if isinstance(rhs_e, tuple):
-                rhs_e = list(rhs_e)
-                rhs_e[0] = self.min_max_normalize(rhs_e[0], dim=0)
-                rhs_e = tuple(rhs_e)
-                rhs_biases = self.min_max_normalize(rhs_biases, dim=0)
-            else:
-                rhs_e = self.min_max_normalize(rhs_e, dim=0)
-                rhs_biases = self.min_max_normalize(rhs_biases, dim=0)
-
             rhs_e_list.append(rhs_e)
             rhs_biases_list.append(rhs_biases)
 
-        if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-            rhs_e, _ = torch.max(torch.stack(rhs_e_list, dim=-1), dim=-1)
-            rhs_biases, _ = torch.max(torch.stack(rhs_biases_list, dim=-1), dim=-1)
-            rhs_e = rhs_e.to('cuda')
-            rhs_biases = rhs_biases.to('cuda')
-        elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-            rhs_e = torch.mean(torch.stack(rhs_e_list, dim=-1), dim=-1).to('cuda')
-            rhs_biases = torch.mean(torch.stack(rhs_biases_list, dim=-1), dim=-1).to('cuda')
-        else:
-            raise ValueError(f'Aggregation method {self.aggregation_method} in get_rhs not supported.')
+        rhs_e_list = torch.stack(rhs_e_list, dim=-1).to('cuda')
+        rhs_biases_list = torch.stack(rhs_biases_list, dim=-1)
+        # if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
+        #     rhs_e, _ = torch.max(rhs_e_list, dim=-1)
+        #     rhs_biases, _ = torch.max(rhs_biases_list, dim=-1)
+        #     rhs_e = rhs_e.to('cuda')
+        #     rhs_biases = rhs_biases.to('cuda')
+        # elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
+        #     rhs_e = torch.mean(rhs_e_list, dim=-1).to('cuda')
+        #     rhs_biases = torch.mean(rhs_biases_list, dim=-1).to('cuda')
+        # else:
+        #     raise ValueError(f'Aggregation method {self.aggregation_method} in get_rhs not supported.')
 
-        return rhs_e, rhs_biases
+        return rhs_e_list, rhs_biases_list
 
     def similarity_score(self, lhs_e, rhs_e, eval_mode):
         """
@@ -614,24 +580,53 @@ class Unified(KGModel):
         """
 
         score_list = []
-        for embedding_method in self.embedding_methods:
+        for index, embedding_method in enumerate(self.embedding_methods):
             if embedding_method in COMPLEX_MODELS:
-                score = self.similarity_score_complex(lhs_e, rhs_e, eval_mode)
+                score = self.similarity_score_complex(lhs_e[:, :, index], rhs_e[:, :, index], eval_mode)
             else:
                 method = get_class(embedding_method, base_method=True)
                 self.set_sim(embedding_method)
-                score = getattr(method, "similarity_score")(self, lhs_e, rhs_e, eval_mode)
+                score = getattr(method, "similarity_score")(self, lhs_e[:, :, index], rhs_e[:, :, index], eval_mode)
             score_list.append(score)
 
+        score_list = torch.stack(score_list, dim=-1).to('cuda')
         if self.aggregation_method[0] == Constants.MAX_SCORE_AGGREGATION[0]:
-            score, _ = torch.max(torch.stack(score_list, dim=-1), dim=-1)
+            score, _ = torch.max(score_list, dim=-1)
             score = score.to('cuda')
         elif self.aggregation_method[0] == Constants.AVERAGE_SCORE_AGGREGATION[0]:
-            score = torch.mean(torch.stack(score_list, dim=-1), dim=-1).to('cuda')
+            score = torch.mean(score_list, dim=-1).to('cuda')
         else:
             raise ValueError(f'Aggregation method {self.aggregation_method} in similarity_score not supported.')
 
         return score
+
+    def normalize(self, score, dim):
+
+        activation = nn.Softmax(dim=dim)
+        score = activation(score)
+
+        return score
+
+    def min_max_normalize(self, tensor, dim):
+        """
+        Normalize the entries of a PyTorch tensor along a given dimension to the interval [0, 1].
+
+        Args:
+            tensor (torch.Tensor): The input tensor.
+            dim (int): The dimension along which to normalize.
+
+        Returns:
+            torch.Tensor: The normalized tensor.
+        """
+        # return tensor
+
+        min_vals, _ = tensor.min(dim=dim, keepdim=True)
+        max_vals, _ = tensor.max(dim=dim, keepdim=True)
+        range_vals = max_vals - min_vals
+
+        # Avoid division by zero
+        normalized_tensor = (tensor - min_vals) / range_vals.clamp(min=1e-6)
+        return normalized_tensor
 
     def set_sim(self, embedding_method):
         """

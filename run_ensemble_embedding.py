@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import random
 import time
 import traceback
 
@@ -32,6 +33,9 @@ parser.add_argument(
     "--valid", default=3, type=float, help="Number of epochs before validation"
 )
 parser.add_argument(
+    "--batch_size", default=1000, type=int, help="Batch size"
+)
+parser.add_argument(
     "--dtype", default="double", type=str, choices=["single", "double"], help="Machine precision"
 )
 parser.add_argument(
@@ -52,32 +56,29 @@ parser.add_argument(
     "--regularizer", choices=["N3", "F2"], default="N3", help="Regularizer"
 )
 parser.add_argument(
-    "--reg", default=0, type=float, help="Regularization weight"
+    "--reg", default=0, help="Regularization weight"
 )
 parser.add_argument(
     "--optimizer", default="Adagrad",  # , choices=["Adagrad", "Adam", "SparseAdam"]
     help="Optimizer"
 )
 parser.add_argument(
-    "--batch_size", default=1000, type=int, help="Batch size"
-)
-parser.add_argument(
     "--neg_sample_size", default=50, help="Negative sample size, -1 to not use negative sampling"
 )
 parser.add_argument(
-    "--dropout", default=0, type=float, help="Dropout rate"
+    "--dropout", default=0, help="Dropout rate"
 )
 parser.add_argument(
-    "--init_size", default=1e-3, type=float, help="Initial embeddings' scale"
+    "--init_size", default=1e-3, help="Initial embeddings' scale"
 )
 parser.add_argument(
-    "--learning_rate", default=1e-1, type=float, help="Learning rate"
+    "--learning_rate", default=1e-1, help="Learning rate"
 )
 parser.add_argument(
-    "--gamma", default=0, type=float, help="Margin for distance-based losses"
+    "--gamma", default=0, help="Margin for distance-based losses"
 )
 parser.add_argument(
-    "--bias", default="constant", type=str, choices=["constant", "learn", "none"], help="Bias type (none for no bias)"
+    "--bias", default="constant", help="Bias type (none for no bias)"  # , choices=["constant", "learn", "none"]
 )
 parser.add_argument(
     "--double_neg", action="store_true",
@@ -110,8 +111,8 @@ parser.add_argument(
          "present in the subgraph, which is calculated by the formula \'rho * √|Relation Names|\'."
 )
 parser.add_argument(
-    "--sampling_seed", default="42",
-    help="The seed for sampling subgraphs. Type \'random\' for a random seed."
+    "--random_seed", default="42",
+    help="The seed for random processes. Type \'random\' for a random seed."
 )
 
 parser.add_argument(
@@ -254,11 +255,22 @@ def run_embedding(args):
 
     logging.debug(f"Args: {args}")
 
+    if type(args.random_seed) is str:
+        try:
+            args.random_seed = int(args.random_seed)
+            logging.debug(f"Converting seed {args.random_seed} to int.")
+        except ValueError:
+            args.random_seed = random.randint(0, 2 ** 32 - 1)
+            logging.debug(f"Selecting a random sampling seed: Seed {args.random_seed}")
+
+    random.seed(args.random_seed)
+    logging.info(f"Seed for random processes: {args.random_seed}")
+
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
                                  subgraph_amount=args.subgraph_amount,
                                  subgraph_size_range=args.subgraph_size_range, entities_per_step=args.entities_per_step,
-                                 rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
+                                 rho=args.rho, no_progress_bar=args.no_progress_bar)
 
     error = False
     try:
@@ -305,7 +317,7 @@ def run_embedding_manual():
     dataset_in = "NELL-995-h100"
     # subgraph_amount = 30
     # subgraph_amount = 10
-    subgraph_amount = 5
+    subgraph_amount = 10
     # subgraph_size_range = (0.6, 0.7)
     subgraph_size_range = (0.2, 0.3)
     # rho = 2.0
@@ -316,8 +328,8 @@ def run_embedding_manual():
 
     args = argparse.Namespace(no_sampling=True, no_training=False, no_time_dependent_file_path=False,
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
-                              subgraph_size_range=subgraph_size_range, rho=rho,
-                              entities_per_step=entities_per_step,
+                              subgraph_size_range=subgraph_size_range, rho=rho, random_seed=42,
+                              entities_per_step=entities_per_step, only_valid=False,
                               sampling_method=Constants.ENTITY_SAMPLING,
                               # sampling_method=Constants.FEATURE_SAMPLING,
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
@@ -352,6 +364,17 @@ def run_embedding_manual():
 
     # util_files.create_entity_and_relation_name_set_file(f"data\\{dataset_in}")
 
+    if type(args.random_seed) is str:
+        try:
+            args.random_seed = int(args.random_seed)
+            logging.debug(f"Converting seed {args.random_seed} to int.")
+        except ValueError:
+            args.random_seed = random.randint(0, 2 ** 32 - 1)
+            logging.debug(f"Selecting a random sampling seed: Seed {args.random_seed}")
+
+    random.seed(args.random_seed)
+    logging.info(f"Seed for random processes: {args.random_seed}")
+
     # --- Sampling process ---
     if not args.no_sampling:
         subsampling.sample_graph(info_directory, dataset_in, dataset_out_dir, args.sampling_method,
@@ -373,15 +396,22 @@ def run_embedding_manual():
     error = False
     try:
         if not args.no_training:
-            args.kge_models = {Constants.SEA: []}
+            args.kge_models = util.get_embedding_methods("{\"TransE\": [\"0:3\", 8], \"DistMult\": [\"7:9\"], "
+                                                         "\"ComplEx\": [2], \"AttE\": [3]}")
+            # args.kge_models = {
+            #     Constants.DIST_MULT: ["0:9", 4],
+            #     Constants.TRANS_E: list(range(20, 30)),
+            #     Constants.ATT_E: [3],
+            #     Constants.COMPL_EX: list(range(10, 20)),
+            # }
 
             # general parameters
-            args.max_epochs = 500
+            args.max_epochs = 50
             args.rank = 32
             args.patience = 15
             args.valid = 5
             args.dtype = "single"
-            args.batch_size = 500
+            args.batch_size = 1000
             args.debug = False
 
             # individually settable parameters
@@ -393,10 +423,11 @@ def run_embedding_manual():
                         'ComplEx': 0.05,
                         'rest': 0.0}
             args.optimizer = {"TransE": "Adam", 'DistMult': "Adagrad",
-                              'ComplEx': "Adagrad", 'RotatE': "Adagrad",
+                              'ComplEx': "Adagrad", 'RotatE': "SparseAdam",
                               'AttE': "Adam", 'AttH': "Adam",
                               'SEA': "Adam",
                               'Unified': "Adagrad"}
+
             args.neg_sample_size = {"TransE": -1, 'DistMult': -1,
                                     'ComplEx': -1, 'RotatE': 250,
                                     'AttE': -1, 'AttH': 250,
@@ -443,10 +474,10 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     # Function to run via command prompt
-    # run_embedding(parser.parse_args())
+    run_embedding(parser.parse_args())
 
     # Function to run manual via IDE
-    run_embedding_manual()
+    # run_embedding_manual()
 
     # Function to run baseline
     # run_baseline()
