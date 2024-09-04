@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -A hk-project-pai00011
 #SBATCH --ntasks=1
-#SBATCH --time=05:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=488000
 #SBATCH --job-name=Ensemble_experiment_WN18RR_RotatE
 #SBATCH --partition=accelerated-h100
@@ -19,7 +19,6 @@ source set_env.sh
 sampling_method="Entity"
 rho="-1"
 rank="32"
-reg="0.0"
 aggregation_method="average"
 subgraph_size_range="(0.2, 0.3)"
 subgraph_amount=5
@@ -38,12 +37,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [[ $rank == 500 ]]; then
-    reg="0.0"
-fi
-
-
-
 # Determine the number of available GPUs
 NUM_GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 
@@ -56,12 +49,14 @@ for (( i=0; i<$NUM_GPUS; i++ ))
   elif [[ ${params_rho[$i]} != "-1" ]]; then
     sampling_method="Feature"
   fi
-    MODEL_PARAMS=(--dataset WN18RR \
+
+  rho=${params_rho[$i]}
+  MODEL_PARAMS=(--dataset WN18RR \
                                  --model RotatE \
                                  --rank "$rank" \
                                  --regularizer N3 \
-                                 --reg "$reg" \
-                                 --optimizer Adam \
+                                 --reg 0.0 \
+                                 --optimizer "{\"Unified\": \"Adagrad\", \"rest\": \"SparseAdam\"}" \
                                  --max_epochs 500 \
                                  --patience 15 \
                                  --valid 5 \

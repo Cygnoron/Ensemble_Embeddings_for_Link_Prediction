@@ -59,7 +59,7 @@ for (( i=0; i<$NUM_GPUS; i++ ))
                                  --optimizer "{\"Unified\": \"Adagrad\", \"TransE\": \"Adam\", \"DistMult\": \"Adagrad\", \"ComplEx\": \"Adagrad\", \"AttE\": \"Adam\"}" \
                                  --max_epochs 500 \
                                  --patience 15 \
-                                 --valid 1 \
+                                 --valid 5 \
                                  --batch_size 1000 \
                                  --neg_sample_size "{\"Unified\": -1, \"TransE\": -1, \"DistMult\": -1, \"ComplEx\": -1, \"AttE\": -1}" \
                                  --init_size 0.001 \
