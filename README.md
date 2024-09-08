@@ -103,7 +103,6 @@ options:
   --no_time_dependent_file_path
                         Turn off specifying the current time in file path, when creating logs and other files.
   --baseline            Start a run using a baseline method and all given parameters.
-
 </pre>
 
 
