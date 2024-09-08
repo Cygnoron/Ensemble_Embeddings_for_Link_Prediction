@@ -177,26 +177,25 @@ The rough outline of the training and score calculation are as described below.
 ### Training
 <pre>
 # initialize unified model with random embeddings
-unified_model = random_init(models, aggregation_method)
+unified_model = setup_unified_model(models, aggregation_method)
 
 for epoch:
     for batch:
         
+        # do forward pass on single models and perform backward pass on each model
+        unified_model.train_single_models(batch)
+        
         # calculate attention based on single model theta and embedding 
-        attention = calculate_attention(models, unified_model)
-        
-        # do forward pass on single models and combine predictions and factors according to attention
-        combined_predictions, combined_factors = unified_model.forward(batch, models, attention)
-        
-        # calculate loss based on combined predictions
-        unified_loss = calculate_loss(combined_predictions, combined_factors, true_values)
-        
+        unified_model.calculate_cross_model_attention(batch)
+                
+        # combine embeddings from single models into unified embeddings
+        unified_model.combine_embeddings(batch)
+
         # do backward pass on unified embedding 
-        unified_model.backward(unified_loss)
+        unified_model.backward(batch)
         
         # update single model embeddings based on attention and unified embedding
-        for model in models:
-            model[embeddings] = model.update_embeddings(unified_model, attention)
+        unified_model.update_single_models(batch)
 
 </pre>
 
@@ -206,25 +205,15 @@ for epoch:
 # get which embedding methods are in the ensemble
 methods = get_used_methods(models)
 
-# if only one method is present, skip aggregation 
-if len(methods) is 1:
-    # calculate scores and targets for single method
-    scores, targets = unified_model.calculate_score(method)
+for batch:
+    # iterate through all embedding methods in the ensemble 
+    for method in ensemble:
+        # calculate score for each embedding method, based on the respective score function
+        method_scores = method.score(batch)
 
-    # directly calculate metrics from scores and targets
-    metrics = calculate_metrics(scores, targets)
+    # aggregate all calculated scores according to aggregation method
+    aggregated score = unified_model.aggregate_scores(batch, method_scores)
 
-# do aggregation if multiple different methods are used
-else:
-    # calculate scores based on each methods score function
-    for method in methods:
-        method_score, method_target = unified_model.calculate_score(method)
-    
-    # combine scores from different methods according to the aggregation method
-    aggregated_scores, aggregated_targets = combine_method_scores(method_scores, method_targets, aggregation_method)
-    
-    # calculate metrics from combined scores
-    metrics = calculate_metrics(aggregated_scores, aggregated_targets)
 </pre>
 
 ## New models
@@ -260,7 +249,7 @@ If you use this implementation, please cite the following paper [1]:
 ---
 
 <!-- TODO Get reference for citation -->
-[1] REFERENCE
+[1] Braun, Tim, "Ensemble Approaches for Link Prediction", Masters' thesis, 2024
 
 [2] Chami, Ines, et al. "Low-Dimensional Hyperbolic Knowledge Graph Embeddings." Annual Meeting of the Association for
 Computational Linguistics. 2020.
