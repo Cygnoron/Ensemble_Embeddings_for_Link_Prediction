@@ -130,7 +130,7 @@ if __name__ == "__main__":
     # dataset = "FB15K-237"
     # model = "ComplEx"
     # args.model_dir = os.path.join("Results", "Rank_32")
-    args.model_dir = os.path.abspath(os.path.join("D:", "Master_results"))
+    args.model_dir = os.path.abspath(os.path.join("D:", "Results", "Rank_500"))
 
     test_baseline = True
     test_ensemble = True
@@ -139,14 +139,14 @@ if __name__ == "__main__":
     # filter_exclusive = False
     filter_exclusive = True
 
-    filters = ["WN18RR", "Feat"]
+    filters = ["WN18RR", "Feat", "TransE"]
 
     # args = parser.parse_args()
     # to_list = os.path.join("data", args.model_dir)
     to_list = args.model_dir
     result_directories = os.listdir(to_list)
 
-    with (open(os.path.join("Results", f"general_{split}_metrics.txt"), "w+") as out_file):
+    with (open(os.path.join(to_list, f"general_{split}_metrics.txt"), "w+") as out_file):
         for result_directory in result_directories:
             if not os.path.isdir(os.path.join(to_list, result_directory)):
                 # skip if result_directory is no directory
