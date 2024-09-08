@@ -501,7 +501,6 @@ if __name__ == "__main__":
         # Function to run baseline via command prompt
         run_baseline(args)
 
-
         # Function to run baseline manual via IDE
         # run_baseline(args, manual=True)
 
