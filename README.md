@@ -38,9 +38,19 @@ source set_env.sh
 
 To train and evaluate a KG embedding model for the link prediction task, use the run_ensemble_embedding.py script:
 <pre>
-usage: run_ensemble_embedding.py [-h] [--dataset DATASET] [--max_epochs MAX_EPOCHS] [--rank RANK] [--patience PATIENCE] [--valid VALID] [--batch_size BATCH_SIZE] [--dtype {single,double}] [--debug] [--model MODEL] [--regularizer {N3,F2}] [--reg REG] [--optimizer OPTIMIZER] [--neg_sample_size NEG_SAMPLE_SIZE] [--dropout DROPOUT] [--init_size INIT_SIZE] [--learning_rate LEARNING_RATE] [--gamma GAMMA] [--bias BIAS]
-                                 [--double_neg] [--multi_c] [--subgraph_amount SUBGRAPH_AMOUNT] [--subgraph_size_range SUBGRAPH_SIZE_RANGE] [--sampling_method {Entity,Feature}] [--rho RHO] [--random_seed RANDOM_SEED] [--entities_per_step ENTITIES_PER_STEP] [--enforcement ENFORCEMENT] [--aggregation_method {max,average}] [--model_dropout_factor MODEL_DROPOUT_FACTOR] [--logging {critical,error,warning,info,debug,data}]
-                                 [--wandb_project WANDB_PROJECT] [--only_valid] [--no_sampling] [--no_training] [--no_progress_bar] [--no_time_dependent_file_path] [--baseline]
+usage: run_ensemble_embedding.py [-h] [--dataset DATASET] [--max_epochs MAX_EPOCHS] [--rank RANK] [--patience PATIENCE] 
+                                 [--valid VALID] [--batch_size BATCH_SIZE] [--dtype {single,double}] [--debug] 
+                                 [--model MODEL] [--regularizer {N3,F2}] [--reg REG] [--optimizer OPTIMIZER] 
+                                 [--neg_sample_size NEG_SAMPLE_SIZE] [--dropout DROPOUT] [--init_size INIT_SIZE] 
+                                 [--learning_rate LEARNING_RATE] [--gamma GAMMA] [--bias BIAS] [--double_neg] 
+                                 [--multi_c] [--subgraph_amount SUBGRAPH_AMOUNT] 
+                                 [--subgraph_size_range SUBGRAPH_SIZE_RANGE] [--sampling_method {Entity,Feature}] 
+                                 [--rho RHO] [--random_seed RANDOM_SEED] [--entities_per_step ENTITIES_PER_STEP] 
+                                 [--enforcement ENFORCEMENT] [--aggregation_method {max,average}] 
+                                 [--model_dropout_factor MODEL_DROPOUT_FACTOR] 
+                                 [--logging {critical,error,warning,info,debug,data}]  [--wandb_project WANDB_PROJECT] 
+                                 [--only_valid] [--no_sampling] [--no_training] [--no_progress_bar] 
+                                 [--no_time_dependent_file_path] [--baseline]
 
 Ensemble Approaches for Link Prediction
 
@@ -57,9 +67,12 @@ options:
   --dtype {single,double}
                         Machine precision
   --debug               Only use 1000 examples for debugging
-  --model MODEL         JSON string of the mapping from embedding methods to subgraphs. - <subgraph number> in a mapping sets the specified subgraphs to this method - 'all' in a mapping sets all subgraphs to this method. This has the same effect as --model <MODEL_NAME> - 'rest' in a mapping allows all unmapped subgraphs to be embedded by this method. If nothing was specified in the mapping, all subgraphs can be embedded by
-                        the given embedding method.
-  --regularizer {N3,F2}
+  --model MODEL         JSON string of the mapping from embedding methods to subgraphs. 
+                        - <"subgraph number"> in a mapping sets the specified subgraphs to this method 
+                        - 'all' in a mapping sets all subgraphs to this method. This has the same effect as --model <"MODEL_NAME"> 
+                        - 'rest' in a mapping allows all unmapped subgraphs to be embedded by this method. 
+                           If nothing was specified in the mapping, all subgraphs can be embedded by the given embedding method.
+  --regularizer {N3,F2} 
                         Regularizer
   --reg REG             Regularization weight
   --optimizer OPTIMIZER
@@ -78,12 +91,15 @@ options:
   --subgraph_amount SUBGRAPH_AMOUNT
                         The amount of subgraphs, that will be present in the ensemble.
   --subgraph_size_range SUBGRAPH_SIZE_RANGE
-                        A tuple (min, normal) with the relative subgraph sizes, where - 'min' is the minimal relative subgraph size that will be used with Feature sampling. - 'normal' is the normal relative subgraph size, that needs to be reached under normal conditions.
+                        A tuple (min, normal) with the relative subgraph sizes, where 
+                        - 'min' is the minimal relative subgraph size that will be used with Feature sampling. 
+                        - 'normal' is the normal relative subgraph size, that needs to be reached under normal conditions.
   --sampling_method {Entity,Feature}
                         The sampling method, that will be used.
-  --rho RHO             Factor for Feature sampling, which specifies, how many relation names should be present in the subgraph, which is calculated by the formula 'rho * √|Relation Names|'.
+  --rho RHO             Factor for Feature sampling, which specifies, how many relation names should be present in the subgraph, 
+                        which is calculated by the formula 'rho * √|Relation Names|'.
   --random_seed RANDOM_SEED
-                        The seed for random processes. Type 'random' for a random seed.
+                        The seed for random processes. Set as 'random' for a random seed.
   --entities_per_step ENTITIES_PER_STEP
                         The amount of entities, that will be selected per sampling step.
   --enforcement ENFORCEMENT
@@ -93,7 +109,10 @@ options:
   --model_dropout_factor MODEL_DROPOUT_FACTOR
                         The multiplier for the first validation loss in order to disregard a model as diverged.
   --logging {critical,error,warning,info,debug,data}
-                        Determines the level of logging. - 'info': Contains information about the progress. - 'debug': Also contains information about variables, e.g. tensor sizes. - 'data': Also contains embedding weights and other data from variables, which is printed directly to the log.'
+                        Determines the level of logging. 
+                        - 'info': Contains information about the progress. 
+                        - 'debug': Also contains information about variables, e.g. tensor sizes. 
+                        - 'data': Also contains embedding weights and other data from variables, which is printed directly to the log.'
   --wandb_project WANDB_PROJECT
                         Turn on logging of metrics via Weights&Biases and synchronize with the given project name.
   --only_valid          Only calculate metrics on the validation set.
