@@ -44,9 +44,15 @@ def avg_both(mrs, mrrs, hits, amris, rank_deviations, epoch=None, active_subgrap
 
     if Constants.LOG_WANDB:
         # Online logging for metrics
-        wandb.log({'MR': mrs, 'MRR': mrrs, 'HITS@1': hits1_wandb, 'HITS@3': hits3_wandb, 'HITS@10': hits10_wandb,
-                   'AMRI': amris, 'rank_deviation': rank_deviations, 'epoch': epoch,
-                   'active_subgraphs': active_subgraphs})
+        print(epoch)
+        if epoch == "test":
+            wandb.log({'MR_test': mrs, 'MRR_test': mrrs, 'HITS@1_test': hits1_wandb, 'HITS@3_test': hits3_wandb,
+                       'HITS@10_test': hits10_wandb, 'AMRI_test': amris, 'rank_deviation_test': rank_deviations,
+                       'epoch_test': epoch, 'active_subgraphs_test': active_subgraphs})
+        else:
+            wandb.log({'MR': mrs, 'MRR': mrrs, 'HITS@1': hits1_wandb, 'HITS@3': hits3_wandb, 'HITS@10': hits10_wandb,
+                       'AMRI': amris, 'rank_deviation': rank_deviations, 'epoch': epoch,
+                       'active_subgraphs': active_subgraphs})
 
     # return {'MR': mrs, 'MRR': mrrs, 'hits@[1,3,10]': hits, 'AMRI': amris, 'rank_deviation': rank_deviations}
     return {'MR': {'average': mrs['average']}, 'MRR': {'average': mrrs['average']},
@@ -76,7 +82,7 @@ def format_metrics(metrics, split, metrics_change_absolut=None, metrics_change_p
         result += f"{format_metrics(metrics_change_absolut, split, init_str='change')}"
 
     if metrics_change_percent is not None:
-        result += f"{format_metrics(metrics_change_percent, split, percent=True,init_str='change %')}"
+        result += f"{format_metrics(metrics_change_percent, split, percent=True, init_str='change %')}"
 
     return result.rstrip("\n")
 

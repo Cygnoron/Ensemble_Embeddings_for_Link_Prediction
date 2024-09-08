@@ -180,8 +180,8 @@ def run_baseline(args, manual=False):
     if manual:
         args = parser.parse_args()
 
-        args.model = "TransE"
-        args.dataset = "NELL-995-h100"
+        args.model = "SEPA"
+        args.dataset = "WN18RR"
         args.max_epochs = 500
         args.rank = 32
         args.patience = 15
@@ -196,7 +196,7 @@ def run_baseline(args, manual=False):
         args.neg_sample_size = -1
         args.bias = "learn"
         args.double_neg = False
-        args.multi_c = False
+        args.multi_c = True
 
         args.regularizer = "N3"
         args.init_size = 0.001
@@ -330,17 +330,17 @@ def run_embedding_manual():
     # --- Setup parameters and args ---
 
     # dataset_in = "Debug"
-    # dataset_in = "WN18RR"
+    dataset_in = "WN18RR"
     # dataset_in = "FB15K-237"
-    dataset_in = "NELL-995-h100"
+    # dataset_in = "NELL-995-h100"
     # subgraph_amount = 30
     # subgraph_amount = 10
     subgraph_amount = 5
-    # subgraph_size_range = (0.6, 0.7)
-    subgraph_size_range = (0.2, 0.3)
-    # rho = 2.0
+    subgraph_size_range = (0.6, 0.7)
+    # subgraph_size_range = (0.2, 0.3)
+    rho = 2.0
     # rho = 1.0
-    rho = 0.5
+    # rho = 0.5
     model_dropout_factor = 10
     entities_per_step = 1
 
@@ -348,14 +348,14 @@ def run_embedding_manual():
                               no_progress_bar=False, subgraph_amount=subgraph_amount, wandb_project="False",
                               subgraph_size_range=subgraph_size_range, rho=rho, random_seed=42,
                               entities_per_step=entities_per_step, only_valid=False,
-                              sampling_method=Constants.ENTITY_SAMPLING,
-                              # sampling_method=Constants.FEATURE_SAMPLING,
+                              # sampling_method=Constants.ENTITY_SAMPLING,
+                              sampling_method=Constants.FEATURE_SAMPLING,
                               # aggregation_method=Constants.MAX_SCORE_AGGREGATION,
                               aggregation_method=Constants.AVERAGE_SCORE_AGGREGATION,
                               model_dropout_factor=model_dropout_factor)
 
     # --- Setup wandb ---
-    # args.wandb_project = "Experiments"
+    args.wandb_project = "Experiments"
     Constants.get_wandb(args.wandb_project)
 
     # --- Setup directories ---
@@ -419,18 +419,18 @@ def run_embedding_manual():
             args.kge_models = {
                 Constants.DIST_MULT: ["0:9", 4],
                 Constants.TRANS_E: list(range(20, 30)),
-                Constants.SEPA: ['all'],
+                Constants.ROTAT_E: ['all'],
                 Constants.COMPL_EX: list(range(10, 20)),
             }
 
             # general parameters
-            args.max_epochs = 50
+            args.max_epochs = 5
             args.rank = 32
             args.patience = 15
-            args.valid = 5
+            args.valid = 1
             args.dtype = "single"
-            args.batch_size = 1000
-            args.debug = False
+            args.batch_size = 500
+            args.debug = True
 
             # individually settable parameters
             args.learning_rate = {'TransE': 0.1, 'DistMult': 0.1,
@@ -495,13 +495,14 @@ def run_embedding_manual():
 
 if __name__ == "__main__":
     args = parser.parse_args()
+    # args.baseline = True
 
     if args.baseline:
         # Function to run baseline via command prompt
         run_baseline(args)
 
         # Function to run baseline manual via IDE
-        run_baseline(args, manual=True)
+        # run_baseline(args, manual=True)
 
     else:
         # Function to run ensemble via command prompt
@@ -509,6 +510,3 @@ if __name__ == "__main__":
 
         # Function to run ensemble manual via IDE
         # run_embedding_manual()
-
-
-

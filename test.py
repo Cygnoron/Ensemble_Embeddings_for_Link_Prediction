@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import pickle
 import traceback
 
 import torch
@@ -41,7 +42,8 @@ def test(model_dir, mode="test", paths=None):
 
     try:
         last_subgraph_path = os.path.join(args.dataset_dir, f"sub_{args.subgraph_amount - 1:03d}", "train.pickle")
-        open(last_subgraph_path, mode='r')
+        with open(last_subgraph_path, mode='r') as test_file:
+            test_subgraph = pickle.load(test_file)
         print(f"All subgraphs exist.")
 
     except Exception:
@@ -52,14 +54,14 @@ def test(model_dir, mode="test", paths=None):
             info_directory = util_files.get_info_directory_path(args.dataset_dir, args)
 
             parent_dataset = parent_dataset.split(os.sep)[1]
-            print(
-                f"Sampling {args.subgraph_amount} subgraphs with size {args.subgraph_size_range} from {parent_dataset}.")
+            print(f"Sampling {args.subgraph_amount} subgraphs with size {args.subgraph_size_range} and rho {args.rho} "
+                  f"from {parent_dataset}.")
 
             subsampling.sample_graph(info_directory, parent_dataset, args.dataset_dir, args.sampling_method,
                                      subgraph_amount=args.subgraph_amount,
                                      subgraph_size_range=args.subgraph_size_range,
                                      entities_per_step=args.entities_per_step,
-                                     rho=args.rho, no_progress_bar=args.no_progress_bar, random_seed=args.sampling_seed)
+                                     rho=args.rho, no_progress_bar=args.no_progress_bar)
 
     # create dataset
     if not hasattr(paths, "dataset_path"):
@@ -83,6 +85,8 @@ def test(model_dir, mode="test", paths=None):
     print(f"The model is located at {model_path}.")
     model.load_state_dict(torch.load(model_path))
 
+    args.batch_size = 250
+
     # eval
     filters = dataset.get_filters()
     if mode == "test":
@@ -93,6 +97,8 @@ def test(model_dir, mode="test", paths=None):
         metrics = avg_both(*model.compute_metrics(valid_examples, filters, args.sizes, batch_size=args.batch_size))
     else:
         raise ValueError(f"The given mode {mode} does not exist!")
+    del model
+
     return metrics, args
 
 
@@ -123,19 +129,22 @@ if __name__ == "__main__":
     split = "test"
     # dataset = "FB15K-237"
     # model = "ComplEx"
-    args.model_dir = os.path.join("Results")
+    # args.model_dir = os.path.join("Results", "Rank_32")
+    args.model_dir = os.path.abspath(os.path.join("D:", "Master_results"))
 
     test_baseline = True
     test_ensemble = True
     filter_inclusive = False
-    filter_exclusive = False
+    # filter_inclusive = True
+    # filter_exclusive = False
+    filter_exclusive = True
+
+    filters = ["WN18RR", "Feat"]
 
     # args = parser.parse_args()
     # to_list = os.path.join("data", args.model_dir)
     to_list = args.model_dir
     result_directories = os.listdir(to_list)
-
-    filters = ["WN18RR", "DistMult"]
 
     with (open(os.path.join("Results", f"general_{split}_metrics.txt"), "w+") as out_file):
         for result_directory in result_directories:

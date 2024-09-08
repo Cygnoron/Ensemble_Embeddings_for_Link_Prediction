@@ -16,12 +16,18 @@ cd ..
 source set_env.sh
 
 # Model parameters
-params_model=("TransE" "DistMult" "ComplEx" "RotatE")
-params_reg=(0.0 0.1 0.1 0.0)
-params_optimizer=("Adam" "Adagrad" "Adagrad" "Adagrad")
-params_neg_sample_size=(250 -1 -1 250)
-params_learning_rate=(0.001 0.1 0.1 0.001)
-params_bias=("learn" "learn" "none" "none")
+#params_model=("TransE" "DistMult" "ComplEx" "RotatE")
+params_model=("RotatE")
+#params_reg=(0.0 0.1 0.1 0.0)
+params_reg=(0.0)
+#params_optimizer=("Adam" "Adagrad" "Adagrad" "Adagrad")
+params_optimizer=("Adagrad")
+#params_neg_sample_size=(250 -1 -1 250)
+params_neg_sample_size=(250)
+#params_learning_rate=(0.001 0.1 0.1 0.001)
+params_learning_rate=(0.001)
+#params_bias=("learn" "learn" "none" "none")
+params_bias=("none")
 
 # Parse arguments
 rank="500"
@@ -56,7 +62,7 @@ for (( i=0; i<$NUM_GPUS; i++ ))
           --max_epochs 500 \
           --patience 15 \
           --valid 5 \
-          --batch_size 500 \
+          --batch_size 400 \
           --neg_sample_size "$neg_sample_size" \
           --init_size 0.001 \
           --learning_rate "$learning_rate" \
