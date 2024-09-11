@@ -41,11 +41,11 @@ def test(model_dir, mode="test", paths=None):
     paths.dataset_path = parent_dataset
 
     try:
+        print(f"Testing for sub_{args.subgraph_amount - 1:03d}")
         last_subgraph_path = os.path.join(args.dataset_dir, f"sub_{args.subgraph_amount - 1:03d}", "train.pickle")
-        with open(last_subgraph_path, mode='r') as test_file:
+        with open(last_subgraph_path, mode='rb') as test_file:
             test_subgraph = pickle.load(test_file)
         print(f"All subgraphs exist.")
-
     except Exception:
         if hasattr(paths, "init_config_name"):
             print("Subgraphs not found, resampling based on given parameters...")
@@ -130,7 +130,9 @@ if __name__ == "__main__":
     # dataset = "FB15K-237"
     # model = "ComplEx"
     # args.model_dir = os.path.join("Results", "Rank_32")
+    # args.model_dir = os.path.abspath(os.path.join("D:", "Results", "Rank_32"))
     args.model_dir = os.path.abspath(os.path.join("D:", "Results", "Rank_500"))
+    # args.model_dir = os.path.abspath(os.path.join("D:", "Results", "Multi_32"))
 
     test_baseline = True
     test_ensemble = True
@@ -139,7 +141,7 @@ if __name__ == "__main__":
     # filter_exclusive = False
     filter_exclusive = True
 
-    filters = ["WN18RR", "Feat", "TransE"]
+    filters = ["WN18RR", "Ent", "RotatE"]
 
     # args = parser.parse_args()
     # to_list = os.path.join("data", args.model_dir)
