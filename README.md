@@ -21,9 +21,9 @@ python datasets/process.py
 ---
 
 <!-- TODO get correct python version and update dependencies -->
-First, create a python 3.# environment and install dependencies:
+First, create a python 3.9 environment and install dependencies:
 <pre>
-virtualenv -p python3.7 hyp_kg_env
+virtualenv -p python3.9 hyp_kg_env
 source hyp_kg_env/bin/activate
 pip install -r requirements.txt
 </pre>
@@ -249,7 +249,7 @@ If you use this implementation, please cite the following paper [1]:
 ---
 
 <!-- TODO Get reference for citation -->
-[1] Braun, Tim, "Ensemble Approaches for Link Prediction", Masters' thesis, 2024
+[1] Braun, Tim, "Ensemble Approaches for Link Prediction", Masters' thesis at University of Stuttgart, 2024
 
 [2] Chami, Ines, et al. "Low-Dimensional Hyperbolic Knowledge Graph Embeddings." Annual Meeting of the Association for
 Computational Linguistics. 2020.
