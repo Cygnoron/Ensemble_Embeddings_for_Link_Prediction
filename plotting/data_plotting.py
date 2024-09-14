@@ -3,7 +3,6 @@ import os.path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import ticker
 from matplotlib.ticker import MaxNLocator
 
 if __name__ == '__main__':
@@ -48,37 +47,39 @@ if __name__ == '__main__':
     # ------------------------------------------------------------------------------------------------------------------
 
     # Define the file path
-    file_path = 'Subgraph_amount.csv'
-    file_path = os.path.join("plotting", file_path)
+    file_paths = ['Subgraph_amount_TransE.csv', 'Subgraph_amount_RotatE.csv']
+    # file_paths = ['Subgraph_amount_RotatE.csv']
+    for file_path in file_paths:
+        file_path = os.path.join("plotting", file_path)
 
-    # Load the data
-    data = pd.read_csv(file_path, delimiter=';')
+        # Load the data
+        data = pd.read_csv(file_path, delimiter=';')
 
-    # Get unique Subgraph_amount values
-    x = data['Subgraph_amount'].unique()
+        # Get unique Subgraph_amount values
+        x = data['Subgraph_amount'].unique()
 
-    # Initialize lists to store MRR values for each rho
-    mrr_values = []
-    rho_values = [-1, 0.5, 1, 2]
+        # Initialize lists to store MRR values for each rho
+        mrr_values = []
+        rho_values = [-1, 0.5, 1, 2]
 
-    # Collect MRR values for each rho
-    for rho in rho_values:
-        filtered_data = data.loc[data['rho'] == rho, ['Subgraph_amount', 'MRR']]
-        # Sort by Subgraph_amount to maintain order in the plot
-        filtered_data = filtered_data.sort_values(by='Subgraph_amount')
-        mrr_values.append(filtered_data['MRR'].values)
+        # Collect MRR values for each rho
+        for rho in rho_values:
+            filtered_data = data.loc[data['rho'] == rho, ['Subgraph_amount', 'MRR']]
+            # Sort by Subgraph_amount to maintain order in the plot
+            filtered_data = filtered_data.sort_values(by='Subgraph_amount')
+            mrr_values.append(filtered_data['MRR'].values)
 
-    # Create the plot
-    fig, ax = plt.subplots(1, 1, figsize=(9, 7))
-    ax.set_xlabel('Subgraph amount N')
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.set_ylabel('MRR [%]')
+        # Create the plot
+        fig, ax = plt.subplots(1, 1, figsize=(9, 7))
+        ax.set_xlabel('Subgraph amount N')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.set_ylabel('MRR [%]')
 
-    # Plot MRR values for each rho
-    for mrr_rho, rho in zip(mrr_values, rho_values):
-        ax.plot(x, mrr_rho, label=f'rho={rho}')
+        # Plot MRR values for each rho
+        for mrr_rho, rho in zip(mrr_values, rho_values):
+            ax.plot(x, mrr_rho, label=f'rho={rho}')
 
-    # Add legend and show plot
-    ax.legend(loc='best')
-    ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5, color='lightgrey')
-    plt.show()
+        # Add legend and show plot
+        ax.legend(loc='best')
+        ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5, color='lightgrey')
+        plt.show()

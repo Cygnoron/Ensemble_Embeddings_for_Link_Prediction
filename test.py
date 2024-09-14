@@ -4,9 +4,11 @@ import argparse
 import json
 import os
 import pickle
+import random
 import traceback
 
 import torch
+import tqdm
 
 import models
 from datasets.kg_dataset import KGDataset
@@ -28,10 +30,19 @@ def test(model_dir, mode="test", paths=None):
             config_name="config.json"
         )
 
+    torch.cuda.empty_cache()
+
     # load config
     with open(os.path.join(model_dir, paths.result_directory, paths.config_name), "r") as f:
         config = json.load(f)
         args = argparse.Namespace(**config)
+
+    if hasattr(args, "random_seed"):
+        random_seed = args.random_seed
+    else:
+        random_seed = args.sampling_seed
+    random.seed(random_seed)
+    print(f"Seed for random processes: {random_seed}")
 
     try:
         args.dataset_dir = args.dataset_dir.replace('/', os.sep)
@@ -40,14 +51,23 @@ def test(model_dir, mode="test", paths=None):
         parent_dataset = os.path.join("data", args.dataset)
     paths.dataset_path = parent_dataset
 
+    bar = tqdm.tqdm(total=args.subgraph_amount, unit=' subgraphs')
+    error = 0
     try:
-        print(f"Testing for sub_{args.subgraph_amount - 1:03d}")
-        last_subgraph_path = os.path.join(args.dataset_dir, f"sub_{args.subgraph_amount - 1:03d}", "train.pickle")
-        with open(last_subgraph_path, mode='rb') as test_file:
-            test_subgraph = pickle.load(test_file)
+        bar.set_description(f'Testing for subgraphs')
+        for subgraph_num in range(args.subgraph_amount):
+            error = subgraph_num
+            last_subgraph_path = os.path.join(args.dataset_dir, f"sub_{subgraph_num:03d}", "train.pickle")
+            with open(last_subgraph_path, mode='rb') as test_file:
+                test_subgraph_existence = pickle.load(test_file)
+            bar.update(1)
+            bar.set_postfix(testing=f"sub_{subgraph_num:03d}")
+        bar.close()
         print(f"All subgraphs exist.")
     except Exception:
+        bar.close()
         if hasattr(paths, "init_config_name"):
+            print(f"Error when testing for sub_{error:03d}.")
             print("Subgraphs not found, resampling based on given parameters...")
 
             util_files.check_directory(args.dataset_dir)
@@ -85,7 +105,7 @@ def test(model_dir, mode="test", paths=None):
     print(f"The model is located at {model_path}.")
     model.load_state_dict(torch.load(model_path))
 
-    args.batch_size = 250
+    args.batch_size = 100
 
     # eval
     filters = dataset.get_filters()
@@ -136,12 +156,12 @@ if __name__ == "__main__":
 
     test_baseline = True
     test_ensemble = True
-    filter_inclusive = False
-    # filter_inclusive = True
-    # filter_exclusive = False
-    filter_exclusive = True
+    # filter_inclusive = False
+    filter_inclusive = True
+    filter_exclusive = False
+    # filter_exclusive = True
 
-    filters = ["WN18RR", "Ent", "RotatE"]
+    filters = ["FB15K", "Base"]
 
     # args = parser.parse_args()
     # to_list = os.path.join("data", args.model_dir)
