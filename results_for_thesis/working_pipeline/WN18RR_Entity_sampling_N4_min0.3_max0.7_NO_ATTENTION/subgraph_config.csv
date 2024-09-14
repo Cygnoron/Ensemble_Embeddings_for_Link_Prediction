@@ -1,5 +1,0 @@
-original_kg;sampling_method;relation_names_rho;directory;sampling_time;subgraph_size_range;subgraph_size_rel;subgraph_num;subgraph_triples_amount;triples_deviation;subgraph_entities_amount;entities_per_step;subgraph_relation_names_amount;subgraph_relation_names
-WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_000;10.95;(0.3, 0.7);0.7;0;60785;0;32548;1;11;[4, 10, 0, 5, 1, 6, 3, 7, 2, 9, 8]
-WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_001;11.352;(0.3, 0.7);0.7;1;60786;1;32528;1;11;[4, 1, 10, 3, 6, 2, 5, 0, 7, 9, 8]
-WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_002;10.747;(0.3, 0.7);0.7;2;60788;3;32613;1;11;[4, 1, 5, 6, 3, 7, 10, 0, 2, 8, 9]
-WN18RR;Entity sampling;11;data\WN18RR_Entity_sampling_N4_min0.3_max0.7_mm05_dd20__HH14_MM42\sub_003;11.426;(0.3, 0.7);0.7;3;60785;0;32607;1;11;[4, 1, 6, 3, 5, 0, 10, 2, 8, 7, 9]
