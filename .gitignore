@@ -1,4 +1,3 @@
-**/data/**
 .idea/
 **/__pycache__/**
 venv/
@@ -6,14 +5,19 @@ venv/
 **/test
 **/train
 **/valid
-**/*.pickle
 **/**.drawio**
 /to_discuss/outline_training_testing_process.png
 **.pyc
 **.pt
 **/wandb/**
 
-#**/experiments/**
+**/data/FB15K/**
+**/data/FB237/**
+**/data/NELL-995/**
+**/data/WN/**
+**/data/YAGO3-10/**
+**/data/Debug/**
+
 **/to_discuss/**
 **/results_for_thesis/**
 **/logs/**
